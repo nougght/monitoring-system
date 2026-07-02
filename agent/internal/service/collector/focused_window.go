@@ -1,6 +1,6 @@
 //go:build windows
 
-package utils
+package collector
 
 import (
 	"syscall"
@@ -13,7 +13,7 @@ var (
 	getWindowText = user32.NewProc("GetWindowTextW")
 )
 
-func GetActiveWindowTitle() string {
+func GetFocusedWindowTitle() string {
 	hwnd, _, _ := getForeground.Call()
 	if hwnd == 0 {
 		return ""
