@@ -27,8 +27,8 @@ const Specifications = ({}: SpecificationsProps) => {
         <section>
             <h2>CPU</h2>
             <p>Модель: {specs?.modelName}</p>
-            <p>Ядер: {specs?.cores}</p>
-            <p>Логических ядер: {specs?.logicalCores}</p>
+            <p>Ядер: {specs?.coreCount}</p>
+            <p>Логических ядер: {specs?.logicalCoreCount}</p>
         </section>
         </div>
     )

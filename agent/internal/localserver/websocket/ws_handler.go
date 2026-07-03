@@ -47,7 +47,7 @@ func (h *WsHandler) HandleConnection(c *gin.Context) {
 func (h *WsHandler) HandleMessages(conn *websocket.Conn) {
 	defer conn.Close()
 
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(time.Millisecond * 100)
 	defer ticker.Stop()
 	go func() {
 		for {
@@ -59,6 +59,7 @@ func (h *WsHandler) HandleMessages(conn *websocket.Conn) {
 			log.Printf("received message: %s", message)
 		}
 	}()
+
 	for {
 		select {
 		case <-ticker.C:

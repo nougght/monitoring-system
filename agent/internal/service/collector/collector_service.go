@@ -22,6 +22,7 @@ type CollectorService struct {
 	metricsConsumer MetricsConsumer
 	metricsChan     chan model.Metric
 	wg              sync.WaitGroup
+	cancel          context.CancelFunc
 }
 
 func NewCollectorService(cfg *config.Config) *CollectorService {
@@ -37,16 +38,35 @@ func (c *CollectorService) SetMetricsConsumer(metricsConsumer MetricsConsumer) {
 	c.metricsConsumer = metricsConsumer
 }
 
-func (c *CollectorService) StartCollectors(ctx context.Context) {
-	c.wg.Add(1)
-	c.runFocusedWindowCollector(ctx)
+func (c *CollectorService) GetSpecifications(ctx context.Context) (*model.CpuSpecs, error) {
+	return getSpecifications(ctx)
+}
 
-	specs, err := c.GetSpecifications(ctx)
+// starts parallel metrics collectors
+func (c *CollectorService) StartCollectors(ctx context.Context) {
+	collectorsCtx, cancel := context.WithCancel(ctx)
+	c.cancel = cancel
+	c.runMetricsSender(collectorsCtx)
+
+	c.runFocusedWindowCollector(collectorsCtx)
+	c.runCpuPercentCollector(collectorsCtx)
+
+	specs, err := c.GetSpecifications(collectorsCtx)
 	if err != nil {
 		log.Println("failed to get specifications")
 	}
 	c.metricsConsumer.UpdateSpecs(specs)
 
+}
+
+// stops collectors with waiting
+func (c *CollectorService) StopCollectors() {
+	c.cancel()
+	c.wg.Wait()
+}
+
+// sends metrics from channel to consumer
+func (c *CollectorService) runMetricsSender(ctx context.Context) {
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
@@ -65,22 +85,45 @@ func (c *CollectorService) StartCollectors(ctx context.Context) {
 	}()
 }
 
-func (c *CollectorService) GetSpecifications(ctx context.Context) (*model.CpuSpecs, error) {
-	return getSpecifications(ctx)
-}
-
 func (c *CollectorService) runFocusedWindowCollector(ctx context.Context) {
 	ticker := time.NewTicker(c.config.FocusedWindowInterval)
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				focusedWindow, err := GetFocusedWindowTitle()
+				if err != nil {
+					log.Printf("failed to get focused window: %s", err.Error())
+					continue
+				}
+				log.Println("focused window " + focusedWindow)
+				c.metricsChan <- model.NewFocusedWindowMetric(focusedWindow)
+			}
+		}
+	}()
+}
+
+func (c *CollectorService) runCpuPercentCollector(ctx context.Context) {
+	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
 		for {
 			select {
 			case <-ctx.Done():
-				ticker.Stop()
 				return
-			case <-ticker.C:
-				focusedWindow := GetFocusedWindowTitle()
-				c.metricsChan <- model.NewFocusedWindowMetric(focusedWindow)
+			default:
+				percent, err := cpu.PercentWithContext(ctx, c.config.CpuPercentInterval, false)
+				if err != nil {
+					log.Printf("failed to get cpu percent: %s", err.Error())
+					continue
+				}
+				// log.Println("cpu percent", percent[0])
+				c.metricsChan <- model.NewCpuPercentMetric(percent[0])
 			}
 		}
 	}()

@@ -9,6 +9,10 @@ const (
 	MetricTypeFocusedWindow MetricType = "focused_window"
 )
 
+const (
+	EmptyFocusedWindow = "EMPTY_FOCUSED_WINDOW"
+)
+
 type Metric interface {
 	Type() MetricType
 	Timestamp() time.Time
@@ -47,6 +51,7 @@ func NewFocusedWindowMetric(value string) *FocusedWindowMetric {
 		timestamp: time.Now(),
 	}
 }
+
 func (m *FocusedWindowMetric) Type() MetricType {
 	return MetricTypeFocusedWindow
 }
@@ -55,10 +60,4 @@ func (m *FocusedWindowMetric) Timestamp() time.Time {
 }
 func (m *FocusedWindowMetric) Value() string {
 	return m.value
-}
-
-type Metrics struct {
-	FocusedWindow string    `json:"focusedWindow"`
-	CpuPercent    float64   `json:"cpuPercent"`
-	Timestamp     time.Time `json:"timestamp"`
 }

@@ -15,14 +15,15 @@ interface Tab {
 }
 
 function App() {
-    const [focusedWindow, setFocusedWindow] = useState("No data");
+    const [metrics, setMetrics] = useState<Metrics | null>(null);
     const [activeTab, setActiveTab] = useState(0)
 
     const tabs: Tab[] = [
         {
             text: "Monitoring",
             content: <div><Monitoring
-                focusedWindow={focusedWindow} /></div>
+                focusedWindow={metrics?.focusedWindow}
+                cpuPercent={metrics?.cpuPercent} /></div>
         },
         {
             text: "Specifications",
@@ -45,7 +46,7 @@ function App() {
             console.log("Message from server ", event.data);
             const metrics = JSON.parse(event.data) as Metrics;
             console.log("metrics", metrics);
-            setFocusedWindow(metrics.focusedWindow);
+            setMetrics(metrics);
         });
     }, []);
 

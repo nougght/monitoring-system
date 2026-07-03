@@ -26,6 +26,10 @@ func (s *Service) StartServices(ctx context.Context) {
 	s.collectorService.StartCollectors(ctx)
 }
 
+func (s *Service) StopServices() {
+	s.collectorService.StopCollectors()
+}
+
 func (s *Service) GetMetricsService() *metrics.MetricsService {
 	return s.metricsService
 }

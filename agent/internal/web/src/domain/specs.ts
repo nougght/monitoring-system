@@ -2,6 +2,6 @@
 
 export interface CpuSpecs {
     modelName: string 
-    cores: number
-    logicalCores: number
+    coreCount: number
+    logicalCoreCount: number
 }

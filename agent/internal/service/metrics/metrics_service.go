@@ -29,7 +29,7 @@ func NewMetricsService(cfg *config.Config, refreshSpecsFunc func(ctx context.Con
 }
 
 func (m *MetricsService) UpdateMetric(metric model.Metric) {
-	log.Println("update metric", metric.Type())
+	// log.Println("update metric", metric.Type())
 	switch metric.Type() {
 	case model.MetricTypeFocusedWindow:
 		m.focusedWindow.Store(metric.(*model.FocusedWindowMetric).Value())
@@ -54,19 +54,24 @@ func (m *MetricsService) UpdateSpecs(specs *model.CpuSpecs) {
 	m.specs = specs
 }
 
-func (m *MetricsService) GetFocusedWindow() string {
-	if m.focusedWindow.Load() == nil {
-		return ""
+func (m *MetricsService) GetFocusedWindow() *string {
+	val := m.focusedWindow.Load()
+	if val == nil {
+		return nil
 	}
-	return m.focusedWindow.Load().(string)
+	title := val.(string)
+	return &title
 }
 
-func (m *MetricsService) GetCpuPercent() float64 {
-	if m.cpuPercent.Load() == nil {
-		return 0
+func (m *MetricsService) GetCpuPercent() *float64 {
+	val := m.cpuPercent.Load()
+	if val == nil {
+		return nil
 	}
-	return m.cpuPercent.Load().(float64)
+	percent := val.(float64)
+	return &percent
 }
+
 func (m *MetricsService) GetMetrics() *model.Metrics {
 	return &model.Metrics{
 		FocusedWindow: m.GetFocusedWindow(),

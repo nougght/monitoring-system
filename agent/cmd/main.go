@@ -21,36 +21,6 @@ import (
 func main() {
 	cfg := config.LoadConfig("config.yaml")
 
-	// fmt.Println(cfg)
-	// v, _ := mem.VirtualMemory()
-
-	// // almost every return value is a struct
-	// fmt.Printf("Total: %v, Free:%v, UsedPercent:%f%%\n", v.Total, v.Free, v.UsedPercent)
-
-	// c, _ := cpu.Percent(time.Second*2, true)
-	// fmt.Println(c)
-
-	// fmt.Println(v)
-
-	// p, _ := process.Processes()
-	// sort.Slice(p, func(i, j int) bool {
-	// 	perc1, _ := p[i].MemoryPercent()
-	// 	perc2, _ := p[j].MemoryPercent()
-	// 	return perc1 > perc2
-	// })
-	// // for _, proc := range p {
-	// // 	name, _ := proc.Name()
-	// // 	perc, _ := proc.MemoryPercent()
-	// // 	fmt.Println(name, perc)
-	// // }
-	// getSpecifications()
-
-	// fmt.Println("window")
-	// fmt.Println(utils.GetActiveWindowTitle())
-
-	// convert to JSON. String() is also implemented
-	// ui.Start()
-
 	rootCtx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
@@ -84,9 +54,9 @@ func main() {
 		<-rootCtx.Done()
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		if err := server.Shutdown(ctx); err != nil {
-			shutdownChan <- err
-		}
+		err := server.Shutdown(ctx)
+		service.StopServices()
+		shutdownChan <- err
 	}()
 
 	log.Println("http server started on :8088")
@@ -98,7 +68,7 @@ func main() {
 
 	err = <-shutdownChan
 	if err != nil {
-		log.Fatal("shutdown: ", err)
+		log.Fatal("shutdown error: ", err)
 	}
 	log.Println("http server stopped")
 }
