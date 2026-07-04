@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -14,10 +15,10 @@ type Config struct {
 	CpuPercentInterval    time.Duration `yaml:"cpu_percent_interval"`
 }
 
-func LoadConfig(path string) *Config {
+func LoadConfig(path string) (*Config, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		log.Panicf("failed to open file %s: %s", path, err.Error())
+		return nil, fmt.Errorf("failed to open file %s: %w", path, err.Error())
 	}
 	defer f.Close()
 	data, err := io.ReadAll(f)
@@ -31,5 +32,5 @@ func LoadConfig(path string) *Config {
 		log.Panicf("failed to decode config: %s", err.Error())
 	}
 
-	return cfg
+	return cfg, nil
 }

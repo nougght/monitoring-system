@@ -38,9 +38,22 @@ const Specifications = ({ }: SpecificationsProps) => {
             </section>
             <section>
                 <h2>CPU</h2>
-                <p>Модель: {specs?.cpu?.modelName}</p>
-                <p>Ядер: {specs?.cpu?.coreCount}</p>
-                <p>Логических ядер: {specs?.cpu?.logicalCoreCount}</p>
+                <h3>{specs?.cpu?.modelName}</h3>
+                <p>Производитель: {specs?.cpu?.manufacturer}</p>
+                <p>Архитектура: {specs?.cpu?.architecture}</p>
+                <p>Сокет: {specs?.cpu?.socketDesignation}</p>
+                <p>Количество ядер: {specs?.cpu?.numberOfCores}</p>
+                <p>Количество доступных ядер: {specs?.cpu?.numberOfEnabledCore}</p>
+                <p>Количество логических ядер: {specs?.cpu?.numberOfLogicalProcessors}</p>
+                <p>Размер L2 кэша: {specs?.cpu?.l2CacheSize == 0 ? 'Неизвестно' : `${specs?.cpu?.l2CacheSize / 1024} Mb`}</p>
+                <p>Размер L3 кэша: {specs?.cpu?.l3CacheSize == 0 ? 'Неизвестно' : `${specs?.cpu?.l3CacheSize / 1024} Mb`}</p>
+                <p>Состояние: {specs?.cpu?.availability}</p>
+                <p>Текущая частота процессора: {specs?.cpu?.currentClockSpeed}</p>
+                <p>Максимальная частота процессора: {specs?.cpu?.maxClockSpeed}</p>
+                <p>Идентификатор процессора: {specs?.cpu?.processorId}</p>
+                <p>Степпинг: {specs?.cpu?.stepping}</p>
+                <p>Разрядность процессора: {specs?.cpu?.dataWidth}</p>
+                <p>Виртуализация: {specs?.cpu?.virtualizationFirmwareEnabled ? 'Включена' : 'Выключена'}</p>
             </section>
             <section>
                 <h2>Диски</h2>

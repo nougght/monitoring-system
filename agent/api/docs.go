@@ -70,14 +70,104 @@ const docTemplate = `{
         "CpuSpecs": {
             "type": "object",
             "properties": {
-                "coreCount": {
+                "architecture": {
+                    "description": "архитектура https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-processor",
+                    "type": "string",
+                    "enum": [
+                        "x86",
+                        "x64",
+                        "mips",
+                        "alpha",
+                        "powerpc",
+                        "arm",
+                        "ia64",
+                        "itanium",
+                        "arm64",
+                        "other"
+                    ]
+                },
+                "availability": {
+                    "description": "состояние https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-processor",
+                    "type": "string",
+                    "enum": [
+                        "other",
+                        "unknown",
+                        "running",
+                        "warning",
+                        "inTest",
+                        "notApplicable",
+                        "powerOff",
+                        "offLine",
+                        "offDuty",
+                        "degraded",
+                        "notInstalled",
+                        "installError",
+                        "powerSaveUnknown",
+                        "powerSaveLowPowerMode",
+                        "powerSaveStandby",
+                        "powerCycle",
+                        "powerSaveWarning",
+                        "paused",
+                        "notReady",
+                        "notConfigured",
+                        "quiesced"
+                    ]
+                },
+                "currentClockSpeed": {
+                    "description": "текущая частота процессора",
                     "type": "integer"
                 },
-                "logicalCoreCount": {
+                "dataWidth": {
+                    "description": "разрядность процессора",
+                    "type": "integer"
+                },
+                "l2CacheSize": {
+                    "description": "размер L2 кэша",
+                    "type": "integer"
+                },
+                "l3CacheSize": {
+                    "description": "размер L3 кэша",
+                    "type": "integer"
+                },
+                "manufacturer": {
+                    "description": "производитель",
+                    "type": "string"
+                },
+                "maxClockSpeed": {
+                    "description": "максимальная частота процессора(низкая точность)",
                     "type": "integer"
                 },
                 "modelName": {
+                    "description": "модель процессора",
                     "type": "string"
+                },
+                "numberOfCores": {
+                    "description": "количество ядер",
+                    "type": "integer"
+                },
+                "numberOfEnabledCore": {
+                    "description": "количество доступных ядер",
+                    "type": "integer"
+                },
+                "numberOfLogicalProcessors": {
+                    "description": "количество логических ядер(потоков)",
+                    "type": "integer"
+                },
+                "processorId": {
+                    "description": "идентификатор процессора",
+                    "type": "string"
+                },
+                "socketDesignation": {
+                    "description": "сокет",
+                    "type": "string"
+                },
+                "stepping": {
+                    "description": "степпинг",
+                    "type": "string"
+                },
+                "virtualizationFirmwareEnabled": {
+                    "description": "включена ли виртуализация",
+                    "type": "boolean"
                 }
             }
         },

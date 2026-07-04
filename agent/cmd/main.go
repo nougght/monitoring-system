@@ -28,8 +28,13 @@ import (
 // @host            localhost:8088
 // @BasePath        /
 func main() {
-	cfg := config.LoadConfig("config.yaml")
-
+	cfg, err := config.LoadConfig("config.yaml")
+	if err != nil {
+		cfg, err = config.LoadConfig("../config.yaml")
+		if err != nil {
+			log.Fatal("failed to load config: ", err)
+		}
+	}
 	rootCtx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 

@@ -3,14 +3,17 @@ package collector
 import (
 	"agent/internal/config"
 	"agent/internal/model"
+	"agent/internal/utils"
 	"context"
 	"log"
+	"runtime"
 	"sync"
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/shirou/gopsutil/v4/host"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
 type MetricsConsumer interface {
@@ -166,11 +169,28 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 	// 	return nil, err
 	// }
 	// log.Printf("user info: %v", userInfo)
-	// virtual, err := mem.VirtualMemory()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// log.Printf("virtual memory: %v", virtual)
+	virtual, err := mem.VirtualMemory()
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("virtual memory: %v", virtual)
+	memoryDetails, err := GetMemoryDetails()
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("memory details: %v\n", memoryDetails)
+	cpuDetails, err := GetProcessorDetails()
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("processor details: %v\n", cpuDetails[0])
+
+	osArch := runtime.GOARCH
+	if osArch == "amd64" {
+		osArch = "x64"
+	} else if osArch == "386" {
+		osArch = "x86"
+	}
 	// swap, err := mem.SwapMemory()
 	// if err != nil {
 	// 	return nil, err
@@ -199,6 +219,7 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	hostSpecs := model.HostSpecs{
 		Hostname:        hostInfo.Hostname,
 		OsType:          hostInfo.OS,
@@ -207,11 +228,26 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		OsKernelVersion: hostInfo.KernelVersion,
 		OsArch:          hostInfo.KernelArch,
 	}
+
 	cpuSpecs := model.CpuSpecs{
-		ModelName:        cpuInfo[0].ModelName,
-		CoreCount:        coreCount,
-		LogicalCoreCount: logicalCoreCount,
+		ModelName:                     cpuInfo[0].ModelName,
+		Architecture:                  utils.ConvertWinCpuArch(cpuDetails[0].Architecture),
+		Availability:                  utils.ConvertWinCpuAvailability(cpuDetails[0].Availability),
+		CurrentClockSpeed:             cpuDetails[0].CurrentClockSpeed,
+		DataWidth:                     cpuDetails[0].DataWidth,
+		L2CacheSize:                   cpuDetails[0].L2CacheSize,
+		L3CacheSize:                   cpuDetails[0].L3CacheSize,
+		Manufacturer:                  cpuDetails[0].Manufacturer,
+		MaxClockSpeed:                 cpuDetails[0].MaxClockSpeed,
+		NumberOfCores:                 uint32(coreCount),
+		NumberOfEnabledCore:           uint32(logicalCoreCount),
+		NumberOfLogicalProcessors:     uint32(logicalCoreCount),
+		ProcessorId:                   cpuDetails[0].ProcessorId,
+		SocketDesignation:             cpuDetails[0].SocketDesignation,
+		Stepping:                      cpuDetails[0].Stepping,
+		VirtualizationFirmwareEnabled: cpuDetails[0].VirtualizationFirmwareEnabled,
 	}
+
 	return &model.Specs{
 		Host: hostSpecs,
 		CPU:  cpuSpecs,

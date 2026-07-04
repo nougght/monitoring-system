@@ -51,7 +51,7 @@ func (m *MetricsService) GetSpecs(ctx context.Context) (*model.Specs, error) {
 		}
 		m.specs = specs
 	}
-	return m.specs, nil
+	return m.refreshSpecsFunc(ctx)
 }
 
 func (m *MetricsService) UpdateSpecs(specs *model.Specs) {

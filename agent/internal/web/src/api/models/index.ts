@@ -6,6 +6,8 @@
  */
 
 export * from './cpuSpecs';
+export * from './cpuSpecsArchitecture';
+export * from './cpuSpecsAvailability';
 export * from './diskSpecs';
 export * from './getMetrics500';
 export * from './getSpecs500';

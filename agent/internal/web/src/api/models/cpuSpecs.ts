@@ -4,9 +4,40 @@
  * Monitoring Agent API
  * OpenAPI spec version: 1.0
  */
+import type { CpuSpecsArchitecture } from './cpuSpecsArchitecture';
+import type { CpuSpecsAvailability } from './cpuSpecsAvailability';
 
 export interface CpuSpecs {
-  coreCount?: number;
-  logicalCoreCount?: number;
+  /** архитектура https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-processor */
+  architecture?: CpuSpecsArchitecture;
+  /** состояние https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-processor */
+  availability?: CpuSpecsAvailability;
+  /** текущая частота процессора */
+  currentClockSpeed?: number;
+  /** разрядность процессора */
+  dataWidth?: number;
+  /** размер L2 кэша */
+  l2CacheSize?: number;
+  /** размер L3 кэша */
+  l3CacheSize?: number;
+  /** производитель */
+  manufacturer?: string;
+  /** максимальная частота процессора(низкая точность) */
+  maxClockSpeed?: number;
+  /** модель процессора */
   modelName?: string;
+  /** количество ядер */
+  numberOfCores?: number;
+  /** количество доступных ядер */
+  numberOfEnabledCore?: number;
+  /** количество логических ядер(потоков) */
+  numberOfLogicalProcessors?: number;
+  /** идентификатор процессора */
+  processorId?: string;
+  /** сокет */
+  socketDesignation?: string;
+  /** степпинг */
+  stepping?: string;
+  /** включена ли виртуализация */
+  virtualizationFirmwareEnabled?: boolean;
 }
