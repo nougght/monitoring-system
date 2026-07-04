@@ -7,9 +7,11 @@
 import type { CpuSpecs } from './cpuSpecs';
 import type { DiskSpecs } from './diskSpecs';
 import type { HostSpecs } from './hostSpecs';
+import type { MemorySpecs } from './memorySpecs';
 
 export interface Specs {
   cpu?: CpuSpecs;
   disk?: DiskSpecs[];
   host?: HostSpecs;
+  memory?: MemorySpecs;
 }

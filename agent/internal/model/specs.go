@@ -41,10 +41,56 @@ const (
 	CpuAvailabilityQuiesced              = "Quiesced"
 )
 
+type PhysicalMemoryType string
+
+const (
+	PhysicalMemoryTypeUnknown = "Unknown"
+	PhysicalMemoryTypeDDR2    = "DDR2"
+	PhysicalMemoryTypeDDR3    = "DDR3"
+	PhysicalMemoryTypeDDR4    = "DDR4"
+	PhysicalMemoryTypeLPDDR2  = "LPDDR2"
+	PhysicalMemoryTypeLPDDR3  = "LPDDR3"
+	PhysicalMemoryTypeLPDDR4  = "LPDDR4"
+	PhysicalMemoryTypeDDR5    = "DDR5"
+	PhysicalMemoryTypeLPDDR5  = "LPDDR5"
+	PhysicalMemoryTypeOther   = "Other"
+)
+
+type PhysicalMemoryFormFactor string
+
+const (
+	PhysicalMemoryFormFactorUnknown = "Unknown"
+
+	PhysicalMemoryFormFactorOther       = "Other"
+	PhysicalMemoryFormFactorSIP         = "SIP"
+	PhysicalMemoryFormFactorDIP         = "DIP"
+	PhysicalMemoryFormFactorZIP         = "ZIP"
+	PhysicalMemoryFormFactorSOJ         = "SOJ"
+	PhysicalMemoryFormFactorProprietary = "Proprietary"
+	PhysicalMemoryFormFactorSIMM        = "SIMM"
+	PhysicalMemoryFormFactorDIMM        = "DIMM"
+	PhysicalMemoryFormFactorTSOP        = "TSOP"
+	PhysicalMemoryFormFactorPGA         = "PGA"
+	PhysicalMemoryFormFactorRIMM        = "RIMM"
+	PhysicalMemoryFormFactorSODIMM      = "SODIMM"
+	PhysicalMemoryFormFactorSRIMM       = "SRIMM"
+	PhysicalMemoryFormFactorSMD         = "SMD"
+	PhysicalMemoryFormFactorSSMP        = "SSMP"
+	PhysicalMemoryFormFactorQFP         = "QFP"
+	PhysicalMemoryFormFactorTQFP        = "TQFP"
+	PhysicalMemoryFormFactorSOIC        = "SOIC"
+	PhysicalMemoryFormFactorLCC         = "LCC"
+	PhysicalMemoryFormFactorPLCC        = "PLCC"
+	PhysicalMemoryFormFactorBGA         = "BGA"
+	PhysicalMemoryFormFactorFPBGA       = "FPBGA"
+	PhysicalMemoryFormFactorLGA         = "LGA"
+)
+
 type Specs struct {
-	Host HostSpecs     `json:"host"`
-	CPU  CpuSpecs      `json:"cpu"`
-	Disk DiskSpecsList `json:"disk"`
+	Host   HostSpecs     `json:"host"`
+	CPU    CpuSpecs      `json:"cpu"`
+	Disk   DiskSpecsList `json:"disk"`
+	Memory MemorySpecs   `json:"memory"`
 } // @name Specs
 
 type HostSpecs struct {
@@ -78,17 +124,28 @@ type CpuSpecs struct {
 } // @name CpuSpecs
 
 type MemorySpecs struct {
-	Total uint64 `json:"total"`
+	Total              uint64               `json:"total"`              // общий объем памяти
+	PhysicalMemoryList []PhysicalMemoryInfo `json:"physicalMemoryList"` // физические плашки памяти
 } // @name MemorySpecs
 
+// информация о физической плашке памяти
 type PhysicalMemoryInfo struct {
-	Capacity     uint64 `json:"capacity"`
-	Location     string `json:"location"`
-	Speed        uint32 `json:"speed"`
-	Manufacturer string `json:"manufacturer"`
-	Model        string `json:"model"`
-	PartNumber   string `json:"partNumber"`
-}
+	DeviceLocator string `json:"deviceLocator"` // расположение памяти
+	// тип памяти
+	MemoryType PhysicalMemoryType `json:"memoryType" enums:"unknown,ddr2,ddr3,ddr4,lpddr2,lpddr3,lpddr4,ddr5,lpddr5,other"`
+	Capacity   uint64             `json:"capacity"` // объем
+	// форм-фактор памяти
+	FormFactor           PhysicalMemoryFormFactor `json:"formFactor" enums:"unknown,other,sip,dip,zip,soj,proprietary,simm,dimm,tsop,pga,rimm,sodimm,srimm,smd,ssmp,qfp,tqfp,soic,lcc,plcc,bga,fpgba,lga"`
+	Speed                uint32                   `json:"speed"`                // поддерживаемя частота памяти
+	ConfiguredClockSpeed uint32                   `json:"configuredClockSpeed"` // настроенная частота памяти
+	Manufacturer         string                   `json:"manufacturer"`         // производитель
+	ModelName            string                   `json:"modelName"`            // модель/партия памяти
+	SerialNumber         string                   `json:"serialNumber"`         // серийный номер
+	BankLabel            string                   `json:"bankLabel"`            // подключение памяти
+	HotSwappable         bool                     `json:"hotSwappable"`         // можно менять память без выключения системы
+	Removable            bool                     `json:"removable"`            // можно ли вынимать память
+	Replaceable          bool                     `json:"replaceable"`          // можно ли заменять память
+} // @name PhysicalMemoryInfo
 
 type DiskSpecs struct {
 	Device string `json:"device"`

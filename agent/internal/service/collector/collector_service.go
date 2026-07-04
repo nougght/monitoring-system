@@ -179,6 +179,21 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		return nil, err
 	}
 	log.Printf("memory details: %v\n", memoryDetails)
+	physicalMemoryList := make([]model.PhysicalMemoryInfo, len(memoryDetails))
+	for i, m := range memoryDetails {
+		physicalMemoryList[i].BankLabel = m.BankLabel
+		physicalMemoryList[i].Capacity = m.Capacity
+		physicalMemoryList[i].ConfiguredClockSpeed = m.ConfiguredClockSpeed
+		physicalMemoryList[i].DeviceLocator = m.DeviceLocator
+		physicalMemoryList[i].FormFactor = utils.ConvertWinPhysicalFormFactor(m.FormFactor)
+		physicalMemoryList[i].HotSwappable = m.HotSwappable
+		physicalMemoryList[i].Manufacturer = m.Manufacturer
+		physicalMemoryList[i].MemoryType = utils.ConvertWinPhysicalMemoryType(m.SMBIOSMemoryType)
+		physicalMemoryList[i].ModelName = m.PartNumber
+		physicalMemoryList[i].Removable = m.Removable
+		physicalMemoryList[i].Replaceable = m.Replaceable
+		physicalMemoryList[i].SerialNumber = m.SerialNumber
+	}
 	cpuDetails, err := GetProcessorDetails()
 	if err != nil {
 		return nil, err
@@ -248,9 +263,14 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		VirtualizationFirmwareEnabled: cpuDetails[0].VirtualizationFirmwareEnabled,
 	}
 
+	memorySpecs := model.MemorySpecs{
+		Total:              virtual.Total,
+		PhysicalMemoryList: physicalMemoryList,
+	}
 	return &model.Specs{
-		Host: hostSpecs,
-		CPU:  cpuSpecs,
-		Disk: diskSpecsList,
+		Host:   hostSpecs,
+		CPU:    cpuSpecs,
+		Disk:   diskSpecsList,
+		Memory: memorySpecs,
 	}, nil
 }

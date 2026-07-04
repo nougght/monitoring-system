@@ -65,6 +65,27 @@ const Specifications = ({ }: SpecificationsProps) => {
                     </div>
                 ))}
             </section>
+            <section>
+                <h2>Оперативная память</h2>
+                <p>Общий объем: {specs?.memory?.total}</p>
+                {specs?.memory?.physicalMemoryList?.map((mem, i) => (
+                    <div key={i}>
+                        <h3>{mem.deviceLocator}</h3>
+                        <p>Тип памяти: {mem.memoryType?.toString()}</p>
+                        <p>Форм-фактор: {mem.formFactor?.toString()}</p>
+                        <p>Объем: {convertBytesToGB(mem.capacity).toFixed(2)} GB</p>
+                        <p>Поддерживаемя частота: {mem.speed}</p>
+                        <p>Настроенная частота: {mem.configuredClockSpeed}</p>
+                        <p>Производитель: {mem.manufacturer}</p>
+                        <p>Модель: {mem.modelName}</p>
+                        <p>Серийный номер: {mem.serialNumber}</p>
+                        <p>Подключение: {mem.bankLabel}</p>
+                        <p>Можно менять память без выключения системы: {mem.hotSwappable ? 'Да' : 'Нет'}</p>
+                        <p>Можно ли вынимать память: {mem.removable ? 'Да' : 'Нет'}</p>
+                        <p>Можно ли заменять память: {mem.replaceable ? 'Да' : 'Нет'}</p>
+                    </div>
+                ))}
+            </section>
         </div>
     );
 };

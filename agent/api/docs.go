@@ -214,6 +214,22 @@ const docTemplate = `{
                 }
             }
         },
+        "MemorySpecs": {
+            "type": "object",
+            "properties": {
+                "physicalMemoryList": {
+                    "description": "физические плашки памяти",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PhysicalMemoryInfo"
+                    }
+                },
+                "total": {
+                    "description": "общий объем памяти",
+                    "type": "integer"
+                }
+            }
+        },
         "Metrics": {
             "type": "object",
             "properties": {
@@ -225,6 +241,101 @@ const docTemplate = `{
                 },
                 "timestamp": {
                     "type": "string"
+                }
+            }
+        },
+        "PhysicalMemoryInfo": {
+            "type": "object",
+            "properties": {
+                "bankLabel": {
+                    "description": "подключение памяти",
+                    "type": "string"
+                },
+                "capacity": {
+                    "description": "объем",
+                    "type": "integer"
+                },
+                "configuredClockSpeed": {
+                    "description": "настроенная частота памяти",
+                    "type": "integer"
+                },
+                "deviceLocator": {
+                    "description": "расположение памяти",
+                    "type": "string"
+                },
+                "formFactor": {
+                    "description": "форм-фактор памяти",
+                    "type": "string",
+                    "enum": [
+                        "unknown",
+                        "other",
+                        "sip",
+                        "dip",
+                        "zip",
+                        "soj",
+                        "proprietary",
+                        "simm",
+                        "dimm",
+                        "tsop",
+                        "pga",
+                        "rimm",
+                        "sodimm",
+                        "srimm",
+                        "smd",
+                        "ssmp",
+                        "qfp",
+                        "tqfp",
+                        "soic",
+                        "lcc",
+                        "plcc",
+                        "bga",
+                        "fpgba",
+                        "lga"
+                    ]
+                },
+                "hotSwappable": {
+                    "description": "можно менять память без выключения системы",
+                    "type": "boolean"
+                },
+                "manufacturer": {
+                    "description": "производитель",
+                    "type": "string"
+                },
+                "memoryType": {
+                    "description": "тип памяти",
+                    "type": "string",
+                    "enum": [
+                        "unknown",
+                        "ddr2",
+                        "ddr3",
+                        "ddr4",
+                        "lpddr2",
+                        "lpddr3",
+                        "lpddr4",
+                        "ddr5",
+                        "lpddr5",
+                        "other"
+                    ]
+                },
+                "modelName": {
+                    "description": "модель/партия памяти",
+                    "type": "string"
+                },
+                "removable": {
+                    "description": "можно ли вынимать память",
+                    "type": "boolean"
+                },
+                "replaceable": {
+                    "description": "можно ли заменять память",
+                    "type": "boolean"
+                },
+                "serialNumber": {
+                    "description": "серийный номер",
+                    "type": "string"
+                },
+                "speed": {
+                    "description": "поддерживаемя частота памяти",
+                    "type": "integer"
                 }
             }
         },
@@ -242,6 +353,9 @@ const docTemplate = `{
                 },
                 "host": {
                     "$ref": "#/definitions/HostSpecs"
+                },
+                "memory": {
+                    "$ref": "#/definitions/MemorySpecs"
                 }
             }
         }

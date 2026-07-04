@@ -75,3 +75,81 @@ func ConvertWinCpuAvailability(availability uint16) model.CpuAvailability {
 		return model.CpuAvailabilityOther
 	}
 }
+
+func ConvertWinPhysicalMemoryType(memoryType uint16) model.PhysicalMemoryType {
+	switch memoryType {
+	case 20:
+		return model.PhysicalMemoryTypeDDR2
+	case 21:
+		return model.PhysicalMemoryTypeDDR3
+	case 24:
+		return model.PhysicalMemoryTypeDDR4
+	case 27:
+		return model.PhysicalMemoryTypeLPDDR2
+	case 29:
+		return model.PhysicalMemoryTypeLPDDR3
+	case 30:
+		return model.PhysicalMemoryTypeLPDDR4
+	case 34:
+		return model.PhysicalMemoryTypeDDR5
+	case 35:
+		return model.PhysicalMemoryTypeLPDDR5
+	default:
+		return model.PhysicalMemoryTypeUnknown
+	}
+}
+
+func ConvertWinPhysicalFormFactor(memoryType uint16) model.PhysicalMemoryFormFactor {
+	switch memoryType {
+	case 0:
+		return model.PhysicalMemoryFormFactorUnknown
+	case 1:
+		return model.PhysicalMemoryFormFactorOther
+	case 2:
+		return model.PhysicalMemoryFormFactorSIP
+	case 3:
+		return model.PhysicalMemoryFormFactorDIP
+	case 4:
+		return model.PhysicalMemoryFormFactorZIP
+	case 5:
+		return model.PhysicalMemoryFormFactorSOJ
+	case 6:
+		return model.PhysicalMemoryFormFactorProprietary
+	case 7:
+		return model.PhysicalMemoryFormFactorSIMM
+	case 8:
+		return model.PhysicalMemoryFormFactorDIMM
+	case 9:
+		return model.PhysicalMemoryFormFactorTSOP
+	case 10:
+		return model.PhysicalMemoryFormFactorPGA
+	case 11:
+		return model.PhysicalMemoryFormFactorRIMM
+	case 12:
+		return model.PhysicalMemoryFormFactorSODIMM
+	case 13:
+		return model.PhysicalMemoryFormFactorSRIMM
+	case 14:
+		return model.PhysicalMemoryFormFactorSMD
+	case 15:
+		return model.PhysicalMemoryFormFactorSSMP
+	case 16:
+		return model.PhysicalMemoryFormFactorQFP
+	case 17:
+		return model.PhysicalMemoryFormFactorTQFP
+	case 18:
+		return model.PhysicalMemoryFormFactorSOIC
+	case 19:
+		return model.PhysicalMemoryFormFactorLCC
+	case 20:
+		return model.PhysicalMemoryFormFactorPLCC
+	case 21:
+		return model.PhysicalMemoryFormFactorBGA
+	case 22:
+		return model.PhysicalMemoryFormFactorFPBGA
+	case 23:
+		return model.PhysicalMemoryFormFactorLGA
+	default:
+		return model.PhysicalMemoryFormFactorUnknown
+	}
+}
