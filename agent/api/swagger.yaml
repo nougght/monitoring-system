@@ -1,0 +1,87 @@
+basePath: /
+definitions:
+  CpuSpecs:
+    properties:
+      coreCount:
+        type: integer
+      logicalCoreCount:
+        type: integer
+      modelName:
+        type: string
+    type: object
+  HostSpecs:
+    properties:
+      hostName:
+        description: имя хоста
+        type: string
+      os:
+        description: операционная система
+        type: string
+      osArch:
+        description: архитектура операционной системы
+        type: string
+      osKernelVersion:
+        description: версия ядра операционной системы
+        type: string
+      osType:
+        description: семейство операционной системы
+        type: string
+      osVersion:
+        description: версия операционной системы
+        type: string
+    type: object
+  Metrics:
+    properties:
+      cpuPercent:
+        type: number
+      focusedWindow:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  Specs:
+    properties:
+      cpu:
+        $ref: '#/definitions/CpuSpecs'
+      host:
+        $ref: '#/definitions/HostSpecs'
+    type: object
+host: localhost:8088
+info:
+  contact: {}
+  title: Monitoring Agent API
+  version: "1.0"
+paths:
+  /metrics:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Metrics'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Current system metrics
+  /specs:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Specs'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: System specifications
+swagger: "2.0"

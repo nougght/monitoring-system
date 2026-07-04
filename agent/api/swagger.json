@@ -1,0 +1,132 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Monitoring Agent API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8088",
+    "basePath": "/",
+    "paths": {
+        "/metrics": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Current system metrics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Metrics"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/specs": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "System specifications",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Specs"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "CpuSpecs": {
+            "type": "object",
+            "properties": {
+                "coreCount": {
+                    "type": "integer"
+                },
+                "logicalCoreCount": {
+                    "type": "integer"
+                },
+                "modelName": {
+                    "type": "string"
+                }
+            }
+        },
+        "HostSpecs": {
+            "type": "object",
+            "properties": {
+                "hostName": {
+                    "description": "имя хоста",
+                    "type": "string"
+                },
+                "os": {
+                    "description": "операционная система",
+                    "type": "string"
+                },
+                "osArch": {
+                    "description": "архитектура операционной системы",
+                    "type": "string"
+                },
+                "osKernelVersion": {
+                    "description": "версия ядра операционной системы",
+                    "type": "string"
+                },
+                "osType": {
+                    "description": "семейство операционной системы",
+                    "type": "string"
+                },
+                "osVersion": {
+                    "description": "версия операционной системы",
+                    "type": "string"
+                }
+            }
+        },
+        "Metrics": {
+            "type": "object",
+            "properties": {
+                "cpuPercent": {
+                    "type": "number"
+                },
+                "focusedWindow": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "Specs": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "$ref": "#/definitions/CpuSpecs"
+                },
+                "host": {
+                    "$ref": "#/definitions/HostSpecs"
+                }
+            }
+        }
+    }
+}

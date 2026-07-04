@@ -16,8 +16,17 @@ import (
 	"agent/internal/localserver/handler"
 	ws "agent/internal/localserver/websocket"
 	"agent/internal/service"
+
+	_ "agent/api"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title           Monitoring Agent API
+// @version         1.0
+// @host            localhost:8088
+// @BasePath        /
 func main() {
 	cfg := config.LoadConfig("config.yaml")
 
@@ -40,8 +49,17 @@ func main() {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: false,
 	}))
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// r.GET("/swagger/*any", func(ctx *gin.Context) {
+	// 	ctx.Request.URL.Path = "/doc.json"
+	// 	r.HandleContext(ctx)
+	// })
+
 	r.GET("/ws", wsHandler.HandleConnection)
 	r.GET("/specs", h.GetSpecifications)
+	r.GET("/metrics", h.GetMetrics)
 
 	server := &http.Server{
 		Addr:    ":8088",
