@@ -16,12 +16,12 @@ const (
 type Metric interface {
 	Type() MetricType
 	Timestamp() time.Time
-}
+} // @name Metric
 
 type CpuPercentMetric struct {
 	value     float64
 	timestamp time.Time
-}
+} // @name CpuPercentMetric
 
 func NewCpuPercentMetric(value float64) *CpuPercentMetric {
 	return &CpuPercentMetric{
@@ -43,7 +43,7 @@ func (m *CpuPercentMetric) Value() float64 {
 type FocusedWindowMetric struct {
 	value     string
 	timestamp time.Time
-}
+} // @name FocusedWindowMetric
 
 func NewFocusedWindowMetric(value string) *FocusedWindowMetric {
 	return &FocusedWindowMetric{

@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
-import { getSpecs } from "../api/specs";
-import type { CpuSpecs } from "../domain/specs";
+import { getSpecs } from "../api/client/monitoringAgentAPI";
+import type { Specs } from "../domain/specs";
 
 interface SpecificationsProps {
 
 }
 const Specifications = ({}: SpecificationsProps) => {
-    const [specs, setSpecs] = useState<CpuSpecs | null>(null);
+    const [specs, setSpecs] = useState<Specs | null>(null);
 
     useEffect(() => {
         const fetchSpecs = async () => {
-            const fetchedSpecs = await getSpecs();
-            try {
-                setSpecs(fetchedSpecs);
+            const fetchedSpecs = await getSpecs({
+                
+            });
+            if (fetchedSpecs.status == 200) {
+                setSpecs(fetchedSpecs.data);
                 console.log(specs);
-            } catch (error) {
-                console.error("Error fetching specs:", error);
+            } else {
+                console.log(fetchedSpecs.status);
             }
         }
         fetchSpecs();
@@ -25,10 +27,19 @@ const Specifications = ({}: SpecificationsProps) => {
         <div>
         <h1>Характеристики</h1>
         <section>
+            <h2>Компьютер</h2>
+            <p>Имя компьютера: {specs?.host?.hostName}</p>
+            <p>Тип операционной системы: {specs?.host?.osType}</p>
+            <p>Операционная система: {specs?.host?.os}</p>
+            <p>Версия операционной системы: {specs?.host?.osVersion}</p>
+            <p>Версия ядра операционной системы: {specs?.host?.osKernelVersion}</p>
+            <p>Архитектура операционной системы: {specs?.host?.osArch}</p>
+        </section>
+        <section>
             <h2>CPU</h2>
-            <p>Модель: {specs?.modelName}</p>
-            <p>Ядер: {specs?.coreCount}</p>
-            <p>Логических ядер: {specs?.logicalCoreCount}</p>
+            <p>Модель: {specs?.cpu?.modelName}</p>
+            <p>Ядер: {specs?.cpu?.coreCount}</p>
+            <p>Логических ядер: {specs?.cpu?.logicalCoreCount}</p>
         </section>
         </div>
     )

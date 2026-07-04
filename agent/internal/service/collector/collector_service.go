@@ -9,11 +9,12 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/host"
 )
 
 type MetricsConsumer interface {
 	UpdateMetric(metric model.Metric)
-	UpdateSpecs(specs *model.CpuSpecs)
+	UpdateSpecs(specs *model.Specs)
 }
 
 // collects data from the system
@@ -38,12 +39,13 @@ func (c *CollectorService) SetMetricsConsumer(metricsConsumer MetricsConsumer) {
 	c.metricsConsumer = metricsConsumer
 }
 
-func (c *CollectorService) GetSpecifications(ctx context.Context) (*model.CpuSpecs, error) {
+func (c *CollectorService) GetSpecifications(ctx context.Context) (*model.Specs, error) {
 	return getSpecifications(ctx)
 }
 
 // starts parallel metrics collectors
 func (c *CollectorService) StartCollectors(ctx context.Context) {
+	log.Println("starting collectors")
 	collectorsCtx, cancel := context.WithCancel(ctx)
 	c.cancel = cancel
 	c.runMetricsSender(collectorsCtx)
@@ -101,7 +103,7 @@ func (c *CollectorService) runFocusedWindowCollector(ctx context.Context) {
 					log.Printf("failed to get focused window: %s", err.Error())
 					continue
 				}
-				log.Println("focused window " + focusedWindow)
+				// log.Println("focused window " + focusedWindow)
 				c.metricsChan <- model.NewFocusedWindowMetric(focusedWindow)
 			}
 		}
@@ -129,7 +131,13 @@ func (c *CollectorService) runCpuPercentCollector(ctx context.Context) {
 	}()
 }
 
-func getSpecifications(ctx context.Context) (*model.CpuSpecs, error) {
+func getSpecifications(ctx context.Context) (*model.Specs, error) {
+	hostInfo, err := host.InfoWithContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("host info: %v", *hostInfo)
+
 	cpuInfo, err := cpu.InfoWithContext(ctx)
 	if err != nil {
 		return nil, err
@@ -142,10 +150,21 @@ func getSpecifications(ctx context.Context) (*model.CpuSpecs, error) {
 	if err != nil {
 		return nil, err
 	}
-	cpuSpecs := &model.CpuSpecs{
+	hostSpecs := model.HostSpecs{
+		Hostname:        hostInfo.Hostname,
+		OsType:          hostInfo.OS,
+		Os:              hostInfo.Platform,
+		OsVersion:       hostInfo.PlatformVersion,
+		OsKernelVersion: hostInfo.KernelVersion,
+		OsArch:          hostInfo.KernelArch,
+	}
+	cpuSpecs := model.CpuSpecs{
 		ModelName:        cpuInfo[0].ModelName,
 		CoreCount:        coreCount,
 		LogicalCoreCount: logicalCoreCount,
 	}
-	return cpuSpecs, nil
+	return &model.Specs{
+		Host: hostSpecs,
+		CPU:  cpuSpecs,
+	}, nil
 }

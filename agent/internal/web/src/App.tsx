@@ -43,9 +43,9 @@ function App() {
 
         // Listen for messages
         socket.addEventListener("message", (event) => {
-            console.log("Message from server ", event.data);
+            // console.log("Message from server ", event.data);
             const metrics = JSON.parse(event.data) as Metrics;
-            console.log("metrics", metrics);
+            // console.log("metrics", metrics);
             setMetrics(metrics);
         });
     }, []);

@@ -5,6 +5,7 @@ import (
 	"agent/internal/model"
 	"context"
 	"log"
+	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -14,14 +15,16 @@ type MetricsService struct {
 	metricsChan <-chan model.Metric
 
 	// temporary storing
-	specs         *model.CpuSpecs
+	specs         *model.Specs
+	specsMu       sync.Mutex
 	focusedWindow atomic.Value
 	cpuPercent    atomic.Value
 
-	refreshSpecsFunc func(ctx context.Context) (*model.CpuSpecs, error)
+	refreshSpecsFunc func(ctx context.Context) (*model.Specs, error)
 }
 
-func NewMetricsService(cfg *config.Config, refreshSpecsFunc func(ctx context.Context) (*model.CpuSpecs, error)) *MetricsService {
+func NewMetricsService(cfg *config.Config,
+	refreshSpecsFunc func(ctx context.Context) (*model.Specs, error)) *MetricsService {
 	return &MetricsService{
 		config:           cfg,
 		refreshSpecsFunc: refreshSpecsFunc,
@@ -38,7 +41,9 @@ func (m *MetricsService) UpdateMetric(metric model.Metric) {
 	}
 }
 
-func (m *MetricsService) GetSpecs(ctx context.Context) (*model.CpuSpecs, error) {
+func (m *MetricsService) GetSpecs(ctx context.Context) (*model.Specs, error) {
+	m.specsMu.Lock()
+	defer m.specsMu.Unlock()
 	if m.specs == nil {
 		specs, err := m.refreshSpecsFunc(ctx)
 		if err != nil {
@@ -49,7 +54,9 @@ func (m *MetricsService) GetSpecs(ctx context.Context) (*model.CpuSpecs, error) 
 	return m.specs, nil
 }
 
-func (m *MetricsService) UpdateSpecs(specs *model.CpuSpecs) {
+func (m *MetricsService) UpdateSpecs(specs *model.Specs) {
+	m.specsMu.Lock()
+	defer m.specsMu.Unlock()
 	log.Println("update specs", specs)
 	m.specs = specs
 }
