@@ -81,6 +81,20 @@ const docTemplate = `{
                 }
             }
         },
+        "DiskSpecs": {
+            "type": "object",
+            "properties": {
+                "device": {
+                    "type": "string"
+                },
+                "fsType": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "HostSpecs": {
             "type": "object",
             "properties": {
@@ -129,6 +143,12 @@ const docTemplate = `{
             "properties": {
                 "cpu": {
                     "$ref": "#/definitions/CpuSpecs"
+                },
+                "disk": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DiskSpecs"
+                    }
                 },
                 "host": {
                     "$ref": "#/definitions/HostSpecs"

@@ -9,6 +9,15 @@ definitions:
       modelName:
         type: string
     type: object
+  DiskSpecs:
+    properties:
+      device:
+        type: string
+      fsType:
+        type: string
+      total:
+        type: integer
+    type: object
   HostSpecs:
     properties:
       hostName:
@@ -43,6 +52,10 @@ definitions:
     properties:
       cpu:
         $ref: '#/definitions/CpuSpecs'
+      disk:
+        items:
+          $ref: '#/definitions/DiskSpecs'
+        type: array
       host:
         $ref: '#/definitions/HostSpecs'
     type: object

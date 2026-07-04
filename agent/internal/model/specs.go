@@ -1,8 +1,10 @@
 package model
 
+//
 type Specs struct {
-	Host HostSpecs `json:"host"`
-	CPU  CpuSpecs  `json:"cpu"`
+	Host HostSpecs     `json:"host"`
+	CPU  CpuSpecs      `json:"cpu"`
+	Disk DiskSpecsList `json:"disk"`
 } // @name Specs
 
 type HostSpecs struct {
@@ -19,3 +21,15 @@ type CpuSpecs struct {
 	CoreCount        int    `json:"coreCount"`
 	LogicalCoreCount int    `json:"logicalCoreCount"`
 } // @name CpuSpecs
+
+type MemorySpecs struct {
+	Total uint64 `json:"total"`
+} // @name MemorySpecs
+
+type DiskSpecs struct {
+	Device string `json:"device"`
+	FsType string `json:"fsType"`
+	Total  uint64 `json:"total"`
+} // @name DiskSpecs
+
+type DiskSpecsList []DiskSpecs // @name DiskSpecsList

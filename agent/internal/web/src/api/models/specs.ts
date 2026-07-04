@@ -5,9 +5,11 @@
  * OpenAPI spec version: 1.0
  */
 import type { CpuSpecs } from './cpuSpecs';
+import type { DiskSpecs } from './diskSpecs';
 import type { HostSpecs } from './hostSpecs';
 
 export interface Specs {
   cpu?: CpuSpecs;
+  disk?: DiskSpecs[];
   host?: HostSpecs;
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/shirou/gopsutil/v4/host"
 )
 
@@ -55,7 +56,7 @@ func (c *CollectorService) StartCollectors(ctx context.Context) {
 
 	specs, err := c.GetSpecifications(collectorsCtx)
 	if err != nil {
-		log.Println("failed to get specifications")
+		log.Println("failed to get specifications: ", err.Error())
 	}
 	c.metricsConsumer.UpdateSpecs(specs)
 
@@ -137,11 +138,59 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		return nil, err
 	}
 	log.Printf("host info: %v", *hostInfo)
-
 	cpuInfo, err := cpu.InfoWithContext(ctx)
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("cpu info: %v", cpuInfo)
+
+	disks, err := disk.PartitionsWithContext(ctx, true)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("disks: %v", disks)
+
+	diskSpecsList := make([]model.DiskSpecs, len(disks))
+	for i, d := range disks {
+		diskSpecsList[i].Device = d.Mountpoint
+		diskSpecsList[i].FsType = d.Fstype
+		diskUsage, err := disk.UsageWithContext(ctx, d.Mountpoint)
+		if err != nil {
+			return nil, err
+		}
+		log.Printf("disk usage: %v", diskUsage)
+		diskSpecsList[i].Total = diskUsage.Total
+	}
+	// userInfo, err := host.Users()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Printf("user info: %v", userInfo)
+	// virtual, err := mem.VirtualMemory()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Printf("virtual memory: %v", virtual)
+	// swap, err := mem.SwapMemory()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Printf("swap memory: %v", swap)
+	// swapDevices, err := mem.SwapDevices()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Printf("swap devices: %v", swapDevices)
+	// c, err := disk.IOCounters()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Printf("disk io: %v", c)
+	// label, err := disk.Label(disks[0].Device)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Printf("disk label: %v", label)
 	coreCount, err := cpu.CountsWithContext(ctx, false)
 	if err != nil {
 		return nil, err
@@ -166,5 +215,6 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 	return &model.Specs{
 		Host: hostSpecs,
 		CPU:  cpuSpecs,
+		Disk: diskSpecsList,
 	}, nil
 }

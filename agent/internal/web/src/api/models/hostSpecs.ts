@@ -6,6 +6,7 @@
  */
 
 export interface HostSpecs {
+  /** имя хоста */
   hostName?: string;
   /** операционная система */
   os?: string;

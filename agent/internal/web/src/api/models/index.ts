@@ -6,6 +6,7 @@
  */
 
 export * from './cpuSpecs';
+export * from './diskSpecs';
 export * from './getMetrics500';
 export * from './getSpecs500';
 export * from './hostSpecs';
