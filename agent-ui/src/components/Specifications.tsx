@@ -45,8 +45,8 @@ const Specifications = ({ }: SpecificationsProps) => {
                 <p>Количество ядер: {specs?.cpu?.numberOfCores}</p>
                 <p>Количество доступных ядер: {specs?.cpu?.numberOfEnabledCore}</p>
                 <p>Количество логических ядер: {specs?.cpu?.numberOfLogicalProcessors}</p>
-                <p>Размер L2 кэша: {specs?.cpu?.l2CacheSize == 0 ? 'Неизвестно' : `${specs?.cpu?.l2CacheSize / 1024} Mb`}</p>
-                <p>Размер L3 кэша: {specs?.cpu?.l3CacheSize == 0 ? 'Неизвестно' : `${specs?.cpu?.l3CacheSize / 1024} Mb`}</p>
+                <p>Размер L2 кэша: {specs?.cpu?.l2CacheSize == undefined ? 'Неизвестно' : `${specs?.cpu?.l2CacheSize / 1024} Mb`}</p>
+                <p>Размер L3 кэша: {specs?.cpu?.l3CacheSize == undefined ? 'Неизвестно' : `${specs?.cpu?.l3CacheSize / 1024} Mb`}</p>
                 <p>Состояние: {specs?.cpu?.availability}</p>
                 <p>Текущая частота процессора: {specs?.cpu?.currentClockSpeed}</p>
                 <p>Максимальная частота процессора: {specs?.cpu?.maxClockSpeed}</p>
@@ -58,10 +58,10 @@ const Specifications = ({ }: SpecificationsProps) => {
             <section>
                 <h2>Диски</h2>
                 {specs?.disk?.map((disk, i) => (
-                    <div key={disk.device}>
+                    <div key={i}>
                         <h3>Диск {disk.device}</h3>
                         <p>Файловая система: {disk.fsType}</p>
-                        <p>Объем: {convertBytesToGB(disk.total).toFixed(2)} GB</p>
+                        <p>Объем: {convertBytesToGB(disk.total ?? 0).toFixed(2)} GB</p>
                     </div>
                 ))}
             </section>
@@ -73,7 +73,7 @@ const Specifications = ({ }: SpecificationsProps) => {
                         <h3>{mem.deviceLocator}</h3>
                         <p>Тип памяти: {mem.memoryType?.toString()}</p>
                         <p>Форм-фактор: {mem.formFactor?.toString()}</p>
-                        <p>Объем: {convertBytesToGB(mem.capacity).toFixed(2)} GB</p>
+                        <p>Объем: {convertBytesToGB(mem.capacity ?? 0).toFixed(2)} GB</p>
                         <p>Поддерживаемя частота: {mem.speed}</p>
                         <p>Настроенная частота: {mem.configuredClockSpeed}</p>
                         <p>Производитель: {mem.manufacturer}</p>
