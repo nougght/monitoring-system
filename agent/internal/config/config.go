@@ -18,7 +18,7 @@ type Config struct {
 func LoadConfig(path string) (*Config, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open file %s: %w", path, err.Error())
+		return nil, fmt.Errorf("failed to open file %s: %w", path, err)
 	}
 	defer f.Close()
 	data, err := io.ReadAll(f)

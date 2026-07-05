@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.35.1
-// source: agent_service.proto
+// source: agent/v1/agent_service.proto
 
 package agentv1
 
@@ -36,7 +36,7 @@ type AgentMessage struct {
 
 func (x *AgentMessage) Reset() {
 	*x = AgentMessage{}
-	mi := &file_agent_service_proto_msgTypes[0]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +48,7 @@ func (x *AgentMessage) String() string {
 func (*AgentMessage) ProtoMessage() {}
 
 func (x *AgentMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[0]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +61,7 @@ func (x *AgentMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentMessage.ProtoReflect.Descriptor instead.
 func (*AgentMessage) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{0}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *AgentMessage) GetPayload() isAgentMessage_Payload {
@@ -132,7 +132,7 @@ type ServerMessage struct {
 
 func (x *ServerMessage) Reset() {
 	*x = ServerMessage{}
-	mi := &file_agent_service_proto_msgTypes[1]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -144,7 +144,7 @@ func (x *ServerMessage) String() string {
 func (*ServerMessage) ProtoMessage() {}
 
 func (x *ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[1]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,7 +157,7 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
 func (*ServerMessage) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{1}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ServerMessage) GetPayload() isServerMessage_Payload {
@@ -195,7 +195,7 @@ type Handshake struct {
 
 func (x *Handshake) Reset() {
 	*x = Handshake{}
-	mi := &file_agent_service_proto_msgTypes[2]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -207,7 +207,7 @@ func (x *Handshake) String() string {
 func (*Handshake) ProtoMessage() {}
 
 func (x *Handshake) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[2]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -220,7 +220,7 @@ func (x *Handshake) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Handshake.ProtoReflect.Descriptor instead.
 func (*Handshake) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{2}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Handshake) GetAgentUuid() string {
@@ -239,7 +239,7 @@ type Metrics struct {
 
 func (x *Metrics) Reset() {
 	*x = Metrics{}
-	mi := &file_agent_service_proto_msgTypes[3]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -251,7 +251,7 @@ func (x *Metrics) String() string {
 func (*Metrics) ProtoMessage() {}
 
 func (x *Metrics) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[3]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -264,7 +264,7 @@ func (x *Metrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Metrics.ProtoReflect.Descriptor instead.
 func (*Metrics) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{3}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Metrics) GetMetrics() []*Metric {
@@ -288,7 +288,7 @@ type Metric struct {
 
 func (x *Metric) Reset() {
 	*x = Metric{}
-	mi := &file_agent_service_proto_msgTypes[4]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -300,7 +300,7 @@ func (x *Metric) String() string {
 func (*Metric) ProtoMessage() {}
 
 func (x *Metric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[4]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -313,7 +313,7 @@ func (x *Metric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Metric.ProtoReflect.Descriptor instead.
 func (*Metric) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{4}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Metric) GetTimestamp() *timestamppb.Timestamp {
@@ -373,7 +373,7 @@ type CpuPercentMetric struct {
 
 func (x *CpuPercentMetric) Reset() {
 	*x = CpuPercentMetric{}
-	mi := &file_agent_service_proto_msgTypes[5]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -385,7 +385,7 @@ func (x *CpuPercentMetric) String() string {
 func (*CpuPercentMetric) ProtoMessage() {}
 
 func (x *CpuPercentMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[5]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -398,7 +398,7 @@ func (x *CpuPercentMetric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CpuPercentMetric.ProtoReflect.Descriptor instead.
 func (*CpuPercentMetric) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{5}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CpuPercentMetric) GetValue() float32 {
@@ -417,7 +417,7 @@ type FocusedWindowMetric struct {
 
 func (x *FocusedWindowMetric) Reset() {
 	*x = FocusedWindowMetric{}
-	mi := &file_agent_service_proto_msgTypes[6]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -429,7 +429,7 @@ func (x *FocusedWindowMetric) String() string {
 func (*FocusedWindowMetric) ProtoMessage() {}
 
 func (x *FocusedWindowMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[6]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -442,7 +442,7 @@ func (x *FocusedWindowMetric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FocusedWindowMetric.ProtoReflect.Descriptor instead.
 func (*FocusedWindowMetric) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{6}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *FocusedWindowMetric) GetValue() string {
@@ -464,7 +464,7 @@ type Command struct {
 
 func (x *Command) Reset() {
 	*x = Command{}
-	mi := &file_agent_service_proto_msgTypes[7]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -476,7 +476,7 @@ func (x *Command) String() string {
 func (*Command) ProtoMessage() {}
 
 func (x *Command) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[7]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -489,7 +489,7 @@ func (x *Command) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Command.ProtoReflect.Descriptor instead.
 func (*Command) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{7}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Command) GetPayload() isCommand_Payload {
@@ -530,7 +530,7 @@ type CommandResult struct {
 
 func (x *CommandResult) Reset() {
 	*x = CommandResult{}
-	mi := &file_agent_service_proto_msgTypes[8]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -542,7 +542,7 @@ func (x *CommandResult) String() string {
 func (*CommandResult) ProtoMessage() {}
 
 func (x *CommandResult) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[8]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -555,7 +555,7 @@ func (x *CommandResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommandResult.ProtoReflect.Descriptor instead.
 func (*CommandResult) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{8}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CommandResult) GetPayload() isCommandResult_Payload {
@@ -592,7 +592,7 @@ type SpecificationsRequest struct {
 
 func (x *SpecificationsRequest) Reset() {
 	*x = SpecificationsRequest{}
-	mi := &file_agent_service_proto_msgTypes[9]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -604,7 +604,7 @@ func (x *SpecificationsRequest) String() string {
 func (*SpecificationsRequest) ProtoMessage() {}
 
 func (x *SpecificationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[9]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -617,7 +617,7 @@ func (x *SpecificationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpecificationsRequest.ProtoReflect.Descriptor instead.
 func (*SpecificationsRequest) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{9}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{9}
 }
 
 type SpecificationsResponse struct {
@@ -629,7 +629,7 @@ type SpecificationsResponse struct {
 
 func (x *SpecificationsResponse) Reset() {
 	*x = SpecificationsResponse{}
-	mi := &file_agent_service_proto_msgTypes[10]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -641,7 +641,7 @@ func (x *SpecificationsResponse) String() string {
 func (*SpecificationsResponse) ProtoMessage() {}
 
 func (x *SpecificationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[10]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -654,7 +654,7 @@ func (x *SpecificationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpecificationsResponse.ProtoReflect.Descriptor instead.
 func (*SpecificationsResponse) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{10}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SpecificationsResponse) GetSpecs() *Specs {
@@ -676,7 +676,7 @@ type Specs struct {
 
 func (x *Specs) Reset() {
 	*x = Specs{}
-	mi := &file_agent_service_proto_msgTypes[11]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -688,7 +688,7 @@ func (x *Specs) String() string {
 func (*Specs) ProtoMessage() {}
 
 func (x *Specs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[11]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -701,7 +701,7 @@ func (x *Specs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Specs.ProtoReflect.Descriptor instead.
 func (*Specs) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{11}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *Specs) GetHost() *HostSpecs {
@@ -746,7 +746,7 @@ type HostSpecs struct {
 
 func (x *HostSpecs) Reset() {
 	*x = HostSpecs{}
-	mi := &file_agent_service_proto_msgTypes[12]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -758,7 +758,7 @@ func (x *HostSpecs) String() string {
 func (*HostSpecs) ProtoMessage() {}
 
 func (x *HostSpecs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[12]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -771,7 +771,7 @@ func (x *HostSpecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HostSpecs.ProtoReflect.Descriptor instead.
 func (*HostSpecs) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{12}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *HostSpecs) GetHostname() string {
@@ -818,29 +818,29 @@ func (x *HostSpecs) GetOsArch() string {
 
 type CpuSpecs struct {
 	state                         protoimpl.MessageState `protogen:"open.v1"`
-	ModelName                     string                 `protobuf:"bytes,1,opt,name=model_name,json=modelName,proto3" json:"model_name,omitempty"`                                                                // модель процессора
-	Architecture                  string                 `protobuf:"bytes,2,opt,name=architecture,proto3" json:"architecture,omitempty"`                                                                           // архитектура процессора
-	Availability                  string                 `protobuf:"bytes,3,opt,name=availability,proto3" json:"availability,omitempty"`                                                                           // доступность процессора
-	CurrentClockSpeed             string                 `protobuf:"bytes,4,opt,name=current_clock_speed,json=currentClockSpeed,proto3" json:"current_clock_speed,omitempty"`                                      // текущая частота процессора
-	DataWidth                     string                 `protobuf:"bytes,5,opt,name=data_width,json=dataWidth,proto3" json:"data_width,omitempty"`                                                                // разрядность процессора
-	L2CacheSize                   string                 `protobuf:"bytes,6,opt,name=l2_cache_size,json=l2CacheSize,proto3" json:"l2_cache_size,omitempty"`                                                        // размер L2 кэша
-	L3CacheSize                   string                 `protobuf:"bytes,7,opt,name=l3_cache_size,json=l3CacheSize,proto3" json:"l3_cache_size,omitempty"`                                                        // размер L3 кэша
-	Manufacturer                  string                 `protobuf:"bytes,8,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`                                                                           // производитель
-	MaxClockSpeed                 string                 `protobuf:"bytes,9,opt,name=max_clock_speed,json=maxClockSpeed,proto3" json:"max_clock_speed,omitempty"`                                                  // максимальная частота процессора
-	NumberOfCores                 string                 `protobuf:"bytes,10,opt,name=number_of_cores,json=numberOfCores,proto3" json:"number_of_cores,omitempty"`                                                 // количество ядер
-	NumberOfEnabledCores          string                 `protobuf:"bytes,11,opt,name=number_of_enabled_cores,json=numberOfEnabledCores,proto3" json:"number_of_enabled_cores,omitempty"`                          // количество доступных ядер
-	NumberOfLogicalProcessors     string                 `protobuf:"bytes,12,opt,name=number_of_logical_processors,json=numberOfLogicalProcessors,proto3" json:"number_of_logical_processors,omitempty"`           // количество логических ядер
-	ProcessorId                   string                 `protobuf:"bytes,13,opt,name=processor_id,json=processorId,proto3" json:"processor_id,omitempty"`                                                         // идентификатор процессора
-	SocketDesignation             string                 `protobuf:"bytes,14,opt,name=socket_designation,json=socketDesignation,proto3" json:"socket_designation,omitempty"`                                       // сокет
-	Stepping                      string                 `protobuf:"bytes,15,opt,name=stepping,proto3" json:"stepping,omitempty"`                                                                                  // степпинг
-	VirtualizationFirmwareEnabled string                 `protobuf:"bytes,16,opt,name=virtualization_firmware_enabled,json=virtualizationFirmwareEnabled,proto3" json:"virtualization_firmware_enabled,omitempty"` // включена ли виртуализация
+	ModelName                     string                 `protobuf:"bytes,1,opt,name=model_name,json=modelName,proto3" json:"model_name,omitempty"`                                                                 // модель процессора
+	Architecture                  string                 `protobuf:"bytes,2,opt,name=architecture,proto3" json:"architecture,omitempty"`                                                                            // архитектура процессора
+	Availability                  string                 `protobuf:"bytes,3,opt,name=availability,proto3" json:"availability,omitempty"`                                                                            // доступность процессора
+	CurrentClockSpeed             uint32                 `protobuf:"varint,4,opt,name=current_clock_speed,json=currentClockSpeed,proto3" json:"current_clock_speed,omitempty"`                                      // текущая частота процессора
+	DataWidth                     uint32                 `protobuf:"varint,5,opt,name=data_width,json=dataWidth,proto3" json:"data_width,omitempty"`                                                                // разрядность процессора
+	L2CacheSize                   uint32                 `protobuf:"varint,6,opt,name=l2_cache_size,json=l2CacheSize,proto3" json:"l2_cache_size,omitempty"`                                                        // размер L2 кэша
+	L3CacheSize                   uint32                 `protobuf:"varint,7,opt,name=l3_cache_size,json=l3CacheSize,proto3" json:"l3_cache_size,omitempty"`                                                        // размер L3 кэша
+	Manufacturer                  string                 `protobuf:"bytes,8,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`                                                                            // производитель
+	MaxClockSpeed                 uint32                 `protobuf:"varint,9,opt,name=max_clock_speed,json=maxClockSpeed,proto3" json:"max_clock_speed,omitempty"`                                                  // максимальная частота процессора
+	NumberOfCores                 uint32                 `protobuf:"varint,10,opt,name=number_of_cores,json=numberOfCores,proto3" json:"number_of_cores,omitempty"`                                                 // количество ядер
+	NumberOfEnabledCores          uint32                 `protobuf:"varint,11,opt,name=number_of_enabled_cores,json=numberOfEnabledCores,proto3" json:"number_of_enabled_cores,omitempty"`                          // количество доступных ядер
+	NumberOfLogicalProcessors     uint32                 `protobuf:"varint,12,opt,name=number_of_logical_processors,json=numberOfLogicalProcessors,proto3" json:"number_of_logical_processors,omitempty"`           // количество логических ядер
+	ProcessorId                   string                 `protobuf:"bytes,13,opt,name=processor_id,json=processorId,proto3" json:"processor_id,omitempty"`                                                          // идентификатор процессора
+	SocketDesignation             string                 `protobuf:"bytes,14,opt,name=socket_designation,json=socketDesignation,proto3" json:"socket_designation,omitempty"`                                        // сокет
+	Stepping                      string                 `protobuf:"bytes,15,opt,name=stepping,proto3" json:"stepping,omitempty"`                                                                                   // степпинг
+	VirtualizationFirmwareEnabled bool                   `protobuf:"varint,16,opt,name=virtualization_firmware_enabled,json=virtualizationFirmwareEnabled,proto3" json:"virtualization_firmware_enabled,omitempty"` // включена ли виртуализация
 	unknownFields                 protoimpl.UnknownFields
 	sizeCache                     protoimpl.SizeCache
 }
 
 func (x *CpuSpecs) Reset() {
 	*x = CpuSpecs{}
-	mi := &file_agent_service_proto_msgTypes[13]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -852,7 +852,7 @@ func (x *CpuSpecs) String() string {
 func (*CpuSpecs) ProtoMessage() {}
 
 func (x *CpuSpecs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[13]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -865,7 +865,7 @@ func (x *CpuSpecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CpuSpecs.ProtoReflect.Descriptor instead.
 func (*CpuSpecs) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{13}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *CpuSpecs) GetModelName() string {
@@ -889,32 +889,32 @@ func (x *CpuSpecs) GetAvailability() string {
 	return ""
 }
 
-func (x *CpuSpecs) GetCurrentClockSpeed() string {
+func (x *CpuSpecs) GetCurrentClockSpeed() uint32 {
 	if x != nil {
 		return x.CurrentClockSpeed
 	}
-	return ""
+	return 0
 }
 
-func (x *CpuSpecs) GetDataWidth() string {
+func (x *CpuSpecs) GetDataWidth() uint32 {
 	if x != nil {
 		return x.DataWidth
 	}
-	return ""
+	return 0
 }
 
-func (x *CpuSpecs) GetL2CacheSize() string {
+func (x *CpuSpecs) GetL2CacheSize() uint32 {
 	if x != nil {
 		return x.L2CacheSize
 	}
-	return ""
+	return 0
 }
 
-func (x *CpuSpecs) GetL3CacheSize() string {
+func (x *CpuSpecs) GetL3CacheSize() uint32 {
 	if x != nil {
 		return x.L3CacheSize
 	}
-	return ""
+	return 0
 }
 
 func (x *CpuSpecs) GetManufacturer() string {
@@ -924,32 +924,32 @@ func (x *CpuSpecs) GetManufacturer() string {
 	return ""
 }
 
-func (x *CpuSpecs) GetMaxClockSpeed() string {
+func (x *CpuSpecs) GetMaxClockSpeed() uint32 {
 	if x != nil {
 		return x.MaxClockSpeed
 	}
-	return ""
+	return 0
 }
 
-func (x *CpuSpecs) GetNumberOfCores() string {
+func (x *CpuSpecs) GetNumberOfCores() uint32 {
 	if x != nil {
 		return x.NumberOfCores
 	}
-	return ""
+	return 0
 }
 
-func (x *CpuSpecs) GetNumberOfEnabledCores() string {
+func (x *CpuSpecs) GetNumberOfEnabledCores() uint32 {
 	if x != nil {
 		return x.NumberOfEnabledCores
 	}
-	return ""
+	return 0
 }
 
-func (x *CpuSpecs) GetNumberOfLogicalProcessors() string {
+func (x *CpuSpecs) GetNumberOfLogicalProcessors() uint32 {
 	if x != nil {
 		return x.NumberOfLogicalProcessors
 	}
-	return ""
+	return 0
 }
 
 func (x *CpuSpecs) GetProcessorId() string {
@@ -973,11 +973,11 @@ func (x *CpuSpecs) GetStepping() string {
 	return ""
 }
 
-func (x *CpuSpecs) GetVirtualizationFirmwareEnabled() string {
+func (x *CpuSpecs) GetVirtualizationFirmwareEnabled() bool {
 	if x != nil {
 		return x.VirtualizationFirmwareEnabled
 	}
-	return ""
+	return false
 }
 
 type DiskSpecsList struct {
@@ -989,7 +989,7 @@ type DiskSpecsList struct {
 
 func (x *DiskSpecsList) Reset() {
 	*x = DiskSpecsList{}
-	mi := &file_agent_service_proto_msgTypes[14]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1001,7 +1001,7 @@ func (x *DiskSpecsList) String() string {
 func (*DiskSpecsList) ProtoMessage() {}
 
 func (x *DiskSpecsList) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[14]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1014,7 +1014,7 @@ func (x *DiskSpecsList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiskSpecsList.ProtoReflect.Descriptor instead.
 func (*DiskSpecsList) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{14}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DiskSpecsList) GetDisk() []*DiskSpecs {
@@ -1028,14 +1028,14 @@ type DiskSpecs struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Device        string                 `protobuf:"bytes,1,opt,name=device,proto3" json:"device,omitempty"`
 	FsType        string                 `protobuf:"bytes,2,opt,name=fs_type,json=fsType,proto3" json:"fs_type,omitempty"`
-	Total         string                 `protobuf:"bytes,3,opt,name=total,proto3" json:"total,omitempty"` // общий объем диска
+	Total         uint64                 `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"` // общий объем диска
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DiskSpecs) Reset() {
 	*x = DiskSpecs{}
-	mi := &file_agent_service_proto_msgTypes[15]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1047,7 +1047,7 @@ func (x *DiskSpecs) String() string {
 func (*DiskSpecs) ProtoMessage() {}
 
 func (x *DiskSpecs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[15]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1060,7 +1060,7 @@ func (x *DiskSpecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiskSpecs.ProtoReflect.Descriptor instead.
 func (*DiskSpecs) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{15}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DiskSpecs) GetDevice() string {
@@ -1077,11 +1077,11 @@ func (x *DiskSpecs) GetFsType() string {
 	return ""
 }
 
-func (x *DiskSpecs) GetTotal() string {
+func (x *DiskSpecs) GetTotal() uint64 {
 	if x != nil {
 		return x.Total
 	}
-	return ""
+	return 0
 }
 
 type MemorySpecs struct {
@@ -1094,7 +1094,7 @@ type MemorySpecs struct {
 
 func (x *MemorySpecs) Reset() {
 	*x = MemorySpecs{}
-	mi := &file_agent_service_proto_msgTypes[16]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1106,7 +1106,7 @@ func (x *MemorySpecs) String() string {
 func (*MemorySpecs) ProtoMessage() {}
 
 func (x *MemorySpecs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[16]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1119,7 +1119,7 @@ func (x *MemorySpecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MemorySpecs.ProtoReflect.Descriptor instead.
 func (*MemorySpecs) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{16}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *MemorySpecs) GetTotal() string {
@@ -1138,26 +1138,26 @@ func (x *MemorySpecs) GetPhysicalMemory() []*PhysicalMemoryInfo {
 
 type PhysicalMemoryInfo struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	DeviceLocator        string                 `protobuf:"bytes,1,opt,name=device_locator,json=deviceLocator,proto3" json:"device_locator,omitempty"`                        // расположение памяти
-	MemoryType           string                 `protobuf:"bytes,2,opt,name=memory_type,json=memoryType,proto3" json:"memory_type,omitempty"`                                 // тип памяти
-	Capacity             string                 `protobuf:"bytes,3,opt,name=capacity,proto3" json:"capacity,omitempty"`                                                       // объем
-	FormFactor           string                 `protobuf:"bytes,4,opt,name=form_factor,json=formFactor,proto3" json:"form_factor,omitempty"`                                 // форм-фактор памяти
-	Speed                string                 `protobuf:"bytes,5,opt,name=speed,proto3" json:"speed,omitempty"`                                                             // поддерживаемя частота памяти
-	ConfiguredClockSpeed string                 `protobuf:"bytes,6,opt,name=configured_clock_speed,json=configuredClockSpeed,proto3" json:"configured_clock_speed,omitempty"` // настроенная частота памяти
-	Manufacturer         string                 `protobuf:"bytes,7,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`                                               // производитель
-	ModelName            string                 `protobuf:"bytes,8,opt,name=model_name,json=modelName,proto3" json:"model_name,omitempty"`                                    // модель/партия памяти
-	SerialNumber         string                 `protobuf:"bytes,9,opt,name=serial_number,json=serialNumber,proto3" json:"serial_number,omitempty"`                           // серийный номер
-	BankLabel            string                 `protobuf:"bytes,10,opt,name=bank_label,json=bankLabel,proto3" json:"bank_label,omitempty"`                                   // подключение памяти
-	HotSwappable         string                 `protobuf:"bytes,11,opt,name=hot_swappable,json=hotSwappable,proto3" json:"hot_swappable,omitempty"`                          // можно менять память без выключения системы
-	Removable            string                 `protobuf:"bytes,12,opt,name=removable,proto3" json:"removable,omitempty"`                                                    // можно ли вынимать память
-	Replaceable          string                 `protobuf:"bytes,13,opt,name=replaceable,proto3" json:"replaceable,omitempty"`                                                // можно ли заменять память
+	DeviceLocator        string                 `protobuf:"bytes,1,opt,name=device_locator,json=deviceLocator,proto3" json:"device_locator,omitempty"`                         // расположение памяти
+	MemoryType           string                 `protobuf:"bytes,2,opt,name=memory_type,json=memoryType,proto3" json:"memory_type,omitempty"`                                  // тип памяти
+	Capacity             uint64                 `protobuf:"varint,3,opt,name=capacity,proto3" json:"capacity,omitempty"`                                                       // объем
+	FormFactor           string                 `protobuf:"bytes,4,opt,name=form_factor,json=formFactor,proto3" json:"form_factor,omitempty"`                                  // форм-фактор памяти
+	Speed                uint32                 `protobuf:"varint,5,opt,name=speed,proto3" json:"speed,omitempty"`                                                             // поддерживаемя частота памяти
+	ConfiguredClockSpeed uint32                 `protobuf:"varint,6,opt,name=configured_clock_speed,json=configuredClockSpeed,proto3" json:"configured_clock_speed,omitempty"` // настроенная частота памяти
+	Manufacturer         string                 `protobuf:"bytes,7,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`                                                // производитель
+	ModelName            string                 `protobuf:"bytes,8,opt,name=model_name,json=modelName,proto3" json:"model_name,omitempty"`                                     // модель/партия памяти
+	SerialNumber         string                 `protobuf:"bytes,9,opt,name=serial_number,json=serialNumber,proto3" json:"serial_number,omitempty"`                            // серийный номер
+	BankLabel            string                 `protobuf:"bytes,10,opt,name=bank_label,json=bankLabel,proto3" json:"bank_label,omitempty"`                                    // подключение памяти
+	HotSwappable         bool                   `protobuf:"varint,11,opt,name=hot_swappable,json=hotSwappable,proto3" json:"hot_swappable,omitempty"`                          // можно менять память без выключения системы
+	Removable            bool                   `protobuf:"varint,12,opt,name=removable,proto3" json:"removable,omitempty"`                                                    // можно ли вынимать память
+	Replaceable          bool                   `protobuf:"varint,13,opt,name=replaceable,proto3" json:"replaceable,omitempty"`                                                // можно ли заменять память
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
 
 func (x *PhysicalMemoryInfo) Reset() {
 	*x = PhysicalMemoryInfo{}
-	mi := &file_agent_service_proto_msgTypes[17]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1169,7 +1169,7 @@ func (x *PhysicalMemoryInfo) String() string {
 func (*PhysicalMemoryInfo) ProtoMessage() {}
 
 func (x *PhysicalMemoryInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_service_proto_msgTypes[17]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1182,7 +1182,7 @@ func (x *PhysicalMemoryInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PhysicalMemoryInfo.ProtoReflect.Descriptor instead.
 func (*PhysicalMemoryInfo) Descriptor() ([]byte, []int) {
-	return file_agent_service_proto_rawDescGZIP(), []int{17}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *PhysicalMemoryInfo) GetDeviceLocator() string {
@@ -1199,11 +1199,11 @@ func (x *PhysicalMemoryInfo) GetMemoryType() string {
 	return ""
 }
 
-func (x *PhysicalMemoryInfo) GetCapacity() string {
+func (x *PhysicalMemoryInfo) GetCapacity() uint64 {
 	if x != nil {
 		return x.Capacity
 	}
-	return ""
+	return 0
 }
 
 func (x *PhysicalMemoryInfo) GetFormFactor() string {
@@ -1213,18 +1213,18 @@ func (x *PhysicalMemoryInfo) GetFormFactor() string {
 	return ""
 }
 
-func (x *PhysicalMemoryInfo) GetSpeed() string {
+func (x *PhysicalMemoryInfo) GetSpeed() uint32 {
 	if x != nil {
 		return x.Speed
 	}
-	return ""
+	return 0
 }
 
-func (x *PhysicalMemoryInfo) GetConfiguredClockSpeed() string {
+func (x *PhysicalMemoryInfo) GetConfiguredClockSpeed() uint32 {
 	if x != nil {
 		return x.ConfiguredClockSpeed
 	}
-	return ""
+	return 0
 }
 
 func (x *PhysicalMemoryInfo) GetManufacturer() string {
@@ -1255,32 +1255,32 @@ func (x *PhysicalMemoryInfo) GetBankLabel() string {
 	return ""
 }
 
-func (x *PhysicalMemoryInfo) GetHotSwappable() string {
+func (x *PhysicalMemoryInfo) GetHotSwappable() bool {
 	if x != nil {
 		return x.HotSwappable
 	}
-	return ""
+	return false
 }
 
-func (x *PhysicalMemoryInfo) GetRemovable() string {
+func (x *PhysicalMemoryInfo) GetRemovable() bool {
 	if x != nil {
 		return x.Removable
 	}
-	return ""
+	return false
 }
 
-func (x *PhysicalMemoryInfo) GetReplaceable() string {
+func (x *PhysicalMemoryInfo) GetReplaceable() bool {
 	if x != nil {
 		return x.Replaceable
 	}
-	return ""
+	return false
 }
 
-var File_agent_service_proto protoreflect.FileDescriptor
+var File_agent_v1_agent_service_proto protoreflect.FileDescriptor
 
-const file_agent_service_proto_rawDesc = "" +
+const file_agent_v1_agent_service_proto_rawDesc = "" +
 	"\n" +
-	"\x13agent_service.proto\x12\x13monitoring.agent.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe0\x01\n" +
+	"\x1cagent/v1/agent_service.proto\x12\x13monitoring.agent.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe0\x01\n" +
 	"\fAgentMessage\x12>\n" +
 	"\thandshake\x18\x01 \x01(\v2\x1e.monitoring.agent.v1.HandshakeH\x00R\thandshake\x128\n" +
 	"\ametrics\x18\x02 \x01(\v2\x1c.monitoring.agent.v1.MetricsH\x00R\ametrics\x12K\n" +
@@ -1331,27 +1331,27 @@ const file_agent_service_proto_rawDesc = "" +
 	"model_name\x18\x01 \x01(\tR\tmodelName\x12\"\n" +
 	"\farchitecture\x18\x02 \x01(\tR\farchitecture\x12\"\n" +
 	"\favailability\x18\x03 \x01(\tR\favailability\x12.\n" +
-	"\x13current_clock_speed\x18\x04 \x01(\tR\x11currentClockSpeed\x12\x1d\n" +
+	"\x13current_clock_speed\x18\x04 \x01(\rR\x11currentClockSpeed\x12\x1d\n" +
 	"\n" +
-	"data_width\x18\x05 \x01(\tR\tdataWidth\x12\"\n" +
-	"\rl2_cache_size\x18\x06 \x01(\tR\vl2CacheSize\x12\"\n" +
-	"\rl3_cache_size\x18\a \x01(\tR\vl3CacheSize\x12\"\n" +
+	"data_width\x18\x05 \x01(\rR\tdataWidth\x12\"\n" +
+	"\rl2_cache_size\x18\x06 \x01(\rR\vl2CacheSize\x12\"\n" +
+	"\rl3_cache_size\x18\a \x01(\rR\vl3CacheSize\x12\"\n" +
 	"\fmanufacturer\x18\b \x01(\tR\fmanufacturer\x12&\n" +
-	"\x0fmax_clock_speed\x18\t \x01(\tR\rmaxClockSpeed\x12&\n" +
+	"\x0fmax_clock_speed\x18\t \x01(\rR\rmaxClockSpeed\x12&\n" +
 	"\x0fnumber_of_cores\x18\n" +
-	" \x01(\tR\rnumberOfCores\x125\n" +
-	"\x17number_of_enabled_cores\x18\v \x01(\tR\x14numberOfEnabledCores\x12?\n" +
-	"\x1cnumber_of_logical_processors\x18\f \x01(\tR\x19numberOfLogicalProcessors\x12!\n" +
+	" \x01(\rR\rnumberOfCores\x125\n" +
+	"\x17number_of_enabled_cores\x18\v \x01(\rR\x14numberOfEnabledCores\x12?\n" +
+	"\x1cnumber_of_logical_processors\x18\f \x01(\rR\x19numberOfLogicalProcessors\x12!\n" +
 	"\fprocessor_id\x18\r \x01(\tR\vprocessorId\x12-\n" +
 	"\x12socket_designation\x18\x0e \x01(\tR\x11socketDesignation\x12\x1a\n" +
 	"\bstepping\x18\x0f \x01(\tR\bstepping\x12F\n" +
-	"\x1fvirtualization_firmware_enabled\x18\x10 \x01(\tR\x1dvirtualizationFirmwareEnabled\"C\n" +
+	"\x1fvirtualization_firmware_enabled\x18\x10 \x01(\bR\x1dvirtualizationFirmwareEnabled\"C\n" +
 	"\rDiskSpecsList\x122\n" +
 	"\x04disk\x18\x01 \x03(\v2\x1e.monitoring.agent.v1.DiskSpecsR\x04disk\"R\n" +
 	"\tDiskSpecs\x12\x16\n" +
 	"\x06device\x18\x01 \x01(\tR\x06device\x12\x17\n" +
 	"\afs_type\x18\x02 \x01(\tR\x06fsType\x12\x14\n" +
-	"\x05total\x18\x03 \x01(\tR\x05total\"u\n" +
+	"\x05total\x18\x03 \x01(\x04R\x05total\"u\n" +
 	"\vMemorySpecs\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\tR\x05total\x12P\n" +
 	"\x0fphysical_memory\x18\x02 \x03(\v2'.monitoring.agent.v1.PhysicalMemoryInfoR\x0ephysicalMemory\"\xd1\x03\n" +
@@ -1359,11 +1359,11 @@ const file_agent_service_proto_rawDesc = "" +
 	"\x0edevice_locator\x18\x01 \x01(\tR\rdeviceLocator\x12\x1f\n" +
 	"\vmemory_type\x18\x02 \x01(\tR\n" +
 	"memoryType\x12\x1a\n" +
-	"\bcapacity\x18\x03 \x01(\tR\bcapacity\x12\x1f\n" +
+	"\bcapacity\x18\x03 \x01(\x04R\bcapacity\x12\x1f\n" +
 	"\vform_factor\x18\x04 \x01(\tR\n" +
 	"formFactor\x12\x14\n" +
-	"\x05speed\x18\x05 \x01(\tR\x05speed\x124\n" +
-	"\x16configured_clock_speed\x18\x06 \x01(\tR\x14configuredClockSpeed\x12\"\n" +
+	"\x05speed\x18\x05 \x01(\rR\x05speed\x124\n" +
+	"\x16configured_clock_speed\x18\x06 \x01(\rR\x14configuredClockSpeed\x12\"\n" +
 	"\fmanufacturer\x18\a \x01(\tR\fmanufacturer\x12\x1d\n" +
 	"\n" +
 	"model_name\x18\b \x01(\tR\tmodelName\x12#\n" +
@@ -1371,26 +1371,26 @@ const file_agent_service_proto_rawDesc = "" +
 	"\n" +
 	"bank_label\x18\n" +
 	" \x01(\tR\tbankLabel\x12#\n" +
-	"\rhot_swappable\x18\v \x01(\tR\fhotSwappable\x12\x1c\n" +
-	"\tremovable\x18\f \x01(\tR\tremovable\x12 \n" +
-	"\vreplaceable\x18\r \x01(\tR\vreplaceable2d\n" +
+	"\rhot_swappable\x18\v \x01(\bR\fhotSwappable\x12\x1c\n" +
+	"\tremovable\x18\f \x01(\bR\tremovable\x12 \n" +
+	"\vreplaceable\x18\r \x01(\bR\vreplaceable2d\n" +
 	"\fAgentService\x12T\n" +
 	"\aConnect\x12!.monitoring.agent.v1.AgentMessage\x1a\".monitoring.agent.v1.ServerMessage(\x010\x01BKZIgithub.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1;agentv1b\x06proto3"
 
 var (
-	file_agent_service_proto_rawDescOnce sync.Once
-	file_agent_service_proto_rawDescData []byte
+	file_agent_v1_agent_service_proto_rawDescOnce sync.Once
+	file_agent_v1_agent_service_proto_rawDescData []byte
 )
 
-func file_agent_service_proto_rawDescGZIP() []byte {
-	file_agent_service_proto_rawDescOnce.Do(func() {
-		file_agent_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_agent_service_proto_rawDesc), len(file_agent_service_proto_rawDesc)))
+func file_agent_v1_agent_service_proto_rawDescGZIP() []byte {
+	file_agent_v1_agent_service_proto_rawDescOnce.Do(func() {
+		file_agent_v1_agent_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_agent_v1_agent_service_proto_rawDesc), len(file_agent_v1_agent_service_proto_rawDesc)))
 	})
-	return file_agent_service_proto_rawDescData
+	return file_agent_v1_agent_service_proto_rawDescData
 }
 
-var file_agent_service_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
-var file_agent_service_proto_goTypes = []any{
+var file_agent_v1_agent_service_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_agent_v1_agent_service_proto_goTypes = []any{
 	(*AgentMessage)(nil),           // 0: monitoring.agent.v1.AgentMessage
 	(*ServerMessage)(nil),          // 1: monitoring.agent.v1.ServerMessage
 	(*Handshake)(nil),              // 2: monitoring.agent.v1.Handshake
@@ -1411,7 +1411,7 @@ var file_agent_service_proto_goTypes = []any{
 	(*PhysicalMemoryInfo)(nil),     // 17: monitoring.agent.v1.PhysicalMemoryInfo
 	(*timestamppb.Timestamp)(nil),  // 18: google.protobuf.Timestamp
 }
-var file_agent_service_proto_depIdxs = []int32{
+var file_agent_v1_agent_service_proto_depIdxs = []int32{
 	2,  // 0: monitoring.agent.v1.AgentMessage.handshake:type_name -> monitoring.agent.v1.Handshake
 	3,  // 1: monitoring.agent.v1.AgentMessage.metrics:type_name -> monitoring.agent.v1.Metrics
 	8,  // 2: monitoring.agent.v1.AgentMessage.command_result:type_name -> monitoring.agent.v1.CommandResult
@@ -1438,44 +1438,44 @@ var file_agent_service_proto_depIdxs = []int32{
 	0,  // [0:17] is the sub-list for field type_name
 }
 
-func init() { file_agent_service_proto_init() }
-func file_agent_service_proto_init() {
-	if File_agent_service_proto != nil {
+func init() { file_agent_v1_agent_service_proto_init() }
+func file_agent_v1_agent_service_proto_init() {
+	if File_agent_v1_agent_service_proto != nil {
 		return
 	}
-	file_agent_service_proto_msgTypes[0].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[0].OneofWrappers = []any{
 		(*AgentMessage_Handshake)(nil),
 		(*AgentMessage_Metrics)(nil),
 		(*AgentMessage_CommandResult)(nil),
 	}
-	file_agent_service_proto_msgTypes[1].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[1].OneofWrappers = []any{
 		(*ServerMessage_Command)(nil),
 	}
-	file_agent_service_proto_msgTypes[4].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[4].OneofWrappers = []any{
 		(*Metric_CpuPercent)(nil),
 		(*Metric_FocusedWindow)(nil),
 	}
-	file_agent_service_proto_msgTypes[7].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[7].OneofWrappers = []any{
 		(*Command_SpecificationsRequest)(nil),
 	}
-	file_agent_service_proto_msgTypes[8].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[8].OneofWrappers = []any{
 		(*CommandResult_SpecificationsResponse)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_service_proto_rawDesc), len(file_agent_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_v1_agent_service_proto_rawDesc), len(file_agent_v1_agent_service_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_agent_service_proto_goTypes,
-		DependencyIndexes: file_agent_service_proto_depIdxs,
-		MessageInfos:      file_agent_service_proto_msgTypes,
+		GoTypes:           file_agent_v1_agent_service_proto_goTypes,
+		DependencyIndexes: file_agent_v1_agent_service_proto_depIdxs,
+		MessageInfos:      file_agent_v1_agent_service_proto_msgTypes,
 	}.Build()
-	File_agent_service_proto = out.File
-	file_agent_service_proto_goTypes = nil
-	file_agent_service_proto_depIdxs = nil
+	File_agent_v1_agent_service_proto = out.File
+	file_agent_v1_agent_service_proto_goTypes = nil
+	file_agent_v1_agent_service_proto_depIdxs = nil
 }

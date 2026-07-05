@@ -9,10 +9,14 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"time"
 
 	"agent/internal/config"
+	grpc_client "agent/internal/grpc"
+
 	"agent/internal/localserver/handler"
 	ws "agent/internal/localserver/websocket"
 	"agent/internal/service"
@@ -81,6 +85,16 @@ func main() {
 		service.StopServices()
 		shutdownChan <- err
 	}()
+
+	grpcClient, err := grpc.NewClient("127.0.0.1:8090", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal("failed to create grpc client: ", err)
+	}
+	grpcAgentClient := grpc_client.NewAgentClient(grpcClient, service.GetMetricsService())
+	err = grpcAgentClient.Connect(rootCtx)
+	if err != nil {
+		log.Fatal("failed to connect to grpc server: ", err)
+	}
 
 	log.Println("http server started on :8088")
 	err = server.ListenAndServe()

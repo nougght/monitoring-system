@@ -93,19 +93,19 @@ message CpuSpecs {
   string model_name = 1; // модель процессора
   string architecture = 2; // архитектура процессора
   string availability = 3; // доступность процессора
-  string current_clock_speed = 4; // текущая частота процессора
-  string data_width = 5; // разрядность процессора
-  string l2_cache_size = 6; // размер L2 кэша
-  string l3_cache_size = 7; // размер L3 кэша
+  uint32 current_clock_speed = 4; // текущая частота процессора
+  uint32 data_width = 5; // разрядность процессора
+  uint32 l2_cache_size = 6; // размер L2 кэша
+  uint32 l3_cache_size = 7; // размер L3 кэша
   string manufacturer = 8; // производитель
-  string max_clock_speed = 9; // максимальная частота процессора
-  string number_of_cores = 10; // количество ядер
-  string number_of_enabled_cores = 11; // количество доступных ядер
-  string number_of_logical_processors = 12; // количество логических ядер
+  uint32 max_clock_speed = 9; // максимальная частота процессора
+  uint32 number_of_cores = 10; // количество ядер
+  uint32 number_of_enabled_cores = 11; // количество доступных ядер
+  uint32 number_of_logical_processors = 12; // количество логических ядер
   string processor_id = 13; // идентификатор процессора
   string socket_designation = 14; // сокет
   string stepping = 15; // степпинг
-  string virtualization_firmware_enabled = 16; // включена ли виртуализация
+  bool virtualization_firmware_enabled = 16; // включена ли виртуализация
 }
 
 
@@ -116,7 +116,7 @@ message DiskSpecsList {
 message DiskSpecs {
   string device = 1;
   string fs_type = 2;
-  string total = 3; // общий объем диска
+  uint64 total = 3; // общий объем диска
 }
 
 message MemorySpecs {
@@ -128,15 +128,15 @@ message MemorySpecs {
 message PhysicalMemoryInfo {
   string device_locator = 1; // расположение памяти
   string memory_type = 2; // тип памяти
-  string capacity = 3; // объем
+  uint64 capacity = 3; // объем
   string form_factor = 4; // форм-фактор памяти
-  string speed = 5; // поддерживаемя частота памяти
-  string configured_clock_speed = 6; // настроенная частота памяти
+  uint32 speed = 5; // поддерживаемя частота памяти
+  uint32 configured_clock_speed = 6; // настроенная частота памяти
   string manufacturer = 7; // производитель
   string model_name = 8; // модель/партия памяти
   string serial_number = 9; // серийный номер
   string bank_label = 10; // подключение памяти
-  string hot_swappable = 11; // можно менять память без выключения системы
-  string removable = 12; // можно ли вынимать память
-  string replaceable = 13; // можно ли заменять память
+  bool hot_swappable = 11; // можно менять память без выключения системы
+  bool removable = 12; // можно ли вынимать память
+  bool replaceable = 13; // можно ли заменять память
 }
