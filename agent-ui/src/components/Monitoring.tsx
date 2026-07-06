@@ -1,23 +1,31 @@
-import { EMPTY_FOCUSED_WINDOW } from "../domain/metrics";
+import { EMPTY_FOCUSED_WINDOW, type Metrics } from "../domain/metrics";
+import type { Specs } from "../domain/specs";
 import { getGradientColor } from "../util/gradientColor";
+import { convertBytesToGB } from "../util/units";
 
 interface MonitoringProps {
-    focusedWindow?: string
-    cpuPercent?: number
+    specs?: Specs
+    metrics?: Metrics
 }
 
-const Monitoring = ({ focusedWindow, cpuPercent }: MonitoringProps) => {
+const Monitoring = ({ specs, metrics }: MonitoringProps) => {
     return (
         <section>
             <h2>Active window</h2>
-            <p>{focusedWindow == null ? "No data" :
-                focusedWindow == EMPTY_FOCUSED_WINDOW ? "No active window" :
-                    focusedWindow}
+            <p>{metrics?.focusedWindow == null ? "No data" :
+                metrics?.focusedWindow == EMPTY_FOCUSED_WINDOW ? "No active window" :
+                    metrics?.focusedWindow}
             </p>
             <h2>CPU usage</h2>
-            <p style={{ color: cpuPercent ? getGradientColor(["#00f000", "#ff0000"], Math.round(cpuPercent)) : "black" }}>
-                {cpuPercent == null ? "No data" :
-                    cpuPercent.toFixed(2) + "%"}
+            <p style={{ color: metrics?.cpuPercent ? getGradientColor(["#4cd485", "#e0cb51","#d44c4c"], Math.round(metrics?.cpuPercent)) : "black" }}>
+                {metrics?.cpuPercent == null ? "No data" :
+                    metrics?.cpuPercent.toFixed(2) + "%"}
+            </p>
+            <h2>Memory usage</h2>
+            <p>{metrics?.memoryUsed == null ? "No data" :
+                convertBytesToGB(metrics?.memoryUsed).toFixed(2)} / {convertBytesToGB(specs?.memory?.total).toFixed(2)} GB <span style={{ color: getGradientColor(["#4cd485", "#e0cb51","#d44c4c"], Math.round((convertBytesToGB(metrics?.memoryUsed) / convertBytesToGB(specs?.memory?.total)) * 100)) }}>
+                    ({Math.round((convertBytesToGB(metrics?.memoryUsed) / convertBytesToGB(specs?.memory?.total)) * 100)}%)
+                </span>
             </p>
         </section>
     )

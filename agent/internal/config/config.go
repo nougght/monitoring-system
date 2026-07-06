@@ -13,6 +13,7 @@ import (
 type Config struct {
 	FocusedWindowInterval time.Duration `yaml:"focused_window_interval"`
 	CpuPercentInterval    time.Duration `yaml:"cpu_percent_interval"`
+	MemoryInterval        time.Duration `yaml:"memory_interval"`
 }
 
 func LoadConfig(path string) (*Config, error) {

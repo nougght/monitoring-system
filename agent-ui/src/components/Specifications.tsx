@@ -4,26 +4,9 @@ import type { Specs } from "../domain/specs";
 import { convertBytesToGB } from "../util/units";
 
 interface SpecificationsProps {
-
+    specs: Specs
 }
-const Specifications = ({ }: SpecificationsProps) => {
-    const [specs, setSpecs] = useState<Specs | null>(null);
-
-    useEffect(() => {
-        const fetchSpecs = async () => {
-            const fetchedSpecs = await getSpecs({
-
-            });
-            if (fetchedSpecs.status == 200) {
-                setSpecs(fetchedSpecs.data);
-                console.log(specs);
-            } else {
-                console.log(fetchedSpecs.status);
-            }
-        }
-        fetchSpecs();
-    }, []);
-
+const Specifications = ({ specs }: SpecificationsProps) => {
     return (
         <div>
             <h1>Характеристики</h1>

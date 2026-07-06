@@ -239,6 +239,9 @@ const docTemplate = `{
                 "focusedWindow": {
                     "type": "string"
                 },
+                "memoryUsed": {
+                    "type": "integer"
+                },
                 "timestamp": {
                     "type": "string"
                 }

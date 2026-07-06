@@ -1,6 +1,7 @@
 export interface Metrics {
     focusedWindow?: string
     cpuPercent?: number
+    memoryUsed?: number
     timestamp: Date
 }
 

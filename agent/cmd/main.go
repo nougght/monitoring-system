@@ -93,7 +93,7 @@ func main() {
 	grpcAgentClient := grpc_client.NewAgentClient(grpcClient, service.GetMetricsService())
 	err = grpcAgentClient.Connect(rootCtx)
 	if err != nil {
-		log.Fatal("failed to connect to grpc server: ", err)
+		log.Println("failed to connect to grpc server: ", err)
 	}
 
 	log.Println("http server started on :8088")

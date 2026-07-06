@@ -8,5 +8,6 @@
 export interface Metrics {
   cpuPercent?: number;
   focusedWindow?: string;
+  memoryUsed?: number;
   timestamp?: string;
 }

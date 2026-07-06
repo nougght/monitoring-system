@@ -19,6 +19,7 @@ type MetricsService struct {
 	specsMu       sync.Mutex
 	focusedWindow atomic.Value
 	cpuPercent    atomic.Value
+	memory        atomic.Value
 
 	refreshSpecsFunc func(ctx context.Context) (*model.Specs, error)
 }
@@ -38,6 +39,8 @@ func (m *MetricsService) UpdateMetric(metric model.Metric) {
 		m.focusedWindow.Store(metric.(*model.FocusedWindowMetric).Value())
 	case model.MetricTypeCpuPercent:
 		m.cpuPercent.Store(metric.(*model.CpuPercentMetric).Value())
+	case model.MetricTypeMemory:
+		m.memory.Store(metric.(*model.MemoryMetric).Value())
 	}
 }
 
@@ -79,10 +82,20 @@ func (m *MetricsService) GetCpuPercent() *float64 {
 	return &percent
 }
 
+func (m *MetricsService) GetMemory() *uint64 {
+	val := m.memory.Load()
+	if val == nil {
+		return nil
+	}
+	memory := val.(uint64)
+	return &memory
+}
+
 func (m *MetricsService) GetMetrics() *model.Metrics {
 	return &model.Metrics{
 		FocusedWindow: m.GetFocusedWindow(),
 		CpuPercent:    m.GetCpuPercent(),
+		MemoryUsed:    m.GetMemory(),
 		Timestamp:     time.Now(),
 	}
 }

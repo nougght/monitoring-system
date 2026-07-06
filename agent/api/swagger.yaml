@@ -131,6 +131,8 @@ definitions:
         type: number
       focusedWindow:
         type: string
+      memoryUsed:
+        type: integer
       timestamp:
         type: string
     type: object

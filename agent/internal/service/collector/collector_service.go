@@ -56,6 +56,7 @@ func (c *CollectorService) StartCollectors(ctx context.Context) {
 
 	c.runFocusedWindowCollector(collectorsCtx)
 	c.runCpuPercentCollector(collectorsCtx)
+	c.runMemoryCollector(collectorsCtx)
 
 	specs, err := c.GetSpecifications(collectorsCtx)
 	if err != nil {
@@ -135,6 +136,28 @@ func (c *CollectorService) runCpuPercentCollector(ctx context.Context) {
 	}()
 }
 
+func (c *CollectorService) runMemoryCollector(ctx context.Context) {
+	ticker := time.NewTicker(c.config.MemoryInterval)
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				memory, err := mem.VirtualMemory()
+				if err != nil {
+					log.Printf("failed to get memory: %s", err.Error())
+					continue
+				}
+				// log.Printf("memory: %v", memory)
+				c.metricsChan <- model.NewMemoryMetric(memory.Used)
+			}
+
+		}
+	}()
+}
 func getSpecifications(ctx context.Context) (*model.Specs, error) {
 	hostInfo, err := host.InfoWithContext(ctx)
 	if err != nil {

@@ -5,8 +5,9 @@ import "time"
 type MetricType string
 
 const (
-	MetricTypeCpuPercent    MetricType = "cpu_percent"
-	MetricTypeFocusedWindow MetricType = "focused_window"
+	MetricTypeFocusedWindow MetricType = "focused_window" // активное окно
+	MetricTypeCpuPercent    MetricType = "cpu_percent"    // процент использования процессора
+	MetricTypeMemory        MetricType = "memory"         // использование памяти
 )
 
 const (
@@ -60,4 +61,28 @@ func (m *FocusedWindowMetric) Timestamp() time.Time {
 }
 func (m *FocusedWindowMetric) Value() string {
 	return m.value
+}
+
+// метрика памяти
+//
+//  минимум полей: Total есть из MemorySpecs, остальное вычисляется
+type MemoryMetric struct {
+	used      uint64
+	timestamp time.Time
+} // @name MemoryMetric
+
+func NewMemoryMetric(used uint64) *MemoryMetric {
+	return &MemoryMetric{
+		used:      used,
+		timestamp: time.Now(),
+	}
+}
+func (m *MemoryMetric) Type() MetricType {
+	return MetricTypeMemory
+}
+func (m *MemoryMetric) Timestamp() time.Time {
+	return m.timestamp
+}
+func (m *MemoryMetric) Value() uint64 {
+	return m.used
 }
