@@ -236,6 +236,13 @@ const docTemplate = `{
                 "cpuPercent": {
                     "type": "number"
                 },
+                "diskUsage": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
                 "focusedWindow": {
                     "type": "string"
                 },

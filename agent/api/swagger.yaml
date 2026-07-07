@@ -129,6 +129,11 @@ definitions:
     properties:
       cpuPercent:
         type: number
+      diskUsage:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
       focusedWindow:
         type: string
       memoryUsed:

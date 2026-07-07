@@ -57,6 +57,7 @@ func (c *CollectorService) StartCollectors(ctx context.Context) {
 	c.runFocusedWindowCollector(collectorsCtx)
 	c.runCpuPercentCollector(collectorsCtx)
 	c.runMemoryCollector(collectorsCtx)
+	c.runDiskUsageCollector(collectorsCtx)
 
 	specs, err := c.GetSpecifications(collectorsCtx)
 	if err != nil {
@@ -158,6 +159,49 @@ func (c *CollectorService) runMemoryCollector(ctx context.Context) {
 		}
 	}()
 }
+
+func (c *CollectorService) getDiskUsageMap(ctx context.Context) (map[string]uint64, error) {
+	disks, err := disk.PartitionsWithContext(ctx, true)
+	if err != nil {
+		return nil, err
+	}
+	diskUsageMap := make(map[string]uint64, len(disks))
+	for _, d := range disks {
+		diskUsage, err := disk.UsageWithContext(ctx, d.Mountpoint)
+		if err != nil {
+			return nil, err
+		}
+		diskUsageMap[diskUsage.Path] = diskUsage.Used
+	}
+	return diskUsageMap, nil
+}
+
+func (c *CollectorService) runDiskUsageCollector(ctx context.Context) {
+	ticker := time.NewTicker(10 * time.Second)
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+		usage, err := c.getDiskUsageMap(ctx)
+		if err == nil {
+			c.metricsChan <- model.NewDiskMetric(usage)
+		}
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				diskUsageMap, err := c.getDiskUsageMap(ctx)
+				if err != nil {
+					log.Printf("failed to get disk usage: %s", err.Error())
+					continue
+				}
+				log.Printf("disk usage: %v", diskUsageMap)
+				c.metricsChan <- model.NewDiskMetric(diskUsageMap)
+			}
+		}
+	}()
+}
+
 func getSpecifications(ctx context.Context) (*model.Specs, error) {
 	hostInfo, err := host.InfoWithContext(ctx)
 	if err != nil {

@@ -14,6 +14,7 @@ export * from './getSpecs500';
 export * from './hostSpecs';
 export * from './memorySpecs';
 export * from './metrics';
+export * from './metricsDiskUsage';
 export * from './physicalMemoryInfo';
 export * from './physicalMemoryInfoFormFactor';
 export * from './physicalMemoryInfoMemoryType';

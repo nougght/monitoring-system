@@ -4,9 +4,11 @@
  * Monitoring Agent API
  * OpenAPI spec version: 1.0
  */
+import type { MetricsDiskUsage } from './metricsDiskUsage';
 
 export interface Metrics {
   cpuPercent?: number;
+  diskUsage?: MetricsDiskUsage;
   focusedWindow?: string;
   memoryUsed?: number;
   timestamp?: string;

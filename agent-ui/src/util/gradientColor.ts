@@ -13,6 +13,7 @@ export function getGradientColor(colors: string[], percentage: number): string {
     const color1 = colors[i];
     const color2 = colors[Math.min(i + 1, colors.length - 1)];
 
+    console.log(color1, color2, percentage, colors.length);
     const rgb = [0, 1, 2].map(j => {
         // rgb color values from hex
         const c1 = parseInt(color1.slice(1 + j * 2, 3 + j * 2), 16);

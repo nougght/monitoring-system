@@ -8,6 +8,7 @@ const (
 	MetricTypeFocusedWindow MetricType = "focused_window" // активное окно
 	MetricTypeCpuPercent    MetricType = "cpu_percent"    // процент использования процессора
 	MetricTypeMemory        MetricType = "memory"         // использование памяти
+	MetricTypeDisk          MetricType = "disk"           // использование диска
 )
 
 const (
@@ -84,5 +85,26 @@ func (m *MemoryMetric) Timestamp() time.Time {
 	return m.timestamp
 }
 func (m *MemoryMetric) Value() uint64 {
+	return m.used
+}
+
+type DiskMetric struct {
+	used      map[string]uint64
+	timestamp time.Time
+} // @name DiskMetric
+
+func NewDiskMetric(used map[string]uint64) *DiskMetric {
+	return &DiskMetric{
+		used:      used,
+		timestamp: time.Now(),
+	}
+}
+func (m *DiskMetric) Type() MetricType {
+	return MetricTypeDisk
+}
+func (m *DiskMetric) Timestamp() time.Time {
+	return m.timestamp
+}
+func (m *DiskMetric) Value() map[string]uint64 {
 	return m.used
 }

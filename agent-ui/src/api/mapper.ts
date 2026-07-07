@@ -5,6 +5,8 @@ export const metricsFromDto = (dto: DtoMetrics): Metrics => {
     return {
         cpuPercent: dto.cpuPercent,
         focusedWindow: dto.focusedWindow,
+        memoryUsed: dto.memoryUsed,
+        diskUsage: dto.diskUsage,
         timestamp: new Date(dto.timestamp ?? new Date().toISOString()),
     }
 }

@@ -20,6 +20,7 @@ type MetricsService struct {
 	focusedWindow atomic.Value
 	cpuPercent    atomic.Value
 	memory        atomic.Value
+	diskUsage     atomic.Value
 
 	refreshSpecsFunc func(ctx context.Context) (*model.Specs, error)
 }
@@ -41,6 +42,8 @@ func (m *MetricsService) UpdateMetric(metric model.Metric) {
 		m.cpuPercent.Store(metric.(*model.CpuPercentMetric).Value())
 	case model.MetricTypeMemory:
 		m.memory.Store(metric.(*model.MemoryMetric).Value())
+	case model.MetricTypeDisk:
+		m.diskUsage.Store(metric.(*model.DiskMetric).Value())
 	}
 }
 
@@ -91,11 +94,21 @@ func (m *MetricsService) GetMemory() *uint64 {
 	return &memory
 }
 
+func (m *MetricsService) GetDiskUsage() *map[string]uint64 {
+	val := m.diskUsage.Load()
+	if val == nil {
+		return nil
+	}
+	diskUsage := val.(map[string]uint64)
+	return &diskUsage
+}
+
 func (m *MetricsService) GetMetrics() *model.Metrics {
 	return &model.Metrics{
 		FocusedWindow: m.GetFocusedWindow(),
 		CpuPercent:    m.GetCpuPercent(),
 		MemoryUsed:    m.GetMemory(),
+		DiskUsage:     m.GetDiskUsage(),
 		Timestamp:     time.Now(),
 	}
 }
