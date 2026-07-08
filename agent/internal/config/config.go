@@ -14,6 +14,8 @@ type Config struct {
 	FocusedWindowInterval time.Duration `yaml:"focused_window_interval"`
 	CpuPercentInterval    time.Duration `yaml:"cpu_percent_interval"`
 	MemoryInterval        time.Duration `yaml:"memory_interval"`
+	DiskInterval          time.Duration `yaml:"disk_interval"`
+	NetInterval           time.Duration `yaml:"net_io_interval"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -32,6 +34,8 @@ func LoadConfig(path string) (*Config, error) {
 	if err != nil {
 		log.Panicf("failed to decode config: %s", err.Error())
 	}
-
+	if cfg.NetInterval < time.Second {
+		log.Panicf("net interval can't be less than 1 second")
+	}
 	return cfg, nil
 }

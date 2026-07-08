@@ -9,7 +9,9 @@ import type { MetricsDiskUsage } from './metricsDiskUsage';
 export interface Metrics {
   cpuPercent?: number;
   diskUsage?: MetricsDiskUsage;
+  downloadMbps?: number;
   focusedWindow?: string;
   memoryUsed?: number;
   timestamp?: string;
+  uploadMbps?: number;
 }

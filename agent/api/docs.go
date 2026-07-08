@@ -243,6 +243,9 @@ const docTemplate = `{
                         "format": "int64"
                     }
                 },
+                "downloadMbps": {
+                    "type": "number"
+                },
                 "focusedWindow": {
                     "type": "string"
                 },
@@ -251,6 +254,9 @@ const docTemplate = `{
                 },
                 "timestamp": {
                     "type": "string"
+                },
+                "uploadMbps": {
+                    "type": "number"
                 }
             }
         },

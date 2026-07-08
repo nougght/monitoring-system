@@ -8,12 +8,14 @@ import (
 	"log"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/shirou/gopsutil/v4/host"
 	"github.com/shirou/gopsutil/v4/mem"
+	"github.com/shirou/gopsutil/v4/net"
 )
 
 type MetricsConsumer interface {
@@ -23,11 +25,14 @@ type MetricsConsumer interface {
 
 // collects data from the system
 type CollectorService struct {
-	config          *config.Config
-	metricsConsumer MetricsConsumer
-	metricsChan     chan model.Metric
-	wg              sync.WaitGroup
-	cancel          context.CancelFunc
+	config           *config.Config
+	metricsConsumer  MetricsConsumer
+	metricsChan      chan model.Metric
+	wg               sync.WaitGroup
+	cancel           context.CancelFunc
+	lastNetInput     atomic.Uint64
+	lastNetOutput    atomic.Uint64
+	lastNetTimestamp atomic.Uint64
 }
 
 func NewCollectorService(cfg *config.Config) *CollectorService {
@@ -58,6 +63,7 @@ func (c *CollectorService) StartCollectors(ctx context.Context) {
 	c.runCpuPercentCollector(collectorsCtx)
 	c.runMemoryCollector(collectorsCtx)
 	c.runDiskUsageCollector(collectorsCtx)
+	c.runNetIOCollectior(collectorsCtx)
 
 	specs, err := c.GetSpecifications(collectorsCtx)
 	if err != nil {
@@ -177,7 +183,7 @@ func (c *CollectorService) getDiskUsageMap(ctx context.Context) (map[string]uint
 }
 
 func (c *CollectorService) runDiskUsageCollector(ctx context.Context) {
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(c.config.DiskInterval)
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
@@ -197,6 +203,39 @@ func (c *CollectorService) runDiskUsageCollector(ctx context.Context) {
 				}
 				log.Printf("disk usage: %v", diskUsageMap)
 				c.metricsChan <- model.NewDiskMetric(diskUsageMap)
+			}
+		}
+	}()
+}
+
+func (c *CollectorService) runNetIOCollectior(ctx context.Context) {
+	ticker := time.NewTicker(c.config.NetInterval)
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				ioCounters, err := net.IOCounters(false)
+				if err != nil {
+					log.Printf("failed to get IOCounters: %s", err.Error())
+					continue
+				}
+				if len(ioCounters) == 0 {
+					log.Printf("empty IOCounters")
+					continue
+				}
+				lastInput := c.lastNetInput.Load()
+				lastOutput := c.lastNetOutput.Load()
+				if lastInput != 0 && lastOutput != 0 {
+					uploadMbps := float64(ioCounters[0].BytesSent-c.lastNetOutput.Load()) / c.config.NetInterval.Seconds() / 125000
+					downloadMbps := float64(ioCounters[0].BytesRecv-c.lastNetInput.Load()) / c.config.NetInterval.Seconds() / 125000
+					c.metricsChan <- model.NewNetIOMetric(uploadMbps, downloadMbps)
+				}
+				c.lastNetInput.Store(ioCounters[0].BytesRecv)
+				c.lastNetOutput.Store(ioCounters[0].BytesSent)
 			}
 		}
 	}()
@@ -293,6 +332,11 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 	// 	return nil, err
 	// }
 	// log.Printf("disk label: %v", label)
+	netIO, err := net.IOCounters(false)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("net io: %v", netIO)
 	coreCount, err := cpu.CountsWithContext(ctx, false)
 	if err != nil {
 		return nil, err

@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type MetricType string
 
@@ -9,6 +11,7 @@ const (
 	MetricTypeCpuPercent    MetricType = "cpu_percent"    // процент использования процессора
 	MetricTypeMemory        MetricType = "memory"         // использование памяти
 	MetricTypeDisk          MetricType = "disk"           // использование диска
+	MetricTypeNet           MetricType = "net"            // использование сети
 )
 
 const (
@@ -66,7 +69,7 @@ func (m *FocusedWindowMetric) Value() string {
 
 // метрика памяти
 //
-//  минимум полей: Total есть из MemorySpecs, остальное вычисляется
+//	минимум полей: Total есть из MemorySpecs, остальное вычисляется
 type MemoryMetric struct {
 	used      uint64
 	timestamp time.Time
@@ -107,4 +110,33 @@ func (m *DiskMetric) Timestamp() time.Time {
 }
 func (m *DiskMetric) Value() map[string]uint64 {
 	return m.used
+}
+
+type NetIOMetric struct {
+	uploadMbps   float64
+	downloadMbps float64
+	timestamp    time.Time
+}
+
+func NewNetIOMetric(upMbps float64, downMbps float64) *NetIOMetric {
+	return &NetIOMetric{
+		uploadMbps:   upMbps,
+		downloadMbps: downMbps,
+	}
+}
+
+func (m *NetIOMetric) Type() MetricType {
+	return MetricTypeNet
+}
+
+func (m *NetIOMetric) Timestamp() time.Time {
+	return m.timestamp
+}
+
+func (m *NetIOMetric) UploadMbps() float64 {
+	return m.uploadMbps
+}
+
+func (m *NetIOMetric) DownloadMbps() float64 {
+	return m.downloadMbps
 }

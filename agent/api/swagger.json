@@ -236,6 +236,9 @@
                         "format": "int64"
                     }
                 },
+                "downloadMbps": {
+                    "type": "number"
+                },
                 "focusedWindow": {
                     "type": "string"
                 },
@@ -244,6 +247,9 @@
                 },
                 "timestamp": {
                     "type": "string"
+                },
+                "uploadMbps": {
+                    "type": "number"
                 }
             }
         },

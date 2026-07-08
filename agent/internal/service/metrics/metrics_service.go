@@ -21,6 +21,8 @@ type MetricsService struct {
 	cpuPercent    atomic.Value
 	memory        atomic.Value
 	diskUsage     atomic.Value
+	uploadMbps    atomic.Value
+	downloadMbps  atomic.Value
 
 	refreshSpecsFunc func(ctx context.Context) (*model.Specs, error)
 }
@@ -44,7 +46,12 @@ func (m *MetricsService) UpdateMetric(metric model.Metric) {
 		m.memory.Store(metric.(*model.MemoryMetric).Value())
 	case model.MetricTypeDisk:
 		m.diskUsage.Store(metric.(*model.DiskMetric).Value())
+	case model.MetricTypeNet:
+		netMetric := metric.(*model.NetIOMetric)
+		m.uploadMbps.Store(netMetric.UploadMbps())
+		m.downloadMbps.Store(netMetric.DownloadMbps())
 	}
+
 }
 
 func (m *MetricsService) GetSpecs(ctx context.Context) (*model.Specs, error) {
@@ -103,12 +110,31 @@ func (m *MetricsService) GetDiskUsage() *map[string]uint64 {
 	return &diskUsage
 }
 
+func (m *MetricsService) GetUploadMbps() *float64 {
+	val := m.uploadMbps.Load()
+	if val == nil {
+		return nil
+	}
+	uploadMbps := val.(float64)
+	return &uploadMbps
+}
+
+func (m *MetricsService) GetDownloadMbps() *float64 {
+	val := m.downloadMbps.Load()
+	if val == nil {
+		return nil
+	}
+	downloadMbps := val.(float64)
+	return &downloadMbps
+}
 func (m *MetricsService) GetMetrics() *model.Metrics {
 	return &model.Metrics{
 		FocusedWindow: m.GetFocusedWindow(),
 		CpuPercent:    m.GetCpuPercent(),
 		MemoryUsed:    m.GetMemory(),
 		DiskUsage:     m.GetDiskUsage(),
+		UploadMbps:    m.GetUploadMbps(),
+		DownloadMbps:  m.GetDownloadMbps(),
 		Timestamp:     time.Now(),
 	}
 }

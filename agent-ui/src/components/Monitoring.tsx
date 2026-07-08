@@ -50,6 +50,10 @@ const Monitoring = ({ specs, metrics }: MonitoringProps) => {
                     )
                 })}
             </p>
+            <h2>Net usage</h2>
+            <p>
+                Up: {metrics?.uploadMbps.toFixed(2)} | Down: {metrics?.downloadMbps.toFixed(2)} Mbit/s
+            </p>
         </section>
     )
 }

@@ -7,6 +7,8 @@ export const metricsFromDto = (dto: DtoMetrics): Metrics => {
         focusedWindow: dto.focusedWindow,
         memoryUsed: dto.memoryUsed,
         diskUsage: dto.diskUsage,
+        uploadMbps: dto.uploadMbps,
+        downloadMbps: dto.downloadMbps,
         timestamp: new Date(dto.timestamp ?? new Date().toISOString()),
     }
 }

@@ -3,6 +3,8 @@ export interface Metrics {
     cpuPercent?: number
     memoryUsed?: number
     diskUsage?: { [deviceName: string]: number }
+    uploadMbps?: number
+    downloadMbps?: number
     timestamp: Date
 }
 
