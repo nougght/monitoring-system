@@ -24,11 +24,11 @@ type Metric interface {
 } // @name Metric
 
 type CpuPercentMetric struct {
-	value     float64
+	value     float32
 	timestamp time.Time
 } // @name CpuPercentMetric
 
-func NewCpuPercentMetric(value float64) *CpuPercentMetric {
+func NewCpuPercentMetric(value float32) *CpuPercentMetric {
 	return &CpuPercentMetric{
 		value:     value,
 		timestamp: time.Now(),
@@ -41,7 +41,7 @@ func (m *CpuPercentMetric) Type() MetricType {
 func (m *CpuPercentMetric) Timestamp() time.Time {
 	return m.timestamp
 }
-func (m *CpuPercentMetric) Value() float64 {
+func (m *CpuPercentMetric) Value() float32 {
 	return m.value
 }
 
@@ -113,12 +113,12 @@ func (m *DiskMetric) Value() map[string]uint64 {
 }
 
 type NetIOMetric struct {
-	uploadMbps   float64
-	downloadMbps float64
+	uploadMbps   float32
+	downloadMbps float32
 	timestamp    time.Time
 }
 
-func NewNetIOMetric(upMbps float64, downMbps float64) *NetIOMetric {
+func NewNetIOMetric(upMbps float32, downMbps float32) *NetIOMetric {
 	return &NetIOMetric{
 		uploadMbps:   upMbps,
 		downloadMbps: downMbps,
@@ -133,10 +133,10 @@ func (m *NetIOMetric) Timestamp() time.Time {
 	return m.timestamp
 }
 
-func (m *NetIOMetric) UploadMbps() float64 {
+func (m *NetIOMetric) UploadMbps() float32 {
 	return m.uploadMbps
 }
 
-func (m *NetIOMetric) DownloadMbps() float64 {
+func (m *NetIOMetric) DownloadMbps() float32 {
 	return m.downloadMbps
 }

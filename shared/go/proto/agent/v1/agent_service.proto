@@ -34,8 +34,14 @@ message Handshake {
 
 
 message Metrics {
-  repeated Metric metrics = 1;
+    CpuPercentMetric cpu_percent = 1;
+    FocusedWindowMetric focused_window = 2;
+    MemoryUsageMetric memory_usage = 3;
+    DiskUsageMetric disk_usage = 4;
+    NetworkUsageMetric network_usage = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
+
 
 message Metric {
   google.protobuf.Timestamp timestamp = 1;
@@ -50,23 +56,28 @@ message Metric {
 
 message CpuPercentMetric {
   float value = 1; // процент использования CPU
+  google.protobuf.Timestamp timestamp = 2;
 }
 
 message FocusedWindowMetric {
   string value = 1; // название активного окна
+  google.protobuf.Timestamp timestamp = 2;
 }
 
 message MemoryUsageMetric {
   uint64 value = 1; // использование памяти
+  google.protobuf.Timestamp timestamp = 2;
 }
 
 message DiskUsageMetric {
   map<string, uint64> value = 1; // использование дисков
+  google.protobuf.Timestamp timestamp = 2;
 }
 
 message NetworkUsageMetric {
-  uint64 upload_mbps = 1; // скорость загрузки
-  uint64 download_mbps = 2; // скорость выгрузки
+  float upload_mbps = 1; // скорость загрузки
+  float download_mbps = 2; // скорость выгрузки
+  google.protobuf.Timestamp timestamp = 3;
 }
 
 message Command {

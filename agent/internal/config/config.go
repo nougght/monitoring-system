@@ -11,11 +11,12 @@ import (
 )
 
 type Config struct {
-	FocusedWindowInterval time.Duration `yaml:"focused_window_interval"`
-	CpuPercentInterval    time.Duration `yaml:"cpu_percent_interval"`
-	MemoryInterval        time.Duration `yaml:"memory_interval"`
-	DiskInterval          time.Duration `yaml:"disk_interval"`
-	NetInterval           time.Duration `yaml:"net_io_interval"`
+	FocusedWindowInterval  time.Duration `yaml:"focused_window_interval"`
+	CpuPercentInterval     time.Duration `yaml:"cpu_percent_interval"`
+	MemoryInterval         time.Duration `yaml:"memory_interval"`
+	DiskInterval           time.Duration `yaml:"disk_interval"`
+	NetInterval            time.Duration `yaml:"net_io_interval"`
+	MetricsSendingInterval time.Duration `yaml:"metrics_sending_interval"`
 }
 
 func LoadConfig(path string) (*Config, error) {

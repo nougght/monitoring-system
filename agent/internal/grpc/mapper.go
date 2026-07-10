@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	pb "github.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func convertSpecsToProto(specs *model.Specs) *pb.Specs {
@@ -92,5 +93,70 @@ func convertPhysicalMemoryInfoToProto(physicalMemory *model.PhysicalMemoryInfo) 
 		HotSwappable:         physicalMemory.HotSwappable,
 		Removable:            physicalMemory.Removable,
 		Replaceable:          physicalMemory.Replaceable,
+	}
+}
+
+func convertCpuPercentMetricToProto(cpuPercent *model.CpuPercentMetric) *pb.CpuPercentMetric {
+	if cpuPercent == nil {
+		return nil
+	}
+	return &pb.CpuPercentMetric{
+		Value:     cpuPercent.Value(),
+		Timestamp: timestamppb.New(cpuPercent.Timestamp()),
+	}
+}
+
+func convertFocusedWindowMetricToProto(focusedWindow *model.FocusedWindowMetric) *pb.FocusedWindowMetric {
+	if focusedWindow == nil {
+		return nil
+	}
+	return &pb.FocusedWindowMetric{
+		Value:     focusedWindow.Value(),
+		Timestamp: timestamppb.New(focusedWindow.Timestamp()),
+	}
+}
+
+func convertMemoryUsageMetricToProto(memoryUsage *model.MemoryMetric) *pb.MemoryUsageMetric {
+	if memoryUsage == nil {
+		return nil
+	}
+	return &pb.MemoryUsageMetric{
+		Value:     memoryUsage.Value(),
+		Timestamp: timestamppb.New(memoryUsage.Timestamp()),
+	}
+}
+
+func convertDiskUsageMetricToProto(diskUsage *model.DiskMetric) *pb.DiskUsageMetric {
+	if diskUsage == nil {
+		return nil
+	}
+	return &pb.DiskUsageMetric{
+		Value:     diskUsage.Value(),
+		Timestamp: timestamppb.New(diskUsage.Timestamp()),
+	}
+}
+
+func convertNetworkUsageMetricToProto(networkUsage *model.NetIOMetric) *pb.NetworkUsageMetric {
+	if networkUsage == nil {
+		return nil
+	}
+	return &pb.NetworkUsageMetric{
+		UploadMbps:   networkUsage.UploadMbps(),
+		DownloadMbps: networkUsage.DownloadMbps(),
+		Timestamp:    timestamppb.New(networkUsage.Timestamp()),
+	}
+}
+
+func convertMetricsToProto(metrics *model.Metrics) *pb.Metrics {
+	if metrics == nil {
+		return nil
+	}
+	return &pb.Metrics{
+		CpuPercent:    convertCpuPercentMetricToProto(metrics.CpuPercent),
+		FocusedWindow: convertFocusedWindowMetricToProto(metrics.FocusedWindow),
+		MemoryUsage:   convertMemoryUsageMetricToProto(metrics.MemoryUsage),
+		DiskUsage:     convertDiskUsageMetricToProto(metrics.DiskUsage),
+		NetworkUsage:  convertNetworkUsageMetricToProto(metrics.NetworkUsage),
+		Timestamp:     timestamppb.New(metrics.Timestamp),
 	}
 }

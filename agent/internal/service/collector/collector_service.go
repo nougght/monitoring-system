@@ -16,6 +16,7 @@ import (
 	"github.com/shirou/gopsutil/v4/host"
 	"github.com/shirou/gopsutil/v4/mem"
 	"github.com/shirou/gopsutil/v4/net"
+	"github.com/shirou/gopsutil/v4/process"
 )
 
 type MetricsConsumer interface {
@@ -137,7 +138,7 @@ func (c *CollectorService) runCpuPercentCollector(ctx context.Context) {
 					continue
 				}
 				// log.Println("cpu percent", percent[0])
-				c.metricsChan <- model.NewCpuPercentMetric(percent[0])
+				c.metricsChan <- model.NewCpuPercentMetric(float32(percent[0]))
 			}
 		}
 	}()
@@ -232,7 +233,7 @@ func (c *CollectorService) runNetIOCollectior(ctx context.Context) {
 				if lastInput != 0 && lastOutput != 0 {
 					uploadMbps := float64(ioCounters[0].BytesSent-c.lastNetOutput.Load()) / c.config.NetInterval.Seconds() / 125000
 					downloadMbps := float64(ioCounters[0].BytesRecv-c.lastNetInput.Load()) / c.config.NetInterval.Seconds() / 125000
-					c.metricsChan <- model.NewNetIOMetric(uploadMbps, downloadMbps)
+					c.metricsChan <- model.NewNetIOMetric(float32(uploadMbps), float32(downloadMbps))
 				}
 				c.lastNetInput.Store(ioCounters[0].BytesRecv)
 				c.lastNetOutput.Store(ioCounters[0].BytesSent)
@@ -337,6 +338,11 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		return nil, err
 	}
 	log.Printf("net io: %v", netIO)
+	ps, err := process.ProcessesWithContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("processes: %v", ps)
 	coreCount, err := cpu.CountsWithContext(ctx, false)
 	if err != nil {
 		return nil, err

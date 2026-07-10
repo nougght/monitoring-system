@@ -90,7 +90,7 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to create grpc client: ", err)
 	}
-	grpcAgentClient := grpc_client.NewAgentClient(grpcClient, service.GetMetricsService())
+	grpcAgentClient := grpc_client.NewAgentClient(grpcClient, cfg, service.GetMetricsService())
 	err = grpcAgentClient.Connect(rootCtx)
 	if err != nil {
 		log.Println("failed to connect to grpc server: ", err)

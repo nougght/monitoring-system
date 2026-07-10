@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"agent/internal/localserver/mapper"
 	"agent/internal/model"
 	"agent/internal/service/metrics"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,7 +43,7 @@ func (h *Handler) GetSpecifications(c *gin.Context) {
 // @Failure 500 {object} map[string]string
 // @Router /metrics [get]
 func (h *Handler) GetMetrics(c *gin.Context) {
-	var metrics *model.Metrics
-	metrics = h.metricsService.GetMetrics()
+	metrics := mapper.ConvertMetricsToDto(h.metricsService.GetMetrics())
+	log.Println("metrics", metrics)
 	c.JSON(http.StatusOK, metrics)
 }

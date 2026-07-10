@@ -1,0 +1,13 @@
+package dto
+
+import "time"
+
+type Metrics struct {
+	FocusedWindow *string            `json:"focusedWindow,omitempty"`
+	CpuPercent    *float32           `json:"cpuPercent,omitempty"`
+	MemoryUsed    *uint64            `json:"memoryUsed,omitempty"`
+	DiskUsage     *map[string]uint64 `json:"diskUsage,omitempty"`
+	UploadMbps    *float32           `json:"uploadMbps,omitempty"`
+	DownloadMbps  *float32           `json:"downloadMbps,omitempty"`
+	Timestamp     time.Time          `json:"timestamp"`
+} // @name Metrics

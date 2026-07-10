@@ -3,11 +3,10 @@ package model
 import "time"
 
 type Metrics struct {
-	FocusedWindow *string            `json:"focusedWindow,omitempty"`
-	CpuPercent    *float64           `json:"cpuPercent,omitempty"`
-	MemoryUsed    *uint64            `json:"memoryUsed,omitempty"`
-	DiskUsage     *map[string]uint64 `json:"diskUsage,omitempty"`
-	UploadMbps    *float64           `json:"uploadMbps,omitempty"`
-	DownloadMbps  *float64           `json:"downloadMbps,omitempty"`
-	Timestamp     time.Time          `json:"timestamp"`
+	FocusedWindow *FocusedWindowMetric `json:"focusedWindow,omitempty"`
+	CpuPercent    *CpuPercentMetric    `json:"cpuPercent,omitempty"`
+	MemoryUsage   *MemoryMetric        `json:"memoryUsage,omitempty"`
+	DiskUsage     *DiskMetric          `json:"diskUsage,omitempty"`
+	NetworkUsage  *NetIOMetric         `json:"networkUsage,omitempty"`
+	Timestamp     time.Time            `json:"timestamp"`
 } // @name Metrics

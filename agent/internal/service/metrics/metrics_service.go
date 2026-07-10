@@ -6,7 +6,6 @@ import (
 	"context"
 	"log"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -15,14 +14,10 @@ type MetricsService struct {
 	metricsChan <-chan model.Metric
 
 	// temporary storing
-	specs         *model.Specs
-	specsMu       sync.Mutex
-	focusedWindow atomic.Value
-	cpuPercent    atomic.Value
-	memory        atomic.Value
-	diskUsage     atomic.Value
-	uploadMbps    atomic.Value
-	downloadMbps  atomic.Value
+	specs     *model.Specs
+	specsMu   sync.RWMutex
+	metrics   *model.Metrics
+	metricsMu sync.RWMutex
 
 	refreshSpecsFunc func(ctx context.Context) (*model.Specs, error)
 }
@@ -32,6 +27,7 @@ func NewMetricsService(cfg *config.Config,
 	return &MetricsService{
 		config:           cfg,
 		refreshSpecsFunc: refreshSpecsFunc,
+		metrics:          new(model.Metrics),
 	}
 }
 
@@ -39,32 +35,34 @@ func (m *MetricsService) UpdateMetric(metric model.Metric) {
 	// log.Println("update metric", metric.Type())
 	switch metric.Type() {
 	case model.MetricTypeFocusedWindow:
-		m.focusedWindow.Store(metric.(*model.FocusedWindowMetric).Value())
+		m.metrics.FocusedWindow = metric.(*model.FocusedWindowMetric)
 	case model.MetricTypeCpuPercent:
-		m.cpuPercent.Store(metric.(*model.CpuPercentMetric).Value())
+		m.metrics.CpuPercent = metric.(*model.CpuPercentMetric)
 	case model.MetricTypeMemory:
-		m.memory.Store(metric.(*model.MemoryMetric).Value())
+		m.metrics.MemoryUsage = metric.(*model.MemoryMetric)
 	case model.MetricTypeDisk:
-		m.diskUsage.Store(metric.(*model.DiskMetric).Value())
+		m.metrics.DiskUsage = metric.(*model.DiskMetric)
 	case model.MetricTypeNet:
 		netMetric := metric.(*model.NetIOMetric)
-		m.uploadMbps.Store(netMetric.UploadMbps())
-		m.downloadMbps.Store(netMetric.DownloadMbps())
+		m.metrics.NetworkUsage = netMetric
 	}
 
 }
 
 func (m *MetricsService) GetSpecs(ctx context.Context) (*model.Specs, error) {
-	m.specsMu.Lock()
-	defer m.specsMu.Unlock()
+	m.metricsMu.RLock()
 	if m.specs == nil {
+		m.metricsMu.RUnlock()
 		specs, err := m.refreshSpecsFunc(ctx)
 		if err != nil {
 			return nil, err
 		}
+		m.metricsMu.Lock()
 		m.specs = specs
+		m.metricsMu.Unlock()
 	}
-	return m.refreshSpecsFunc(ctx)
+	m.metricsMu.RUnlock()
+	return m.specs, nil
 }
 
 func (m *MetricsService) UpdateSpecs(specs *model.Specs) {
@@ -74,67 +72,64 @@ func (m *MetricsService) UpdateSpecs(specs *model.Specs) {
 	m.specs = specs
 }
 
-func (m *MetricsService) GetFocusedWindow() *string {
-	val := m.focusedWindow.Load()
-	if val == nil {
+func (m *MetricsService) GetFocusedWindow() *model.FocusedWindowMetric {
+	m.metricsMu.RLock()
+	defer m.metricsMu.RUnlock()
+	if m.metrics.FocusedWindow == nil {
 		return nil
 	}
-	title := val.(string)
-	return &title
+	return m.metrics.FocusedWindow
 }
 
-func (m *MetricsService) GetCpuPercent() *float64 {
-	val := m.cpuPercent.Load()
-	if val == nil {
+func (m *MetricsService) GetCpuPercent() *model.CpuPercentMetric {
+	m.metricsMu.RLock()
+	defer m.metricsMu.RUnlock()
+	if m.metrics.CpuPercent == nil {
 		return nil
 	}
-	percent := val.(float64)
-	return &percent
+	return m.metrics.CpuPercent
 }
 
-func (m *MetricsService) GetMemory() *uint64 {
-	val := m.memory.Load()
-	if val == nil {
+func (m *MetricsService) GetMemory() *model.MemoryMetric {
+	m.metricsMu.RLock()
+	defer m.metricsMu.RUnlock()
+	if m.metrics.MemoryUsage == nil {
 		return nil
 	}
-	memory := val.(uint64)
-	return &memory
+	return m.metrics.MemoryUsage
 }
 
-func (m *MetricsService) GetDiskUsage() *map[string]uint64 {
-	val := m.diskUsage.Load()
-	if val == nil {
+func (m *MetricsService) GetDiskUsage() *model.DiskMetric {
+	m.metricsMu.RLock()
+	defer m.metricsMu.RUnlock()
+	if m.metrics.DiskUsage == nil {
 		return nil
 	}
-	diskUsage := val.(map[string]uint64)
-	return &diskUsage
+	return m.metrics.DiskUsage
 }
 
-func (m *MetricsService) GetUploadMbps() *float64 {
-	val := m.uploadMbps.Load()
-	if val == nil {
+func (m *MetricsService) GetNetworkUsage() *model.NetIOMetric {
+	m.metricsMu.RLock()
+	defer m.metricsMu.RUnlock()
+	if m.metrics.NetworkUsage == nil {
 		return nil
 	}
-	uploadMbps := val.(float64)
-	return &uploadMbps
+	return m.metrics.NetworkUsage
 }
 
-func (m *MetricsService) GetDownloadMbps() *float64 {
-	val := m.downloadMbps.Load()
-	if val == nil {
-		return nil
-	}
-	downloadMbps := val.(float64)
-	return &downloadMbps
+func (m *MetricsService) GetTimestamp() time.Time {
+	m.metricsMu.RLock()
+	defer m.metricsMu.RUnlock()
+	return m.metrics.Timestamp
 }
+
 func (m *MetricsService) GetMetrics() *model.Metrics {
 	return &model.Metrics{
 		FocusedWindow: m.GetFocusedWindow(),
 		CpuPercent:    m.GetCpuPercent(),
-		MemoryUsed:    m.GetMemory(),
+		MemoryUsage:   m.GetMemory(),
 		DiskUsage:     m.GetDiskUsage(),
-		UploadMbps:    m.GetUploadMbps(),
-		DownloadMbps:  m.GetDownloadMbps(),
+		NetworkUsage:  m.GetNetworkUsage(),
 		Timestamp:     time.Now(),
 	}
 }

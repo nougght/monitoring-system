@@ -1,11 +1,13 @@
 package grpc_client
 
 import (
+	"agent/internal/config"
 	"agent/internal/model"
 	"context"
 	"errors"
 	"io"
 	"log"
+	"time"
 
 	pb "github.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1"
 	"google.golang.org/grpc"
@@ -18,13 +20,15 @@ type MetricsProvider interface {
 
 type AgentClient struct {
 	conn            *grpc.ClientConn
+	config          *config.Config
 	grpcClient      pb.AgentServiceClient
 	metricsProvider MetricsProvider
 }
 
-func NewAgentClient(conn *grpc.ClientConn, metricsProvider MetricsProvider) *AgentClient {
+func NewAgentClient(conn *grpc.ClientConn, config *config.Config, metricsProvider MetricsProvider) *AgentClient {
 	return &AgentClient{
 		conn:            conn,
+		config:          config,
 		grpcClient:      pb.NewAgentServiceClient(conn),
 		metricsProvider: metricsProvider,
 	}
@@ -36,7 +40,7 @@ func (c *AgentClient) Connect(ctx context.Context) error {
 		return err
 	}
 	c.runReader(stream)
-	// c.runWriter(stream)
+	c.runWriter(stream)
 	return nil
 }
 
@@ -84,15 +88,27 @@ func (c *AgentClient) runReader(stream pb.AgentService_ConnectClient) {
 	}()
 }
 
-// func (c *AgentClient) runWriter(stream pb.AgentService_ConnectClient) error {
-// 	ticker := time.NewTicker(1 * time.Second)
-// 	go func() {
-// 		for {
-// 			metrics, err := c.metricsProvider.GetMetrics()
-// 			if err != nil {
-// 				return err
-// 			}
-// 		}
-// 	}()
-// 	return nil
-// }
+func (c *AgentClient) runWriter(stream pb.AgentService_ConnectClient) error {
+	ticker := time.NewTicker(c.config.MetricsSendingInterval)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				metrics := c.metricsProvider.GetMetrics()
+				err := stream.Send(&pb.AgentMessage{
+					Payload: &pb.AgentMessage_Metrics{
+						Metrics: convertMetricsToProto(metrics),
+					},
+				})
+				if err != nil {
+					log.Println("error sending metrics:", err)
+					return
+				}
+			case <-stream.Context().Done():
+				log.Println("grpc stream closed")
+				return
+			}
+		}
+	}()
+	return nil
+}

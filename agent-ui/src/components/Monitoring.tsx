@@ -26,13 +26,13 @@ const Monitoring = ({ specs, metrics }: MonitoringProps) => {
             </p>
             <h2>Memory usage</h2>
             <p>{metrics?.memoryUsed == null ? "No data" :
-                convertBytesToGB(metrics?.memoryUsed).toFixed(2)} / {convertBytesToGB(specs?.memory?.total).toFixed(2)} GB <span
+                convertBytesToGB(metrics?.memoryUsed ?? 0).toFixed(2)} / {convertBytesToGB(specs?.memory?.total ?? 0).toFixed(2)} GB <span
                     style={{
                         color: metrics?.memoryUsed != null && specs?.memory?.total != null ?
                             getGradientColor(["#4cd485", "#e0cb51", "#d44c4c"], Math.round((convertBytesToGB(metrics?.memoryUsed) /
                                 convertBytesToGB(specs?.memory?.total)) * 100)) : "black"
                     }}>
-                    ({Math.round((convertBytesToGB(metrics?.memoryUsed) / convertBytesToGB(specs?.memory?.total)) * 100)}%)
+                    ({Math.round((convertBytesToGB(metrics?.memoryUsed ?? 0) / convertBytesToGB(specs?.memory?.total ?? 0)) * 100)}%)
                 </span>
             </p>
             <h2>Disk usage</h2>
@@ -41,9 +41,9 @@ const Monitoring = ({ specs, metrics }: MonitoringProps) => {
                     return (
                         <div key={disk.device}>
                             <p>
-                                {disk.device}: {convertBytesToGB(metrics?.diskUsage?.[disk.device] ?? 0).toFixed(2)} /
-                                {convertBytesToGB(disk.total).toFixed(2)} GB <span style={{ color: getGradientColor(["#4cd485", "#e0cb51", "#d44c4c"], Math.round((metrics?.diskUsage?.[disk.device] ?? 0) / disk.total * 100)) }}>
-                                    ({Math.round((metrics?.diskUsage?.[disk.device] ?? 0) / disk.total * 100)}%)
+                                {disk.device}: {convertBytesToGB(metrics?.diskUsage?.[disk.device ?? ""] ?? 0).toFixed(2)} /
+                                {convertBytesToGB(disk.total ?? 0).toFixed(2)} GB <span style={{ color: getGradientColor(["#4cd485", "#e0cb51", "#d44c4c"], Math.round((metrics?.diskUsage?.[disk.device ?? ""] ?? 0) / (disk.total ?? 0) * 100)) }}>
+                                    ({Math.round((metrics?.diskUsage?.[disk.device ?? ""] ?? 0) / (disk.total ?? 0) * 100)}%)
                                 </span>
                             </p>
                         </div>
@@ -52,7 +52,7 @@ const Monitoring = ({ specs, metrics }: MonitoringProps) => {
             </p>
             <h2>Net usage</h2>
             <p>
-                Up: {metrics?.uploadMbps.toFixed(2)} | Down: {metrics?.downloadMbps.toFixed(2)} Mbit/s
+                Up: {metrics?.uploadMbps?.toFixed(2) ?? "0"} | Down: {metrics?.downloadMbps?.toFixed(2) ?? "0"} Mbit/s
             </p>
         </section>
     )

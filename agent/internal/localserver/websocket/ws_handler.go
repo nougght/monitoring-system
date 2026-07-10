@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"agent/internal/localserver/mapper"
 	"agent/internal/service/metrics"
 	"context"
 	"log"
@@ -63,7 +64,7 @@ func (h *WsHandler) HandleMessages(conn *websocket.Conn) {
 	for {
 		select {
 		case <-ticker.C:
-			metrics := h.metricsService.GetMetrics()
+			metrics := mapper.ConvertMetricsToDto(h.metricsService.GetMetrics())
 			err := conn.WriteJSON(metrics)
 			if err != nil {
 				log.Println("failed to write message: ", err)
