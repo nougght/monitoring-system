@@ -42,6 +42,9 @@ message Metric {
   oneof payload {
     CpuPercentMetric cpu_percent = 2;
     FocusedWindowMetric focused_window = 3;
+    MemoryUsageMetric memory_usage = 4;
+    DiskUsageMetric disk_usage = 5;
+    NetworkUsageMetric network_usage = 6;
   }
 }
 
@@ -53,6 +56,18 @@ message FocusedWindowMetric {
   string value = 1; // название активного окна
 }
 
+message MemoryUsageMetric {
+  uint64 value = 1; // использование памяти
+}
+
+message DiskUsageMetric {
+  map<string, uint64> value = 1; // использование дисков
+}
+
+message NetworkUsageMetric {
+  uint64 upload_mbps = 1; // скорость загрузки
+  uint64 download_mbps = 2; // скорость выгрузки
+}
 
 message Command {
   oneof payload {
