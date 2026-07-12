@@ -3,6 +3,7 @@ package ws
 import (
 	"agent/internal/localserver/mapper"
 	"agent/internal/service/metrics"
+	"agent/internal/utils"
 	"context"
 	"log"
 	"net/http"
@@ -11,12 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
-}
 
 type WsHandler struct {
 	upgrader       *websocket.Upgrader
@@ -46,7 +41,7 @@ func (h *WsHandler) HandleConnection(c *gin.Context) {
 }
 
 func (h *WsHandler) HandleMessages(conn *websocket.Conn) {
-	defer conn.Close()
+	defer utils.CloseWithLog(conn)
 
 	ticker := time.NewTicker(time.Millisecond * 100)
 	defer ticker.Stop()

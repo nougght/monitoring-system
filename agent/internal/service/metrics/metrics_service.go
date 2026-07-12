@@ -10,8 +10,7 @@ import (
 )
 
 type MetricsService struct {
-	config      *config.Config
-	metricsChan <-chan model.Metric
+	config *config.Config
 
 	// temporary storing
 	specs     *model.Specs

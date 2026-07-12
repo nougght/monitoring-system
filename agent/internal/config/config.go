@@ -1,6 +1,7 @@
 package config
 
 import (
+	"agent/internal/utils"
 	"fmt"
 	"io"
 	"log"
@@ -24,7 +25,7 @@ func LoadConfig(path string) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file %s: %w", path, err)
 	}
-	defer f.Close()
+	defer utils.CloseWithLog(f)
 	data, err := io.ReadAll(f)
 	if err != nil {
 		log.Panicf("failed to read file %s: %s", path, err.Error())

@@ -40,7 +40,10 @@ func (c *AgentClient) Connect(ctx context.Context) error {
 		return err
 	}
 	c.runReader(stream)
-	c.runWriter(stream)
+	err = c.runWriter(stream)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return nil
 }
 

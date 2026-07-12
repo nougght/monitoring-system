@@ -3,10 +3,8 @@ package collector
 import (
 	"agent/internal/config"
 	"agent/internal/model"
-	"agent/internal/utils"
 	"context"
 	"log"
-	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -33,7 +31,7 @@ type CollectorService struct {
 	cancel           context.CancelFunc
 	lastNetInput     atomic.Uint64
 	lastNetOutput    atomic.Uint64
-	lastNetTimestamp atomic.Uint64
+	lastNetTimestamp atomic.Uint64 //nolint
 }
 
 func NewCollectorService(cfg *config.Config) *CollectorService {
@@ -281,38 +279,11 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		return nil, err
 	}
 	log.Printf("virtual memory: %v", virtual)
-	memoryDetails, err := GetMemoryDetails()
+	physicalMemoryList, err := GetMemoryDetails()
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("memory details: %v\n", memoryDetails)
-	physicalMemoryList := make([]model.PhysicalMemoryInfo, len(memoryDetails))
-	for i, m := range memoryDetails {
-		physicalMemoryList[i].BankLabel = m.BankLabel
-		physicalMemoryList[i].Capacity = m.Capacity
-		physicalMemoryList[i].ConfiguredClockSpeed = m.ConfiguredClockSpeed
-		physicalMemoryList[i].DeviceLocator = m.DeviceLocator
-		physicalMemoryList[i].FormFactor = utils.ConvertWinPhysicalFormFactor(m.FormFactor)
-		physicalMemoryList[i].HotSwappable = m.HotSwappable
-		physicalMemoryList[i].Manufacturer = m.Manufacturer
-		physicalMemoryList[i].MemoryType = utils.ConvertWinPhysicalMemoryType(m.SMBIOSMemoryType)
-		physicalMemoryList[i].ModelName = m.PartNumber
-		physicalMemoryList[i].Removable = m.Removable
-		physicalMemoryList[i].Replaceable = m.Replaceable
-		physicalMemoryList[i].SerialNumber = m.SerialNumber
-	}
-	cpuDetails, err := GetProcessorDetails()
-	if err != nil {
-		return nil, err
-	}
-	log.Printf("processor details: %v\n", cpuDetails[0])
-
-	osArch := runtime.GOARCH
-	if osArch == "amd64" {
-		osArch = "x64"
-	} else if osArch == "386" {
-		osArch = "x86"
-	}
+	log.Printf("physical memory: %v", physicalMemoryList)
 	// swap, err := mem.SwapMemory()
 	// if err != nil {
 	// 	return nil, err
@@ -343,14 +314,14 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		return nil, err
 	}
 	log.Printf("processes: %v", ps)
-	coreCount, err := cpu.CountsWithContext(ctx, false)
-	if err != nil {
-		return nil, err
-	}
-	logicalCoreCount, err := cpu.CountsWithContext(ctx, true)
-	if err != nil {
-		return nil, err
-	}
+	// coreCount, err := cpu.CountsWithContext(ctx, false)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// logicalCoreCount, err := cpu.CountsWithContext(ctx, true)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	hostSpecs := model.HostSpecs{
 		Hostname:        hostInfo.Hostname,
@@ -361,23 +332,9 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		OsArch:          hostInfo.KernelArch,
 	}
 
-	cpuSpecs := model.CpuSpecs{
-		ModelName:                     cpuInfo[0].ModelName,
-		Architecture:                  utils.ConvertWinCpuArch(cpuDetails[0].Architecture),
-		Availability:                  utils.ConvertWinCpuAvailability(cpuDetails[0].Availability),
-		CurrentClockSpeed:             cpuDetails[0].CurrentClockSpeed,
-		DataWidth:                     cpuDetails[0].DataWidth,
-		L2CacheSize:                   cpuDetails[0].L2CacheSize,
-		L3CacheSize:                   cpuDetails[0].L3CacheSize,
-		Manufacturer:                  cpuDetails[0].Manufacturer,
-		MaxClockSpeed:                 cpuDetails[0].MaxClockSpeed,
-		NumberOfCores:                 uint32(coreCount),
-		NumberOfEnabledCore:           uint32(logicalCoreCount),
-		NumberOfLogicalProcessors:     uint32(logicalCoreCount),
-		ProcessorId:                   cpuDetails[0].ProcessorId,
-		SocketDesignation:             cpuDetails[0].SocketDesignation,
-		Stepping:                      cpuDetails[0].Stepping,
-		VirtualizationFirmwareEnabled: cpuDetails[0].VirtualizationFirmwareEnabled,
+	cpuSpecs, err := GetProcessorDetails()
+	if err != nil {
+		return nil, err
 	}
 
 	memorySpecs := model.MemorySpecs{
@@ -386,7 +343,7 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 	}
 	return &model.Specs{
 		Host:   hostSpecs,
-		CPU:    cpuSpecs,
+		CPU:    cpuSpecs[0],
 		Disk:   diskSpecsList,
 		Memory: memorySpecs,
 	}, nil
