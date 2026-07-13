@@ -1,0 +1,294 @@
+basePath: /
+definitions:
+  CpuSpecs:
+    properties:
+      architecture:
+        description: архитектура https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-processor
+        enum:
+        - x86
+        - x64
+        - mips
+        - alpha
+        - powerpc
+        - arm
+        - ia64
+        - itanium
+        - arm64
+        - other
+        type: string
+      availability:
+        description: состояние https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-processor
+        enum:
+        - other
+        - unknown
+        - running
+        - warning
+        - inTest
+        - notApplicable
+        - powerOff
+        - offLine
+        - offDuty
+        - degraded
+        - notInstalled
+        - installError
+        - powerSaveUnknown
+        - powerSaveLowPowerMode
+        - powerSaveStandby
+        - powerCycle
+        - powerSaveWarning
+        - paused
+        - notReady
+        - notConfigured
+        - quiesced
+        type: string
+      currentClockSpeed:
+        description: текущая частота процессора
+        type: integer
+      dataWidth:
+        description: разрядность процессора
+        type: integer
+      l2CacheSize:
+        description: размер L2 кэша
+        type: integer
+      l3CacheSize:
+        description: размер L3 кэша
+        type: integer
+      manufacturer:
+        description: производитель
+        type: string
+      maxClockSpeed:
+        description: максимальная частота процессора(низкая точность)
+        type: integer
+      modelName:
+        description: модель процессора
+        type: string
+      numberOfCores:
+        description: количество ядер
+        type: integer
+      numberOfEnabledCore:
+        description: количество доступных ядер
+        type: integer
+      numberOfLogicalProcessors:
+        description: количество логических ядер(потоков)
+        type: integer
+      processorId:
+        description: идентификатор процессора
+        type: string
+      socketDesignation:
+        description: сокет
+        type: string
+      stepping:
+        description: степпинг
+        type: string
+      virtualizationFirmwareEnabled:
+        description: включена ли виртуализация
+        type: boolean
+    type: object
+  DiskSpecs:
+    properties:
+      device:
+        type: string
+      fsType:
+        type: string
+      total:
+        type: integer
+    type: object
+  HostSpecs:
+    properties:
+      hostName:
+        description: имя хоста
+        type: string
+      os:
+        description: операционная система
+        type: string
+      osArch:
+        description: архитектура операционной системы
+        type: string
+      osKernelVersion:
+        description: версия ядра операционной системы
+        type: string
+      osType:
+        description: семейство операционной системы
+        type: string
+      osVersion:
+        description: версия операционной системы
+        type: string
+    type: object
+  MemorySpecs:
+    properties:
+      physicalMemoryList:
+        description: физические плашки памяти
+        items:
+          $ref: '#/definitions/PhysicalMemoryInfo'
+        type: array
+      total:
+        description: общий объем памяти
+        type: integer
+    type: object
+  Metrics:
+    properties:
+      cpuPercent:
+        type: number
+      diskUsage:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      downloadMbps:
+        type: number
+      focusedWindow:
+        type: string
+      memoryUsed:
+        type: integer
+      processList:
+        items:
+          $ref: '#/definitions/Process'
+        type: array
+      timestamp:
+        type: string
+      uploadMbps:
+        type: number
+    type: object
+  PhysicalMemoryInfo:
+    properties:
+      bankLabel:
+        description: подключение памяти
+        type: string
+      capacity:
+        description: объем
+        type: integer
+      configuredClockSpeed:
+        description: настроенная частота памяти
+        type: integer
+      deviceLocator:
+        description: расположение памяти
+        type: string
+      formFactor:
+        description: форм-фактор памяти
+        enum:
+        - unknown
+        - other
+        - sip
+        - dip
+        - zip
+        - soj
+        - proprietary
+        - simm
+        - dimm
+        - tsop
+        - pga
+        - rimm
+        - sodimm
+        - srimm
+        - smd
+        - ssmp
+        - qfp
+        - tqfp
+        - soic
+        - lcc
+        - plcc
+        - bga
+        - fpgba
+        - lga
+        type: string
+      hotSwappable:
+        description: можно менять память без выключения системы
+        type: boolean
+      manufacturer:
+        description: производитель
+        type: string
+      memoryType:
+        description: тип памяти
+        enum:
+        - unknown
+        - ddr2
+        - ddr3
+        - ddr4
+        - lpddr2
+        - lpddr3
+        - lpddr4
+        - ddr5
+        - lpddr5
+        - other
+        type: string
+      modelName:
+        description: модель/партия памяти
+        type: string
+      removable:
+        description: можно ли вынимать память
+        type: boolean
+      replaceable:
+        description: можно ли заменять память
+        type: boolean
+      serialNumber:
+        description: серийный номер
+        type: string
+      speed:
+        description: поддерживаемя частота памяти
+        type: integer
+    type: object
+  Process:
+    properties:
+      cpuPercent:
+        type: number
+      memoryUsed:
+        type: integer
+      name:
+        type: string
+      parentPid:
+        type: integer
+      pid:
+        type: integer
+    type: object
+  Specs:
+    properties:
+      cpu:
+        $ref: '#/definitions/CpuSpecs'
+      disk:
+        items:
+          $ref: '#/definitions/DiskSpecs'
+        type: array
+      host:
+        $ref: '#/definitions/HostSpecs'
+      memory:
+        $ref: '#/definitions/MemorySpecs'
+    type: object
+host: localhost:8088
+info:
+  contact: {}
+  title: Monitoring Agent API
+  version: "1.0"
+paths:
+  /metrics:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Metrics'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Current system metrics
+  /specs:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Specs'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: System specifications
+swagger: "2.0"

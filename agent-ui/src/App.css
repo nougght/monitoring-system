@@ -1,0 +1,23 @@
+
+.tabBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.tabBar > .tab-button {
+    border-radius: 10px;
+    border: 1px solid rgb(178, 183, 185);
+    padding: 5px;
+    margin: 5px;
+}
+
+.tabBar > .tab-button:hover {
+    background-color: rgb(240, 231, 216);
+}
+
+.tabBar > .tab-button.active {
+    border: 2px solid rgb(240, 162, 61);
+    padding: 4px;
+}

@@ -1,0 +1,12 @@
+
+# интервалы сбора метрик
+focused_window_collector_interval: 1s
+cpu_percent_collector_interval: 500ms
+memory_collector_interval: 1s
+disk_collector_interval: 10s
+net_io_collector_interval: 1s
+process_collector_interval: 1s
+
+
+# интервал отправки по grpc
+metrics_sending_interval: 500ms

@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "workspaces": [
+    "shared/ui",
+    "web-panel",
+    "agent-ui",
+    ".temp/rm"
+  ],
+  "scripts": {
+    "build:web": "npm run build --workspace=web-panel",
+    "build:agent-ui": "npm run build --workspace=agent-ui",
+    "build:all": "npm run build:web && npm run build:agent-ui",
+    "dev:web": "npm run dev --workspace=web-panel",
+    "dev:agent-ui": "npm run dev --workspace=agent-ui",
+    "rmp" : "npm run dev --workspace=.temp/rm"
+  }
+}

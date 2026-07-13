@@ -1,0 +1,179 @@
+
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+package monitoring.agent.v1;
+
+option go_package = "github.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1;agentv1";
+
+service AgentService {
+  rpc Connect(stream AgentMessage) returns (stream ServerMessage);
+}
+
+message AgentMessage {
+  oneof payload {
+    Handshake handshake = 1;
+    Metrics metrics = 2;
+    CommandResult command_result = 3;
+    // Heartbeat heartbeat = 4;
+  }
+}
+
+message ServerMessage {
+  oneof payload {
+    Command command = 1;
+    // PollingConfig config_update = 2; 
+    // Ack ack = 3;
+  }
+}
+
+message Handshake {
+  string agent_uuid = 1;
+  // string agent_mode = 2;
+}
+
+
+message Metrics {
+    CpuPercentMetric cpu_percent = 1;
+    FocusedWindowMetric focused_window = 2;
+    MemoryUsageMetric memory_usage = 3;
+    DiskUsageMetric disk_usage = 4;
+    NetworkUsageMetric network_usage = 5;
+    google.protobuf.Timestamp timestamp = 6;
+}
+
+
+message Metric {
+  google.protobuf.Timestamp timestamp = 1;
+  oneof payload {
+    CpuPercentMetric cpu_percent = 2;
+    FocusedWindowMetric focused_window = 3;
+    MemoryUsageMetric memory_usage = 4;
+    DiskUsageMetric disk_usage = 5;
+    NetworkUsageMetric network_usage = 6;
+    ProcessMetric process = 7;
+  }
+}
+
+message CpuPercentMetric {
+  float value = 1; // процент использования CPU
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+message FocusedWindowMetric {
+  string value = 1; // название активного окна
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+message MemoryUsageMetric {
+  uint64 value = 1; // использование памяти
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+message DiskUsageMetric {
+  map<string, uint64> value = 1; // использование дисков
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+message NetworkUsageMetric {
+  float upload_mbps = 1; // скорость загрузки
+  float download_mbps = 2; // скорость выгрузки
+  google.protobuf.Timestamp timestamp = 3;
+}
+message Process {
+    int32 pid = 1; 
+    string name = 2;
+    optional int32 parent_pid = 3;
+    optional float cpu_percent = 4;
+    optional uint64 memory_used = 5;
+}
+message ProcessMetric {
+    repeated Process process_list = 1;
+}
+
+message Command {
+  oneof payload {
+    SpecificationsRequest specifications_request = 1;
+  }
+}
+
+message CommandResult {
+  oneof payload {
+    SpecificationsResponse specifications_response = 1;
+  }
+}
+
+message SpecificationsRequest {
+}
+
+message SpecificationsResponse {
+  Specs specs = 1;
+}
+
+message Specs {
+  HostSpecs host = 1;
+  CpuSpecs cpu = 2;
+  DiskSpecsList disk = 3;
+  MemorySpecs memory = 4;
+}
+
+message HostSpecs {
+  string hostname = 1; // имя хоста
+  string os_type = 2; // семейство операционной системы
+  string os = 3; // операционная система
+  string os_version = 4; // версия операционной системы
+  string os_kernel_version = 5; // версия ядра операционной системы
+  string os_arch = 6; // архитектура операционной системы
+}
+
+message CpuSpecs {
+  string model_name = 1; // модель процессора
+  string architecture = 2; // архитектура процессора
+  string availability = 3; // доступность процессора
+  uint32 current_clock_speed = 4; // текущая частота процессора
+  uint32 data_width = 5; // разрядность процессора
+  uint32 l2_cache_size = 6; // размер L2 кэша
+  uint32 l3_cache_size = 7; // размер L3 кэша
+  string manufacturer = 8; // производитель
+  uint32 max_clock_speed = 9; // максимальная частота процессора
+  uint32 number_of_cores = 10; // количество ядер
+  uint32 number_of_enabled_cores = 11; // количество доступных ядер
+  uint32 number_of_logical_processors = 12; // количество логических ядер
+  string processor_id = 13; // идентификатор процессора
+  string socket_designation = 14; // сокет
+  string stepping = 15; // степпинг
+  bool virtualization_firmware_enabled = 16; // включена ли виртуализация
+}
+
+
+message DiskSpecsList {
+  repeated DiskSpecs disk = 1;
+}
+
+message DiskSpecs {
+  string device = 1;
+  string fs_type = 2;
+  uint64 total = 3; // общий объем диска
+}
+
+message MemorySpecs {
+  string total = 1; // общий объем памяти
+  repeated PhysicalMemoryInfo physical_memory = 2;
+}
+
+
+message PhysicalMemoryInfo {
+  string device_locator = 1; // расположение памяти
+  string memory_type = 2; // тип памяти
+  uint64 capacity = 3; // объем
+  string form_factor = 4; // форм-фактор памяти
+  uint32 speed = 5; // поддерживаемя частота памяти
+  uint32 configured_clock_speed = 6; // настроенная частота памяти
+  string manufacturer = 7; // производитель
+  string model_name = 8; // модель/партия памяти
+  string serial_number = 9; // серийный номер
+  string bank_label = 10; // подключение памяти
+  bool hot_swappable = 11; // можно менять память без выключения системы
+  bool removable = 12; // можно ли вынимать память
+  bool replaceable = 13; // можно ли заменять память
+}
