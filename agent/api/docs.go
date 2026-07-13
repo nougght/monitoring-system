@@ -252,6 +252,12 @@ const docTemplate = `{
                 "memoryUsed": {
                     "type": "integer"
                 },
+                "processList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Process"
+                    }
+                },
                 "timestamp": {
                     "type": "string"
                 },
@@ -351,6 +357,26 @@ const docTemplate = `{
                 },
                 "speed": {
                     "description": "поддерживаемя частота памяти",
+                    "type": "integer"
+                }
+            }
+        },
+        "Process": {
+            "type": "object",
+            "properties": {
+                "cpuPercent": {
+                    "type": "number"
+                },
+                "memoryUsed": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parentPid": {
+                    "type": "integer"
+                },
+                "pid": {
                     "type": "integer"
                 }
             }

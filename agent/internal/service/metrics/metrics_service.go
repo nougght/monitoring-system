@@ -44,6 +44,8 @@ func (m *MetricsService) UpdateMetric(metric model.Metric) {
 	case model.MetricTypeNet:
 		netMetric := metric.(*model.NetIOMetric)
 		m.metrics.NetworkUsage = netMetric
+	case model.MetricTypeProcess:
+		m.metrics.Process = metric.(*model.ProcessMetric)
 	}
 
 }
@@ -116,6 +118,15 @@ func (m *MetricsService) GetNetworkUsage() *model.NetIOMetric {
 	return m.metrics.NetworkUsage
 }
 
+func (m *MetricsService) GetProcess() *model.ProcessMetric {
+	m.metricsMu.RLock()
+	defer m.metricsMu.RUnlock()
+	if m.metrics.Process == nil {
+		return nil
+	}
+	return m.metrics.Process
+}
+
 func (m *MetricsService) GetTimestamp() time.Time {
 	m.metricsMu.RLock()
 	defer m.metricsMu.RUnlock()
@@ -129,6 +140,7 @@ func (m *MetricsService) GetMetrics() *model.Metrics {
 		MemoryUsage:   m.GetMemory(),
 		DiskUsage:     m.GetDiskUsage(),
 		NetworkUsage:  m.GetNetworkUsage(),
+		Process:       m.GetProcess(),
 		Timestamp:     time.Now(),
 	}
 }

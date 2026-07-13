@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { MetricsDiskUsage } from './metricsDiskUsage';
+import type { Process } from './process';
 
 export interface Metrics {
   cpuPercent?: number;
@@ -12,6 +13,7 @@ export interface Metrics {
   downloadMbps?: number;
   focusedWindow?: string;
   memoryUsed?: number;
+  processList?: Process[];
   timestamp?: string;
   uploadMbps?: number;
 }

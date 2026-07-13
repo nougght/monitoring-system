@@ -12,6 +12,7 @@ const (
 	MetricTypeMemory        MetricType = "memory"         // использование памяти
 	MetricTypeDisk          MetricType = "disk"           // использование диска
 	MetricTypeNet           MetricType = "net"            // использование сети
+	MetricTypeProcess       MetricType = "process"        // процессы
 )
 
 const (
@@ -122,6 +123,7 @@ func NewNetIOMetric(upMbps float32, downMbps float32) *NetIOMetric {
 	return &NetIOMetric{
 		uploadMbps:   upMbps,
 		downloadMbps: downMbps,
+		timestamp:    time.Now(),
 	}
 }
 
@@ -139,4 +141,27 @@ func (m *NetIOMetric) UploadMbps() float32 {
 
 func (m *NetIOMetric) DownloadMbps() float32 {
 	return m.downloadMbps
+}
+
+type ProcessMetric struct {
+	processes []Process
+	timestamp time.Time
+}
+
+func NewProcessMetric(processList []Process) *ProcessMetric {
+	return &ProcessMetric{
+		processes: processList,
+		timestamp: time.Now(),
+	}
+}
+func (m *ProcessMetric) Type() MetricType {
+	return MetricTypeProcess
+}
+
+func (m *ProcessMetric) Timestamp() time.Time {
+	return m.timestamp
+}
+
+func (m *ProcessMetric) ProcessList() []Process {
+	return m.processes
 }

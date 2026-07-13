@@ -140,6 +140,10 @@ definitions:
         type: string
       memoryUsed:
         type: integer
+      processList:
+        items:
+          $ref: '#/definitions/Process'
+        type: array
       timestamp:
         type: string
       uploadMbps:
@@ -221,6 +225,19 @@ definitions:
         type: string
       speed:
         description: поддерживаемя частота памяти
+        type: integer
+    type: object
+  Process:
+    properties:
+      cpuPercent:
+        type: number
+      memoryUsed:
+        type: integer
+      name:
+        type: string
+      parentPid:
+        type: integer
+      pid:
         type: integer
     type: object
   Specs:

@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"agent/internal/localserver/dto"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,11 +41,12 @@ func (h *Handler) GetSpecifications(c *gin.Context) {
 // GetMetrics godoc
 // @Summary Current system metrics
 // @Produce json
-// @Success 200 {object} model.Metrics
+// @Success 200 {object} dto.Metrics
 // @Failure 500 {object} map[string]string
 // @Router /metrics [get]
 func (h *Handler) GetMetrics(c *gin.Context) {
-	metrics := mapper.ConvertMetricsToDto(h.metricsService.GetMetrics())
+	var metrics *dto.Metrics
+	metrics = mapper.ConvertMetricsToDto(h.metricsService.GetMetrics())
 	log.Println("metrics", metrics)
 	c.JSON(http.StatusOK, metrics)
 }

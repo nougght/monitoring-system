@@ -51,6 +51,7 @@ message Metric {
     MemoryUsageMetric memory_usage = 4;
     DiskUsageMetric disk_usage = 5;
     NetworkUsageMetric network_usage = 6;
+    ProcessMetric process = 7;
   }
 }
 
@@ -78,6 +79,16 @@ message NetworkUsageMetric {
   float upload_mbps = 1; // скорость загрузки
   float download_mbps = 2; // скорость выгрузки
   google.protobuf.Timestamp timestamp = 3;
+}
+message Process {
+    int32 pid = 1; 
+    string name = 2;
+    optional int32 parent_pid = 3;
+    optional float cpu_percent = 4;
+    optional uint64 memory_used = 5;
+}
+message ProcessMetric {
+    repeated Process process_list = 1;
 }
 
 message Command {

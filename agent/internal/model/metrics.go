@@ -8,5 +8,6 @@ type Metrics struct {
 	MemoryUsage   *MemoryMetric        `json:"memoryUsage,omitempty"`
 	DiskUsage     *DiskMetric          `json:"diskUsage,omitempty"`
 	NetworkUsage  *NetIOMetric         `json:"networkUsage,omitempty"`
+	Process       *ProcessMetric       `json:"process,omitempty"`
 	Timestamp     time.Time            `json:"timestamp"`
 } // @name Metrics

@@ -1,3 +1,5 @@
+import type { Process } from "./process"
+
 export interface Metrics {
     focusedWindow?: string
     cpuPercent?: number
@@ -5,6 +7,7 @@ export interface Metrics {
     diskUsage?: { [deviceName: string]: number }
     uploadMbps?: number
     downloadMbps?: number
+    processList?: Process[]
     timestamp: Date
 }
 

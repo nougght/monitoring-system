@@ -18,4 +18,5 @@ export * from './metricsDiskUsage';
 export * from './physicalMemoryInfo';
 export * from './physicalMemoryInfoFormFactor';
 export * from './physicalMemoryInfoMemoryType';
+export * from './process';
 export * from './specs';

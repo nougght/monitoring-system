@@ -63,6 +63,7 @@ func (c *CollectorService) StartCollectors(ctx context.Context) {
 	c.runMemoryCollector(collectorsCtx)
 	c.runDiskUsageCollector(collectorsCtx)
 	c.runNetIOCollectior(collectorsCtx)
+	c.runProcessCollector(collectorsCtx)
 
 	specs, err := c.GetSpecifications(collectorsCtx)
 	if err != nil {
@@ -240,6 +241,62 @@ func (c *CollectorService) runNetIOCollectior(ctx context.Context) {
 	}()
 }
 
+func (c *CollectorService) runProcessCollector(ctx context.Context) {
+	ticker := time.NewTicker(c.config.ProcessInterval)
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			ps, err := process.ProcessesWithContext(ctx)
+			if err != nil {
+				log.Printf("failed to get processes: %s", err.Error())
+			}
+			processList := make([]model.Process, len(ps))
+			for i, p := range ps {
+				processList[i].Pid = p.Pid
+				name, err := p.NameWithContext(ctx)
+				if err != nil {
+					log.Printf("failed to get process name: %s", err.Error())
+					name = "NO DATA"
+				}
+				processList[i].Name = name
+				// isBackground, _ := p.Background()
+				// fmt.Printf("background: %v", isBackground)
+				parent, err := p.ParentWithContext(ctx)
+				if err != nil {
+					log.Printf("failed to get process name: %s", err.Error())
+				}
+				if parent == nil {
+					processList[i].ParentPid = nil
+				} else {
+					processList[i].ParentPid = &parent.Pid
+				}
+
+				cpuPercent, err := p.CPUPercentWithContext(ctx)
+				if err != nil {
+					log.Printf("failed to get cpu percent: %s", err.Error())
+					processList[i].CPUPercent = nil
+				} else {
+					processList[i].CPUPercent = &cpuPercent
+				}
+				memory, err := p.MemoryInfoWithContext(ctx)
+				if err != nil {
+					log.Printf("failed to get memory info: %s", err.Error())
+					processList[i].MemoryUsed = nil
+				} else {
+					processList[i].MemoryUsed = &memory.RSS
+				}
+				// fmt.Print(p.Username())
+				c.metricsChan <- model.NewProcessMetric(processList)
+			}
+		}
+	}()
+}
+
 func getSpecifications(ctx context.Context) (*model.Specs, error) {
 	hostInfo, err := host.InfoWithContext(ctx)
 	if err != nil {
@@ -309,11 +366,11 @@ func getSpecifications(ctx context.Context) (*model.Specs, error) {
 		return nil, err
 	}
 	log.Printf("net io: %v", netIO)
-	ps, err := process.ProcessesWithContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	log.Printf("processes: %v", ps)
+	// ps, err := process.ProcessesWithContext(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Printf("processes: %v", ps)
 	// coreCount, err := cpu.CountsWithContext(ctx, false)
 	// if err != nil {
 	// 	return nil, err
