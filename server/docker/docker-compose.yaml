@@ -1,0 +1,14 @@
+services:
+  timescale:
+    image: timescale/timescaledb-ha:latest
+    environment:
+      POSTGRES_DB: "timescale"
+      POSTGRES_PASSWORD: "pgpass54"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+volumes:
+  db-data:
+    driver: local
