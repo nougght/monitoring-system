@@ -1,1 +1,9 @@
 .temp/
+
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+
+*.exe

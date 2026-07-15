@@ -73,6 +73,7 @@ function App() {
             const metrics = JSON.parse(event.data) as Metrics;
             // console.log("metrics", metrics);
             setMetrics(metrics);
+            console.log("processes", metrics.processList?.sort((a, b) => (b?.cpuPercent ?? 0) - (a?.cpuPercent ?? 0)));
         });
     }, []);
 

@@ -26,7 +26,7 @@ func NewMetricsService(cfg *config.Config,
 	return &MetricsService{
 		config:           cfg,
 		refreshSpecsFunc: refreshSpecsFunc,
-		metrics:          new(model.Metrics),
+		metrics:          &model.Metrics{},
 	}
 }
 

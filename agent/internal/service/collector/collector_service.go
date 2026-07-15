@@ -32,6 +32,8 @@ type CollectorService struct {
 	lastNetInput     atomic.Uint64
 	lastNetOutput    atomic.Uint64
 	lastNetTimestamp atomic.Uint64 //nolint
+
+	processes map[int32]*process.Process
 }
 
 func NewCollectorService(cfg *config.Config) *CollectorService {
@@ -40,6 +42,7 @@ func NewCollectorService(cfg *config.Config) *CollectorService {
 		metricsConsumer: nil,
 		metricsChan:     make(chan model.Metric),
 		wg:              sync.WaitGroup{},
+		processes:       make(map[int32]*process.Process),
 	}
 }
 
@@ -246,51 +249,64 @@ func (c *CollectorService) runProcessCollector(ctx context.Context) {
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
+		ps, err := process.ProcessesWithContext(ctx)
+		if err != nil {
+			log.Printf("failed to get processes: %s", err.Error())
+		}
+		for _, p := range ps {
+			c.processes[p.Pid] = p
+		}
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				ps, err := process.ProcessesWithContext(ctx)
+				if err != nil {
+					log.Printf("failed to get processes: %s", err.Error())
+				}
+				processList := make([]model.Process, len(ps))
+				for i, p := range ps {
+					if _, ok := c.processes[p.Pid]; !ok {
+						c.processes[p.Pid] = p
+					}
+					p = c.processes[p.Pid]
+					processList[i].Pid = p.Pid
+					name, err := p.NameWithContext(ctx)
+					if err != nil {
+						// log.Printf("failed to get process name: %s", err.Error())
+						name = "NO DATA"
+					}
+					processList[i].Name = name
+					// isBackground, _ := p.Background()
+					// fmt.Printf("background: %v", isBackground)
+					parent, err := p.ParentWithContext(ctx)
+					if err != nil {
+						// log.Printf("failed to get process name: %s", err.Error())
+					}
+					if parent == nil {
+						processList[i].ParentPid = nil
+					} else {
+						processList[i].ParentPid = &parent.Pid
+					}
 
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			ps, err := process.ProcessesWithContext(ctx)
-			if err != nil {
-				log.Printf("failed to get processes: %s", err.Error())
-			}
-			processList := make([]model.Process, len(ps))
-			for i, p := range ps {
-				processList[i].Pid = p.Pid
-				name, err := p.NameWithContext(ctx)
-				if err != nil {
-					log.Printf("failed to get process name: %s", err.Error())
-					name = "NO DATA"
+					cpuPercent, err := p.PercentWithContext(ctx, 0)
+					if err != nil {
+						// log.Printf("failed to get cpu percent: %s", err.Error())
+						processList[i].CPUPercent = nil
+					} else {
+						cpuPercent /= 16
+						processList[i].CPUPercent = &cpuPercent
+					}
+					memory, err := p.MemoryInfoWithContext(ctx)
+					if err != nil {
+						// log.Printf("failed to get memory info: %s", err.Error())
+						processList[i].MemoryUsed = nil
+					} else {
+						processList[i].MemoryUsed = &memory.RSS
+					}
+					// fmt.Print(p.Username())
 				}
-				processList[i].Name = name
-				// isBackground, _ := p.Background()
-				// fmt.Printf("background: %v", isBackground)
-				parent, err := p.ParentWithContext(ctx)
-				if err != nil {
-					log.Printf("failed to get process name: %s", err.Error())
-				}
-				if parent == nil {
-					processList[i].ParentPid = nil
-				} else {
-					processList[i].ParentPid = &parent.Pid
-				}
-
-				cpuPercent, err := p.CPUPercentWithContext(ctx)
-				if err != nil {
-					log.Printf("failed to get cpu percent: %s", err.Error())
-					processList[i].CPUPercent = nil
-				} else {
-					processList[i].CPUPercent = &cpuPercent
-				}
-				memory, err := p.MemoryInfoWithContext(ctx)
-				if err != nil {
-					log.Printf("failed to get memory info: %s", err.Error())
-					processList[i].MemoryUsed = nil
-				} else {
-					processList[i].MemoryUsed = &memory.RSS
-				}
-				// fmt.Print(p.Username())
 				c.metricsChan <- model.NewProcessMetric(processList)
 			}
 		}
