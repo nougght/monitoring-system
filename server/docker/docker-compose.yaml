@@ -3,7 +3,7 @@ services:
     image: timescale/timescaledb-ha:latest
     environment:
       POSTGRES_DB: "timescale"
-      POSTGRES_PASSWORD: "pgpass54"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
       - db-data:/var/lib/postgresql/data

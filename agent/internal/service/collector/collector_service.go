@@ -282,7 +282,7 @@ func (c *CollectorService) runProcessCollector(ctx context.Context) {
 					// fmt.Printf("background: %v", isBackground)
 					parent, err := p.ParentWithContext(ctx)
 					if err != nil {
-						// log.Printf("failed to get process name: %s", err.Error())
+						log.Printf("failed to get process name: %s", err.Error())
 					}
 					if parent == nil {
 						processList[i].ParentPid = nil

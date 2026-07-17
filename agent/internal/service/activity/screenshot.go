@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"agent/internal/utils"
+
 	"github.com/kbinani/screenshot"
 )
 
@@ -30,7 +32,7 @@ func SaveScreenshot(img image.Image, path string) error {
 		log.Println("error creating file:", err)
 		return err
 	}
-	defer file.Close()
+	defer utils.CloseWithLog(file)
 	err = png.Encode(file, img)
 	if err != nil {
 		log.Println("error encoding image:", err)
