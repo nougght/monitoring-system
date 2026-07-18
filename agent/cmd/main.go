@@ -65,7 +65,7 @@ func main() {
 	r.GET("/metrics", h.GetMetrics)
 
 	server := &http.Server{
-		Addr:    ":8088",
+		Addr:    ":8111",
 		Handler: r.Handler(),
 	}
 
@@ -80,7 +80,7 @@ func main() {
 		shutdownChan <- err
 	}()
 
-	grpcClient, err := grpc.NewClient("127.0.0.1:8090", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	grpcClient, err := grpc.NewClient("127.0.0.1:8092", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal("failed to create grpc client: ", err)
 	}
@@ -90,7 +90,7 @@ func main() {
 		log.Println("failed to connect to grpc server: ", err)
 	}
 
-	log.Println("http server started on :8088")
+	log.Println("http server started on :8111")
 	err = server.ListenAndServe()
 
 	if err != nil && err != http.ErrServerClosed {

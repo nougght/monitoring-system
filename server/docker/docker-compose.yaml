@@ -1,14 +1,35 @@
 services:
   timescale:
-    image: timescale/timescaledb-ha:latest
+    image: timescale/timescaledb-ha:pg18
     environment:
       POSTGRES_DB: "timescale"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      PGDATA: "/var/lib/postgresql/data/pgdata"
+      PGDATA: /home/postgres/pgdata/data
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/home/postgres/pgdata
     ports:
       - "5433:5432"
+    env_file:
+      - ../.env
+  
+  monitoring-backend:
+    build:
+      # repo root so shared/go is available for the go.mod replace
+      context: ../..
+      dockerfile: server/docker/server.Dockerfile
+    image: monitoring-backend
+
+
+    ports:
+      - "8091:8091"
+      - "8092:8092"
+      
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_HOST: "timescale"
+      POSTGRES_PORT: "5432"
+    depends_on:
+      - timescale
+    stop_grace_period: 10s
 volumes:
   db-data:
-    driver: local

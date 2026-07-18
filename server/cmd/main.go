@@ -1,26 +1,25 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
-	"net"
+	"os/signal"
+	"syscall"
 
-	grpc_handler "github.com/nougght/monitoring-system/server/internal/handler/grpc"
-	"google.golang.org/grpc"
+	"github.com/nougght/monitoring-system/server/internal/app"
+	"github.com/nougght/monitoring-system/server/internal/config"
 )
 
 func main() {
+	cfg := config.MustLoadConfig()
+	rootCtx, cancel := signal.NotifyContext(
+		context.Background(), syscall.SIGINT, syscall.SIGTERM,
+	)
+	defer cancel()
 
-	s := grpc.NewServer()
-	agentService := grpc_handler.NewAgentService()
-	agentService.Register(s)
+	app := app.New(rootCtx, cfg)
 
-	l, err := net.Listen("tcp", fmt.Sprintf(":%d", 8090))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	log.Println("server started")
-	if err := s.Serve(l); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	if err := app.Run(rootCtx); err != nil {
+		log.Fatalf("failed to run app: %v", err)
 	}
 }

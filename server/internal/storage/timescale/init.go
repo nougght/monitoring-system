@@ -1,4 +1,4 @@
-package repository
+package timescale
 
 import (
 	"context"
@@ -26,9 +26,8 @@ func RunMigrations(pool *pgxpool.Pool) error {
 	db := stdlib.OpenDBFromPool(pool)
 	dbDriver, err := migrate_pgx.WithInstance(db, &migrate_pgx.Config{})
 	if err != nil {
-		return fmt.Errorf("failed to create postgres driver: %w", err)
+		return fmt.Errorf("failed to create pgx driver: %w", err)
 	}
-
 	m, err := migrate.NewWithInstance("iofs", sourceDriver, "postgres", dbDriver)
 	if err != nil {
 		return fmt.Errorf("failed to create migrate instance: %w", err)
