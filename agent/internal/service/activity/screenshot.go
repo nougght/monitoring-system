@@ -7,9 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"agent/internal/utils"
-
 	"github.com/kbinani/screenshot"
+	"github.com/nougght/monitoring-system/shared/go/util"
 )
 
 func TakeScreenshot() (image.Image, error) {
@@ -32,7 +31,7 @@ func SaveScreenshot(img image.Image, path string) error {
 		log.Println("error creating file:", err)
 		return err
 	}
-	defer utils.CloseWithLog(file)
+	defer util.CloseWithLog(file)
 	err = png.Encode(file, img)
 	if err != nil {
 		log.Println("error encoding image:", err)

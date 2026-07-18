@@ -32,13 +32,7 @@ import (
 // @host            localhost:8088
 // @BasePath        /
 func main() {
-	cfg, err := config.LoadConfig("config.yaml")
-	if err != nil {
-		cfg, err = config.LoadConfig("../config.yaml")
-		if err != nil {
-			log.Fatal("failed to load config: ", err)
-		}
-	}
+	cfg := config.MustLoadConfig("config.yaml")
 	rootCtx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
@@ -53,7 +47,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // или "*" для всех
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: false,

@@ -2,8 +2,6 @@ package utils
 
 import (
 	"agent/internal/model"
-	"io"
-	"log"
 )
 
 // https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-processor
@@ -155,15 +153,5 @@ func ConvertWinPhysicalFormFactor(memoryType uint16) model.PhysicalMemoryFormFac
 		return model.PhysicalMemoryFormFactorLGA
 	default:
 		return model.PhysicalMemoryFormFactorUnknown
-	}
-}
-
-func CloseWithLog(closer io.Closer) {
-	if closer == nil {
-		return
-	}
-	err := closer.Close()
-	if err != nil {
-		log.Printf("failed to close file: %s", err.Error())
 	}
 }
