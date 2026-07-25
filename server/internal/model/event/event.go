@@ -1,4 +1,4 @@
-package event
+package model
 
 import "context"
 
@@ -10,8 +10,8 @@ type Event interface {
 type EventHandler func(ctx context.Context, event Event)
 
 type EventBus interface {
-	Start() error
+	Start(ctx context.Context)
 	Shutdown(ctx context.Context) error
 	Subscribe(subject string, handler EventHandler) error
-	Publish(event Event)
+	Publish(ctx context.Context, event Event) error
 }
