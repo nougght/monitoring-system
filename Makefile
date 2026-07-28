@@ -42,6 +42,7 @@ else
 	migrate create -ext sql -dir server/internal/storage/timescale/migrations -seq ${MIGRATE_NAME}
 endif
 
+
 migrate-force:
 ifndef MIGRATE_VERSION
 	echo $(error migrate version is required, use `make migrate-force MIGRATE_VERSION=your_migration_version`)

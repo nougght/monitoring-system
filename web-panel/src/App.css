@@ -1,0 +1,28 @@
+.bottomArea{
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    width: 90%;
+    margin: 10px auto;
+    display: flex;
+    justify-content: space-around;
+    /* background-color: red; */
+}
+.addAgentButton{
+    font-size: 20px;
+
+}
+
+.app, main {
+    height: 100%;
+}
+
+main{
+}
+
+
+
+.keyContainer{
+    text-align: center;
+}
