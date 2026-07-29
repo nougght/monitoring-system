@@ -21,7 +21,8 @@ func (c *PostgresConfig) ConnString() string {
 }
 
 type Config struct {
-	Postgres *PostgresConfig
+	Postgres                 *PostgresConfig
+	AgentEnrollmentKeyLength int
 }
 
 func MustLoadConfig() *Config {

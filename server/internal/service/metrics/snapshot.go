@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	model "github.com/nougght/monitoring-system/server/internal/model/event/metrics"
+	model "github.com/nougght/monitoring-system/server/internal/model/metrics"
 )
 
 type SnapshotCache struct {
