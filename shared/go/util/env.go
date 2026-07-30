@@ -1,17 +1,17 @@
 package util
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strconv"
 )
 
 func MustGetEnvVar(key string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		log.Panicf(`env variable "%s" not found`, key)
 	}
-	panic(fmt.Sprintf(`env variable "%s" not found`, key))
+	return value
 }
 
 //nolint:unused
@@ -22,15 +22,27 @@ func GetOptionalEnvVar(key string, defaultValue string) string {
 	return defaultValue
 }
 
+func MustGetIntEnvVar(key string) int {
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		log.Panicf(`env variable "%s" not found`, key)
+	}
+	intValue, err := strconv.Atoi(value)
+	if err != nil {
+		log.Panicf(`env variable "%s" is not a valid integer: %s`, key, err.Error())
+	}
+	return intValue
+}
+
 //nolint:unused
-func GetOptionalInt(key string, defaultValue int) int {
+func GetOptionalIntEnvVar(key string, defaultValue int) int {
 	value, exists := os.LookupEnv(key)
 	if !exists {
 		return defaultValue
 	}
 	intValue, err := strconv.Atoi(value)
 	if err != nil {
-		log.Panicf(`env variable "%s" is not a valid integer: %s`, key, err)
+		log.Panicf(`env variable "%s" is not a valid integer: %s`, key, err.Error())
 	}
 	return intValue
 }

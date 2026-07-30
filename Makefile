@@ -30,10 +30,10 @@ timescale-up:
 	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system up -d --build timescale
 
 server-build:
-	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system build monitoring-backend
+	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system --build monitoring-backend
 
 server-up:
-	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system up -d monitoring-backend
+	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system up -d --build monitoring-backend
 
 migrate-create: 
 ifndef MIGRATE_NAME
@@ -49,3 +49,10 @@ ifndef MIGRATE_VERSION
 else
 	migrate -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable -path server/internal/storage/timescale/migrations force ${MIGRATE_VERSION}
 endif
+
+
+gen-swag-agent:
+	cd agent && swag init -g cmd/main.go -o api --parseDependency --parseInternal 
+
+gen-swag-server:
+	cd server && swag init -g cmd/main.go -o api --parseDependency --parseInternal 

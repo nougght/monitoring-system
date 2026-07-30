@@ -72,7 +72,9 @@ func (b *EventBus) Subscribe(subject string, handler model.EventHandler, bufferS
 	ch := make(chan model.Event, bufferSize)
 	b.subs[subject] = append(b.subs[subject], ch)
 
+	b.wg.Add(1)
 	go func() {
+		defer b.wg.Done()
 		for {
 			if b.busCtx == nil {
 				continue
@@ -125,10 +127,7 @@ func isValidSubject(subject string) bool {
 }
 
 func isFullSubject(subject string) bool {
-	if strings.ContainsAny(subject, ">*") {
-		return false
-	}
-	return true
+	return !strings.ContainsAny(subject, ">*")
 }
 
 func isWildcard(subject string) (bool, []string) {

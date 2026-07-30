@@ -7,16 +7,28 @@ import (
 
 // -- agents --
 
-func AgentToDTO(domain *agent.Agent, isOnline bool) (res *dto.AgentDTO, err error) {
+func AgentToDTO(domain *agent.Agent) (res *dto.AgentDTO) {
 	if domain == nil {
-		return res, nil
+		return
 	}
-	return &dto.AgentDTO{
+	res = &dto.AgentDTO{
 		ID:          domain.ID,
 		Name:        domain.Name,
 		Description: domain.Description,
 		CreatedAt:   domain.CreatedAt,
 		LastSeenAt:  domain.LastSeenAt,
-		IsOnline:    isOnline,
-	}, nil
+		IsOnline:    domain.IsOnline,
+	}
+	return
+}
+
+func CreateAgentResultToDTO(domain *agent.CreateAgentResult) (res *dto.CreateAgentResponse) {
+	if domain == nil {
+		return
+	}
+	res = &dto.CreateAgentResponse{
+		AgentDTO:      *AgentToDTO(&domain.Agent),
+		EnrollmentKey: domain.EnrollmentKey,
+	}
+	return
 }

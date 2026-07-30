@@ -6,12 +6,17 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "github.com/nougght/monitoring-system/server/api"
 	"github.com/nougght/monitoring-system/server/internal/app"
 	"github.com/nougght/monitoring-system/server/internal/config"
 )
 
+// @title           Monitoring Server API
+// @version         1.0
+// @host            localhost:8091
+// @BasePath        /
 func main() {
-	cfg := config.MustLoadConfig()
+	cfg := config.MustLoadConfig("config.yaml")
 	rootCtx, cancel := signal.NotifyContext(
 		context.Background(), syscall.SIGINT, syscall.SIGTERM,
 	)

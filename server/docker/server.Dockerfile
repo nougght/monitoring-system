@@ -15,5 +15,6 @@ FROM alpine
 WORKDIR /app
 
 COPY --from=build /build/app ./app
+COPY --from=build /build/server/config.yaml ./config.yaml
 
 ENTRYPOINT ["./app"]

@@ -13,9 +13,19 @@ type AgentDTO struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	LastSeenAt  time.Time `json:"lastSeenAt"`
 	IsOnline    bool      `json:"isOnline"`
-}
+} // @Name Agent
 
 type EnrollmentResponse struct {
 	EnrollmentKey string
 	AgentID       uuid.UUID
-}
+} // @Name EnrollmentResponse
+
+type CreateAgentBody struct {
+	Name        string  `json:"name" binding:"required"`
+	Description *string `json:"description,omitempty"`
+} // @Name CreateAgentBody
+
+type CreateAgentResponse struct {
+	AgentDTO
+	EnrollmentKey string
+} // @Name CreateAgentResponse

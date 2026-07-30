@@ -8,14 +8,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nougght/monitoring-system/server/internal/config"
-	grpc_handler "github.com/nougght/monitoring-system/server/internal/transport/grpc"
 	"github.com/nougght/monitoring-system/server/internal/service"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale/repository"
+	grpc_handler "github.com/nougght/monitoring-system/server/internal/transport/grpc"
+	"github.com/nougght/monitoring-system/server/internal/transport/rest"
 	"google.golang.org/grpc"
 )
 
@@ -25,6 +24,9 @@ type App struct {
 	Repositories *repository.Repositories
 
 	Services *service.Services
+
+	HTTPServer *http.Server
+	GRPCServer *grpc.Server
 }
 
 func New(ctx context.Context, cfg *config.Config) *App {
@@ -33,20 +35,35 @@ func New(ctx context.Context, cfg *config.Config) *App {
 		log.Panicf("failed to connect to database: %v", err)
 	}
 
-	return &App{
-		DB:           db,
+	services := service.New(service.ServicesOptions{
+		Config:       cfg,
 		Repositories: repository.New(db),
-		Services: service.New(service.ServicesOptions{
-			Repositories: repository.New(db),
-		}),
-	}
-}
+		Transactor:   db,
+	})
 
-func (a *App) Run(ctx context.Context) error {
+	httpServer := rest.NewServer(cfg, *services)
 
 	grpcServer := grpc.NewServer()
 	agentService := grpc_handler.NewAgentService()
 	agentService.Register(grpcServer)
+
+	return &App{
+		DB:           db,
+		Repositories: repository.New(db),
+		Services:     services,
+		HTTPServer:   httpServer,
+		GRPCServer:   grpcServer,
+	}
+}
+
+func (a *App) Run(ctx context.Context) error {
+	httpErrChan := make(chan error)
+	go func() {
+		log.Println("starting HTTP server")
+		if err := a.HTTPServer.ListenAndServe(); err != nil {
+			httpErrChan <- err
+		}
+	}()
 
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", 8092))
 	if err != nil {
@@ -55,28 +72,8 @@ func (a *App) Run(ctx context.Context) error {
 	grpcErrChan := make(chan error)
 	go func() {
 		log.Println("starting gRPC server")
-		if err := grpcServer.Serve(l); err != nil {
+		if err := a.GRPCServer.Serve(l); err != nil {
 			grpcErrChan <- err
-		}
-	}()
-
-	r := gin.Default()
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		AllowCredentials: false,
-	}))
-
-	httpServer := http.Server{
-		Addr:    ":8091",
-		Handler: r.Handler(),
-	}
-	httpErrChan := make(chan error)
-	go func() {
-		log.Println("starting HTTP server")
-		if err := httpServer.ListenAndServe(); err != nil {
-			httpErrChan <- err
 		}
 	}()
 
@@ -94,8 +91,8 @@ func (a *App) Run(ctx context.Context) error {
 	)
 	defer cancel()
 
-	grpcServer.GracefulStop()
-	err = httpServer.Shutdown(shutdownCtx)
+	a.GRPCServer.GracefulStop()
+	err = a.HTTPServer.Shutdown(shutdownCtx)
 	if err != nil && err != http.ErrServerClosed {
 		log.Fatalf("failed to shutdown HTTP server: %v", err)
 	}
