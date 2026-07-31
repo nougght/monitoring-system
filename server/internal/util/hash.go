@@ -60,6 +60,9 @@ func parseHashString(hashString string) (hash, salt string, params *HashParams, 
 }
 
 func Hash(value string, params *HashParams) (hashString string, err error) {
+	if params == nil {
+		params = defaultHashParams()
+	}
 	salt := make([]byte, params.SaltLength)
 	if _, err = rand.Read(salt); err != nil {
 		return

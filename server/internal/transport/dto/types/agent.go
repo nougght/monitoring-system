@@ -27,5 +27,5 @@ type CreateAgentBody struct {
 
 type CreateAgentResponse struct {
 	AgentDTO
-	EnrollmentKey string
+	EnrollmentKey string `json:"enrollmentKey"`
 } // @Name CreateAgentResponse

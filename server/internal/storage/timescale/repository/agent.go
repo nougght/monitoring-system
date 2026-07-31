@@ -34,6 +34,7 @@ func (r *AgentRepository) CreateAgent(ctx context.Context, agent *agent.Agent) (
 	query := `
 	INSERT INTO agents (name, description) 
 	VALUES($1, $2)
+	RETURNING id, created_at, last_seen_at
 	`
 	err := r.db(ctx).QueryRow(ctx, query, agent.Name, agent.Description).Scan(&agent.ID, &agent.CreatedAt, &agent.LastSeenAt)
 	if err != nil {

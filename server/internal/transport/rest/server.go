@@ -16,14 +16,13 @@ func NewServer(cfg *config.Config, services service.Services) *http.Server {
 	handlers := newHandlers(&services)
 
 	r := gin.New()
-	api := r.Group("/api/v1")
-
-	api.Use(cors.New(cors.Config{
+	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: false,
 	}))
+	api := r.Group("/api/v1")
 
 	api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
