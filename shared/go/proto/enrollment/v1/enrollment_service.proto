@@ -1,0 +1,23 @@
+
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+package monitoring.enrollment.v1;
+
+option go_package = "github.com/nougght/monitoring-system/shared/go/proto/gen/enrollment/v1;enrollmentv1";
+
+service AgentEnrollmentService {
+  rpc Enroll(EnrollRequest) returns (EnrollResponse);
+}
+
+message EnrollRequest {
+  string agent_id = 1;
+  string token = 2;
+  bytes  csr_der = 3;     // CSR в DER, сгенерирован агентом локально
+}
+
+message EnrollResponse {
+  bytes certificate_der = 1;
+  repeated bytes ca_chain_der = 2;
+  google.protobuf.Timestamp not_after = 3;
+}
