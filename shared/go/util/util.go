@@ -22,3 +22,7 @@ func Map[T any, R any](slice []T, f func(T) R, args ...any) []R {
 	}
 	return result
 }
+
+func Ptr[T any](value T) *T {
+	return &value
+}

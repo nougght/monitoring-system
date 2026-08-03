@@ -21,6 +21,11 @@ lint-shared:
 run-agent:
 	cd agent && go run cmd/main.go
 
+build-agent:
+	GOOS=linux GOARCH=amd64 go build -o ../bin/agent agent
+	GOOS=windows GOARCH=amd64 go build -o ../bin/agent.exe agent
+
+
 
 run-server:
 	cd server && go run cmd/main.go

@@ -2,13 +2,17 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/nougght/monitoring-system/shared/go/util"
+	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -16,6 +20,7 @@ import (
 
 	"agent/internal/config"
 	grpc_client "agent/internal/grpc"
+	"agent/internal/model"
 
 	"agent/internal/localserver/handler"
 	ws "agent/internal/localserver/websocket"
@@ -32,6 +37,53 @@ import (
 // @host            localhost:8088
 // @BasePath        /
 func main() {
+	var configPath string
+	var rootCmd = &cobra.Command{
+		Use: "agent",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if configPath == "" {
+				return fmt.Errorf("config path required")
+			}
+			// TODO: auto resolve config path
+			return nil
+		},
+	}
+	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "path to start config")
+
+	var runCmd = &cobra.Command{
+		Use: "run",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var cfg model.StartConfig
+			util.MustReadYaml(configPath, cfg)
+			runAgent(cfg)
+			return nil
+		},
+	}
+	rootCmd.AddCommand(runCmd)
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+	// var enrollCmd = &cobra.Command{
+	// 	Use: "run",
+	// 	RunE: func(cmd *cobra.Command, args []string) error {
+	// 		// cfg := loadConfig(configPath)
+	// 		// enroll(cfg)
+	// 		return nil
+	// 	},
+	// }
+
+	// var statusCmd = &cobra.Command{
+	// 	Use: "status",
+	// 	RunE: func(cmd *cobra.Command, args []string) error {
+	// 		// return cmdStatus(configPath)
+	// 	},
+	// }
+}
+
+func resolveConfigPaht() {
+
+}
+func runAgent(startConfig model.StartConfig) {
 	cfg := config.MustLoadConfig("config.yaml")
 	rootCtx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
