@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -18,10 +19,24 @@ type Config struct {
 }
 
 func MustLoadConfig(path string) *Config {
-	cfg := new(Config)
-	util.MustReadYaml(path, cfg)
-	if cfg.NetInterval < time.Second {
-		log.Panicf("net interval can't be less than 1 second")
+	cfg, err := LoadConfig(path)
+	if err != nil {
+		log.Panic(err)
 	}
+
 	return cfg
+}
+
+func LoadConfig(path string) (*Config, error) {
+	cfg := new(Config)
+	err := util.ReadYaml(path, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read yaml config")
+	}
+
+	if cfg.NetInterval < time.Second {
+		return nil, fmt.Errorf("net interval can't be less than 1 second")
+	}
+	return cfg, nil
+
 }

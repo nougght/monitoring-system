@@ -1,6 +1,6 @@
-package model
+package config
 
-type StartConfig struct {
+type SetupConfig struct {
 	EnrollmentKey string `yaml:"enrollment_key"`
 	CaPath        string `yaml:"ca_path"`
 	KeyPath       string `yaml:"key_path"`

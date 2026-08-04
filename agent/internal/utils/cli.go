@@ -6,6 +6,7 @@ import (
 	"fmt"
 )
 
+// unused
 func ReadArgs(args []model.ArgInfo) (res map[string]*string, err error) {
 	res = make(map[string]*string)
 	for _, arg := range args {
