@@ -121,7 +121,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigBody"
+                            "$ref": "#/definitions/AgentConfigBody"
                         }
                     }
                 ],
@@ -129,7 +129,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigResponse"
+                            "$ref": "#/definitions/AgentConfigResponse"
                         }
                     },
                     "400": {
@@ -178,6 +178,28 @@ const docTemplate = `{
                 }
             }
         },
+        "AgentConfigBody": {
+            "type": "object",
+            "properties": {
+                "enrollmentKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "AgentConfigResponse": {
+            "type": "object",
+            "properties": {
+                "enrollmentAddress": {
+                    "type": "string"
+                },
+                "enrollmentKey": {
+                    "type": "string"
+                },
+                "serverAddress": {
+                    "type": "string"
+                }
+            }
+        },
         "CreateAgentBody": {
             "type": "object",
             "required": [
@@ -221,28 +243,6 @@ const docTemplate = `{
         "gin.H": {
             "type": "object",
             "additionalProperties": {}
-        },
-        "github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigBody": {
-            "type": "object",
-            "properties": {
-                "enrollmentKey": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigResponse": {
-            "type": "object",
-            "properties": {
-                "enrollmentAddress": {
-                    "type": "string"
-                },
-                "enrollmentKey": {
-                    "type": "string"
-                },
-                "serverAddress": {
-                    "type": "string"
-                }
-            }
         }
     }
 }`

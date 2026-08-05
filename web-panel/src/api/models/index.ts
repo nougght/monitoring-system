@@ -6,6 +6,8 @@
  */
 
 export * from './agent';
+export * from './agentConfigBody';
+export * from './agentConfigResponse';
 export * from './createAgentBody';
 export * from './createAgentResponse';
 export * from './ginH';

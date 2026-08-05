@@ -32,10 +32,10 @@ type CreateAgentResponse struct {
 
 type AgentConfigBody struct {
 	EnrollmentKey string `json:"enrollmentKey"`
-}
+} // @Name AgentConfigBody
 
 type AgentConfigResponse struct {
 	EnrollmentKey     string `yaml:"enrollment_key"`
 	EnrollmentAddress string `yaml:"enrollment_address"`
 	ServerAddress     string `yaml:"server_address"`
-}
+} // @Name AgentConfigResponse

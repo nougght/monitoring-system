@@ -6,6 +6,8 @@
  */
 import type {
   Agent,
+  AgentConfigBody,
+  AgentConfigResponse,
   CreateAgentBody,
   CreateAgentResponse,
   GinH
@@ -128,6 +130,67 @@ export const postAgents = async (createAgentBody: CreateAgentBody, options?: Req
 
   const data: postAgentsResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as postAgentsResponse
+}
+
+
+
+export type postAgentsAgentIDSetupconfigResponse200 = {
+  data: AgentConfigResponse
+  status: 200
+}
+
+export type postAgentsAgentIDSetupconfigResponse400 = {
+  data: GinH
+  status: 400
+}
+
+export type postAgentsAgentIDSetupconfigResponse404 = {
+  data: GinH
+  status: 404
+}
+
+export type postAgentsAgentIDSetupconfigResponse500 = {
+  data: GinH
+  status: 500
+}
+
+export type postAgentsAgentIDSetupconfigResponseSuccess = (postAgentsAgentIDSetupconfigResponse200) & {
+  headers: Headers;
+};
+export type postAgentsAgentIDSetupconfigResponseError = (postAgentsAgentIDSetupconfigResponse400 | postAgentsAgentIDSetupconfigResponse404 | postAgentsAgentIDSetupconfigResponse500) & {
+  headers: Headers;
+};
+
+export type postAgentsAgentIDSetupconfigResponse = (postAgentsAgentIDSetupconfigResponseSuccess | postAgentsAgentIDSetupconfigResponseError)
+
+export const getPostAgentsAgentIDSetupconfigUrl = (agentID: string,) => {
+
+
+
+
+  return `http://127.0.0.1:8091/api/v1/agents/${agentID}/setupconfig`
+}
+
+/**
+ * @summary Download agent setup config
+ */
+export const postAgentsAgentIDSetupconfig = async (agentID: string,
+    agentConfigBody: AgentConfigBody, options?: RequestInit): Promise<postAgentsAgentIDSetupconfigResponse> => {
+
+  const res = await fetch(getPostAgentsAgentIDSetupconfigUrl(agentID),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(agentConfigBody)
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: postAgentsAgentIDSetupconfigResponse['data'] = body !== null ? body : ''
+  return { data, status: res.status, headers: res.headers } as postAgentsAgentIDSetupconfigResponse
 }
 
 

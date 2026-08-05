@@ -14,6 +14,21 @@
 
 }
 
+.infoMessage{
+    font-size: 18px;
+    width: fit-content;
+    height: fit-content;
+    background-color: rgba(173, 216, 230, 0.397);
+    border-radius: 10px;
+    padding: 0 5px;
+    max-width: 70%;
+    position:fixed;
+    bottom: 20px;
+    left:0;
+    right:0;
+    margin: 0 auto;
+}
+
 .app, main {
     height: 100%;
 }

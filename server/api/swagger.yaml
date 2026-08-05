@@ -15,6 +15,20 @@ definitions:
       name:
         type: string
     type: object
+  AgentConfigBody:
+    properties:
+      enrollmentKey:
+        type: string
+    type: object
+  AgentConfigResponse:
+    properties:
+      enrollmentAddress:
+        type: string
+      enrollmentKey:
+        type: string
+      serverAddress:
+        type: string
+    type: object
   CreateAgentBody:
     properties:
       description:
@@ -43,20 +57,6 @@ definitions:
     type: object
   gin.H:
     additionalProperties: {}
-    type: object
-  github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigBody:
-    properties:
-      enrollmentKey:
-        type: string
-    type: object
-  github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigResponse:
-    properties:
-      enrollmentAddress:
-        type: string
-      enrollmentKey:
-        type: string
-      serverAddress:
-        type: string
     type: object
 host: localhost:8091
 info:
@@ -133,14 +133,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigBody'
+          $ref: '#/definitions/AgentConfigBody'
       produces:
       - application/x-yaml
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigResponse'
+            $ref: '#/definitions/AgentConfigResponse'
         "400":
           description: Bad Request
           schema:

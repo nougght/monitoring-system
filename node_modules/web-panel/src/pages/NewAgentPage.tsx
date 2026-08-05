@@ -1,6 +1,7 @@
 import { useState } from "react"
-import { useCreateAgents } from "../hooks/useCreateAgent";
+import { useCreateAgents, useDownloadConfig } from "../hooks/useCreateAgent";
 import type { postAgentsResponse, postAgentsResponseSuccess } from "../api/client/monitoringServerAPI";
+import type { CreateAgentResponse } from "../api/models";
 
 
 interface NewAgentProps {
@@ -14,12 +15,14 @@ interface NewAgentProps {
 }
 
 export const NewAgentPage = (_props: NewAgentProps) => {
-    const [key, setKey] = useState<string | null>(null)
+    const [resp, setResp] = useState<CreateAgentResponse | null>(null)
     const [name, setName] = useState<string>(Math.random().toString(36).substring(2))
     const [description, setDescription] = useState<string | null>(null)
     const [warning, setWarning] = useState<string | null>()
+    const [info, setInfo] = useState<string | null>()
 
     const { mutate, isPending, isError, isSuccess } = useCreateAgents()
+    const { mutate: downloadConfig, isPending: isPendingConfig, isError: isErrorConfig, isSuccess: isSuccessError } = useDownloadConfig()
 
 
     const handleCreate = () => {
@@ -29,18 +32,35 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                 description: description ?? undefined
             },
             {
-                // onSuccess/onError можно передать прямо в mutate
-                // они сработают после глобальных из useMutation
                 onSuccess: (resp) => {
                     if (resp.status == 200) {
-                        setKey(resp.data.enrollmentKey ?? null)
+                        setResp(resp.data)
                     } else {
                         setWarning("ошибка")
                     }
+                },
+                onError: (error) => {
+                    setWarning(`ошибка:${error}`)
                 }
             }
         )
     }
+
+    const handleDownloadInstaller = () => {
+        setInfo("not implemented")
+        setTimeout(() => { setInfo(null) }, 1500)
+    }
+    const handleDownloadConfig = () => {
+        downloadConfig(
+            {
+                agentID: resp?.id ?? "",
+                dto: {
+                    enrollmentKey: resp?.enrollmentKey ?? undefined
+                }
+            }
+        )
+    }
+
     return (
         <div>
             <div>
@@ -49,10 +69,10 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                     <label htmlFor="name">Название</label>
                     <input type="text" id="name" name="name" value={name}
                         required onChange={e => setName(e.target.value)} />
-                    <br/>
+                    <br />
                     <label htmlFor="description">Описание</label>
                     <input type="text" id="name" name="name" value={description ?? ""} onChange={e => setName(e.target.value)} />
-                    <br/>
+                    <br />
                     <button onClick={handleCreate}>Создать</button>
                 </div>
             </div>
@@ -64,11 +84,24 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                         <h3>
                             Ключ подключения агента
                         </h3>
-                        <p>{isSuccess ? key : "....."}</p>
+                        <p>{isSuccess ? resp?.enrollmentKey : "....."}</p>
+                        <div>
+                            <button onClick={handleDownloadInstaller}>Скачать установщик</button>
+                            <button onClick={handleDownloadConfig}>Скачать конфиг</button>
+                        </div>
                     </div>
                 }
             </div>
-            <p>{warning}</p>
+            {
+                warning != null &&
+                <p>{warning}</p>
+            }
+            {
+                info != null &&
+                <div className="infoMessage">
+                    <p>{info}</p>
+                </div>
+            }
         </div>
     )
 }
