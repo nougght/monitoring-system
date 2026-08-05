@@ -56,7 +56,7 @@ func getAgentIDFromCert(cert tls.Certificate) (uuid.UUID, error) {
 		return uuid.Nil, fmt.Errorf("invalid agent uuid")
 	}
 
-	id, err := uuid.FromBytes([]byte(cn))
+	id, err := uuid.Parse(cn)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("faile get uuid from cn")
 	}

@@ -29,3 +29,13 @@ type CreateAgentResponse struct {
 	AgentDTO
 	EnrollmentKey string `json:"enrollmentKey"`
 } // @Name CreateAgentResponse
+
+type AgentConfigBody struct {
+	EnrollmentKey string `json:"enrollmentKey"`
+}
+
+type AgentConfigResponse struct {
+	EnrollmentKey     string `yaml:"enrollment_key"`
+	EnrollmentAddress string `yaml:"enrollment_address"`
+	ServerAddress     string `yaml:"server_address"`
+}

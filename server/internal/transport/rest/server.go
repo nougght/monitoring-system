@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -27,10 +28,10 @@ func NewServer(cfg *config.Config, services service.Services) *http.Server {
 	api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	handlers.AgentHandler().RegisterRoutes(api)
-
 	server := http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.Http.ServerPort),
+		Addr:    fmt.Sprintf(":%d", cfg.HTTP.ServerPort),
 		Handler: r.Handler(),
 	}
+	log.Println(server.Addr)
 	return &server
 }

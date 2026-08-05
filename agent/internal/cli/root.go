@@ -26,7 +26,7 @@ type CLI struct {
 }
 
 func New() *CLI {
-	cli := &CLI{}
+	cli := &CLI{setupConfigPath: new(string)}
 	cli.rootCmd = cli.newRootCmd()
 	cli.rootCmd.AddCommand(newRunCmd(cli.setupConfigPath))
 	return cli

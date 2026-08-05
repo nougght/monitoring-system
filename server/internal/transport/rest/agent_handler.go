@@ -1,10 +1,13 @@
 package rest
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/nougght/monitoring-system/server/internal/model"
 	agent "github.com/nougght/monitoring-system/server/internal/service/agent_interaction"
 	agentregistry "github.com/nougght/monitoring-system/server/internal/service/agent_registry"
 	"github.com/nougght/monitoring-system/server/internal/transport/dto/mapper"
@@ -33,6 +36,7 @@ func (h *AgentHandler) RegisterRoutes(r *gin.RouterGroup) {
 
 	group.POST("", h.CreateAgent)
 	group.GET("", h.GetAllAgents)
+	group.POST("/:agentID/setupconfig", h.DownloadAgentConfig)
 }
 
 // CreateAgent godoc
@@ -60,6 +64,36 @@ func (h *AgentHandler) CreateAgent(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, mapper.CreateAgentResultToDTO(res))
+}
+
+// DownloadAgentConfig godoc
+// @Summary Download agent setup config
+// @Accept json
+// @Produce application/x-yaml
+// @Param agentID path string true "Agent ID"
+// @Param request body dto.AgentConfigBody true "Download agent config body"
+// @Success 200 {object} dto.AgentConfigResponse
+// @Failure      400  {object}  gin.H
+// @Failure      404  {object}  gin.H
+// @Failure      500  {object}  gin.H
+// @Router /agents/{agentID}/setupconfig [post]
+func (h *AgentHandler) DownloadAgentConfig(c *gin.Context) {
+	agentID, err := uuid.Parse(c.Param("agentID"))
+	if err != nil {
+		handleError(c, fmt.Errorf("invalid 'agentID' path parameter: %w", model.ErrBadRequest))
+		return
+	}
+
+	var body dto.AgentConfigBody
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		handleError(c, fmt.Errorf("invalid request body: %w", model.ErrBadRequest))
+		return
+	}
+
+	config := h.agentRegistryService.GenerateAgentSetupConfig(c.Request.Context(), agentID, body.EnrollmentKey)
+	c.Writer.Header().Set("Content-Disposition", `attachment; filename="config.yaml"`)
+	c.YAML(http.StatusOK, config)
 }
 
 // GetAllAgents godoc

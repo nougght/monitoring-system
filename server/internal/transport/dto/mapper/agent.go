@@ -32,3 +32,15 @@ func CreateAgentResultToDTO(domain *agent.CreateAgentResult) (res *dto.CreateAge
 	}
 	return
 }
+
+func AgentConfigToDTO(domain *agent.AgentSetupConfig) (res *dto.AgentConfigResponse) {
+	if domain == nil {
+		return
+	}
+	res = &dto.AgentConfigResponse{
+		EnrollmentKey:     domain.EnrollmentKey,
+		EnrollmentAddress: domain.EnrollmentAddress,
+		ServerAddress:     domain.ServerAddress,
+	}
+	return
+}

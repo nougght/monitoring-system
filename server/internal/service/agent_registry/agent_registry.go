@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/nougght/monitoring-system/server/internal/config"
 	"github.com/nougght/monitoring-system/server/internal/model"
+	"github.com/nougght/monitoring-system/server/internal/model/agent"
 	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale/repository"
 	"github.com/nougght/monitoring-system/server/internal/util"
@@ -40,7 +41,7 @@ func NewAgentRegistryService(cfg *config.Config, agentRepo *repository.AgentRepo
 }
 
 func (s *AgentRegistryService) genEnrollmentKey() *string {
-	rawKey := make([]byte, s.cfg.AgentEnrollmentKeyLength)
+	rawKey := make([]byte, s.cfg.SettingsConfig.AgentEnrollmentKeyLength)
 	_, err := rand.Read(rawKey)
 	if err != nil {
 		return nil
@@ -98,6 +99,14 @@ func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, des
 		Agent:         *agent,
 		EnrollmentKey: *enrollmentKey,
 	}, nil
+}
+
+func (s *AgentRegistryService) GenerateAgentSetupConfig(ctx context.Context, agentID uuid.UUID, enrollmentKey string) *agent.AgentSetupConfig {
+	return &agent_model.AgentSetupConfig{
+		EnrollmentKey:     enrollmentKey,
+		EnrollmentAddress: fmt.Sprintf("%s:%d", s.cfg.SettingsConfig.Address, s.cfg.GRPC.EnrollmentPort),
+		ServerAddress:     fmt.Sprintf("%s:%d", s.cfg.SettingsConfig.Address, s.cfg.GRPC.MainPort),
+	}
 }
 
 // TODO: return agent token

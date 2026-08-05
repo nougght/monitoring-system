@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/nougght/monitoring-system/shared/go/util"
 )
 
@@ -19,6 +20,15 @@ type PostgresConfig struct {
 type HTTPConfig struct {
 	ServerPort int
 }
+type GRPCConfig struct {
+	MainPort       int
+	EnrollmentPort int
+}
+
+type SettingsConfig struct {
+	AgentEnrollmentKeyLength int    `yaml:"enrollment_key_length"`
+	Address                  string `yaml:"address"`
+}
 
 func (c *PostgresConfig) ConnString() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
@@ -26,15 +36,21 @@ func (c *PostgresConfig) ConnString() string {
 }
 
 type Config struct {
-	Postgres                 *PostgresConfig
-	Http                     *HTTPConfig
-	AgentEnrollmentKeyLength int `yaml:"enrollment_key_length"`
+	Postgres       *PostgresConfig
+	HTTP           *HTTPConfig
+	GRPC           *GRPCConfig
+	SettingsConfig *SettingsConfig
 }
 
 func MustLoadConfig(path string) *Config {
-	cfg := new(Config)
-	util.MustReadYaml(path, cfg)
-	if cfg.AgentEnrollmentKeyLength < 10 {
+	if err := godotenv.Load(); err != nil {
+		log.Println(err.Error())
+	}
+	cfg := &Config{
+		SettingsConfig: &SettingsConfig{},
+	}
+	util.MustReadYaml(path, cfg.SettingsConfig)
+	if cfg.SettingsConfig.AgentEnrollmentKeyLength < 10 {
 		log.Panicf("agent enrollment key length can't be less than 10")
 	}
 
@@ -47,12 +63,16 @@ func MustLoadConfig(path string) *Config {
 		SSLMode:  util.MustGetEnvVar("POSTGRES_SSL_MODE"),
 	}
 
-	serverPort := util.MustGetIntEnvVar("HTTP_SERVER_PORT")
-	if serverPort <= 1024 || serverPort > 65535 {
-		log.Panicf("http server port must be in range 1025-65535")
-	}
-	cfg.Http = &HTTPConfig{
+	serverPort := util.MustGetPortEnvVar("HTTP_SERVER_PORT")
+	cfg.HTTP = &HTTPConfig{
 		ServerPort: serverPort,
+	}
+
+	grpcPort := util.MustGetPortEnvVar("GRPC_SERVER_PORT")
+	grpcEnrollmentPort := util.MustGetPortEnvVar("GRPC_ENROLLMENT_PORT")
+	cfg.GRPC = &GRPCConfig{
+		MainPort:       grpcPort,
+		EnrollmentPort: grpcEnrollmentPort,
 	}
 	return cfg
 }

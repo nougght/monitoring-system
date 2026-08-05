@@ -1,4 +1,4 @@
-basePath: /
+basePath: /api/v1
 definitions:
   Agent:
     properties:
@@ -43,6 +43,20 @@ definitions:
     type: object
   gin.H:
     additionalProperties: {}
+    type: object
+  github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigBody:
+    properties:
+      enrollmentKey:
+        type: string
+    type: object
+  github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigResponse:
+    properties:
+      enrollmentAddress:
+        type: string
+      enrollmentKey:
+        type: string
+      serverAddress:
+        type: string
     type: object
 host: localhost:8091
 info:
@@ -104,4 +118,40 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Create new agent
+  /agents/{agentID}/setupconfig:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Agent ID
+        in: path
+        name: agentID
+        required: true
+        type: string
+      - description: Download agent config body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigBody'
+      produces:
+      - application/x-yaml
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Download agent setup config
 swagger: "2.0"

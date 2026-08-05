@@ -46,3 +46,11 @@ func GetOptionalIntEnvVar(key string, defaultValue int) int {
 	}
 	return intValue
 }
+
+func MustGetPortEnvVar(key string) int {
+	value := MustGetIntEnvVar(key)
+	if value <= 1024 || value > 65535 {
+		log.Panicf("port must be in range 1025-65535")
+	}
+	return value
+}

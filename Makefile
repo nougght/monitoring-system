@@ -22,14 +22,11 @@ run-agent:
 	cd agent && go run cmd/main.go
 
 build-agent:
-	GOOS=linux GOARCH=amd64 go build -o ../bin/agent agent
-	GOOS=windows GOARCH=amd64 go build -o ../bin/agent.exe agent
-
-
+	cd agent && GOOS=linux GOARCH=amd64 go build -o ../bin/agent ./cmd
+	cd agent && GOOS=windows GOARCH=amd64 go build -o ../bin/agent.exe ./cmd
 
 run-server:
 	cd server && go run cmd/main.go
-
 
 timescale-up:
 	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system up -d --build timescale

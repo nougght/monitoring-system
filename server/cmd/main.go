@@ -14,7 +14,7 @@ import (
 // @title           Monitoring Server API
 // @version         1.0
 // @host            localhost:8091
-// @BasePath        /
+// @BasePath        /api/v1
 func main() {
 	cfg := config.MustLoadConfig("config.yaml")
 	rootCtx, cancel := signal.NotifyContext(

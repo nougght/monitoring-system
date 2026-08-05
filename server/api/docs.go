@@ -97,6 +97,61 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/agents/{agentID}/setupconfig": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/x-yaml"
+                ],
+                "summary": "Download agent setup config",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent ID",
+                        "name": "agentID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Download agent config body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -166,6 +221,28 @@ const docTemplate = `{
         "gin.H": {
             "type": "object",
             "additionalProperties": {}
+        },
+        "github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigBody": {
+            "type": "object",
+            "properties": {
+                "enrollmentKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_nougght_monitoring-system_server_internal_transport_dto_types.AgentConfigResponse": {
+            "type": "object",
+            "properties": {
+                "enrollmentAddress": {
+                    "type": "string"
+                },
+                "enrollmentKey": {
+                    "type": "string"
+                },
+                "serverAddress": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
@@ -174,7 +251,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8091",
-	BasePath:         "/",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Monitoring Server API",
 	Description:      "",
