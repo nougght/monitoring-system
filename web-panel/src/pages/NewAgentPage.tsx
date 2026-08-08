@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { useCreateAgents, useDownloadConfig } from "../hooks/useCreateAgent";
+import { useCreateAgents } from "../hooks/useCreateAgent";
 import type { postAgentsResponse, postAgentsResponseSuccess } from "../api/client/monitoringServerAPI";
 import type { CreateAgentResponse } from "../api/models";
+import { useDownloadConfig } from "../hooks/useDownloadConfig";
 
 
 interface NewAgentProps {
@@ -57,6 +58,11 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                 dto: {
                     enrollmentKey: resp?.enrollmentKey ?? undefined
                 }
+            },
+            {
+                onError:(error)=> {
+                    setWarning(`ошибка:${error}`)
+                }
             }
         )
     }
@@ -94,7 +100,9 @@ export const NewAgentPage = (_props: NewAgentProps) => {
             </div>
             {
                 warning != null &&
+                <div>
                 <p>{warning}</p>
+                </div>
             }
             {
                 info != null &&
