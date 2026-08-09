@@ -11,13 +11,12 @@ service AgentEnrollmentService {
 }
 
 message EnrollRequest {
-  string agent_id = 1;
-  string token = 2;
+  string enrollment_key = 2;
   bytes  csr_der = 3;     // CSR в DER, сгенерирован агентом локально
 }
 
 message EnrollResponse {
   bytes certificate_der = 1;
-  repeated bytes ca_chain_der = 2;
+  repeated bytes ca_chain_der = 2;   // intermediate CA
   google.protobuf.Timestamp not_after = 3;
 }

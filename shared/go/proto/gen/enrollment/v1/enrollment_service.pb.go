@@ -24,8 +24,7 @@ const (
 
 type EnrollRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	EnrollmentKey string                 `protobuf:"bytes,2,opt,name=enrollment_key,json=enrollmentKey,proto3" json:"enrollment_key,omitempty"`
 	CsrDer        []byte                 `protobuf:"bytes,3,opt,name=csr_der,json=csrDer,proto3" json:"csr_der,omitempty"` // CSR в DER, сгенерирован агентом локально
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -61,16 +60,9 @@ func (*EnrollRequest) Descriptor() ([]byte, []int) {
 	return file_enrollment_v1_enrollment_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *EnrollRequest) GetAgentId() string {
+func (x *EnrollRequest) GetEnrollmentKey() string {
 	if x != nil {
-		return x.AgentId
-	}
-	return ""
-}
-
-func (x *EnrollRequest) GetToken() string {
-	if x != nil {
-		return x.Token
+		return x.EnrollmentKey
 	}
 	return ""
 }
@@ -85,7 +77,7 @@ func (x *EnrollRequest) GetCsrDer() []byte {
 type EnrollResponse struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	CertificateDer []byte                 `protobuf:"bytes,1,opt,name=certificate_der,json=certificateDer,proto3" json:"certificate_der,omitempty"`
-	CaChainDer     [][]byte               `protobuf:"bytes,2,rep,name=ca_chain_der,json=caChainDer,proto3" json:"ca_chain_der,omitempty"`
+	CaChainDer     [][]byte               `protobuf:"bytes,2,rep,name=ca_chain_der,json=caChainDer,proto3" json:"ca_chain_der,omitempty"` // intermediate CA
 	NotAfter       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=not_after,json=notAfter,proto3" json:"not_after,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -146,10 +138,9 @@ var File_enrollment_v1_enrollment_service_proto protoreflect.FileDescriptor
 
 const file_enrollment_v1_enrollment_service_proto_rawDesc = "" +
 	"\n" +
-	"&enrollment/v1/enrollment_service.proto\x12\x18monitoring.enrollment.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"Y\n" +
-	"\rEnrollRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x14\n" +
-	"\x05token\x18\x02 \x01(\tR\x05token\x12\x17\n" +
+	"&enrollment/v1/enrollment_service.proto\x12\x18monitoring.enrollment.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"O\n" +
+	"\rEnrollRequest\x12%\n" +
+	"\x0eenrollment_key\x18\x02 \x01(\tR\renrollmentKey\x12\x17\n" +
 	"\acsr_der\x18\x03 \x01(\fR\x06csrDer\"\x94\x01\n" +
 	"\x0eEnrollResponse\x12'\n" +
 	"\x0fcertificate_der\x18\x01 \x01(\fR\x0ecertificateDer\x12 \n" +

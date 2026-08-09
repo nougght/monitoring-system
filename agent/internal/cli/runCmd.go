@@ -34,11 +34,11 @@ func newRunCmd(setupConfigPath *string) *cobra.Command {
 				return fmt.Errorf("run command didn't get receive setup config path")
 			}
 			var cfg config.SetupConfig
-			if err := util.ReadYaml(*setupConfigPath, cfg); err != nil {
+			if err := util.ReadYaml(*setupConfigPath, &cfg); err != nil {
 				return fmt.Errorf("failed to read yaml setup config: %w", err)
 			}
 			if cfg.EnrollmentKey != model.EnrollmentKeyUsed {
-				return fmt.Errorf(`agent is not enrolled, use 'agent enroll --config="/path/to/setup/config"`)
+				return fmt.Errorf(`agent is not enrolled, use 'agent enroll --setupconfig="/path/to/setup/config"`)
 			}
 			if err := runAgent(cfg); err != nil {
 				return fmt.Errorf("run agent error: %w", err)
