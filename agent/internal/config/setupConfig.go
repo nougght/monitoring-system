@@ -1,5 +1,12 @@
 package config
 
+import (
+	"agent/internal/model"
+	"fmt"
+
+	"github.com/nougght/monitoring-system/shared/go/util"
+)
+
 type SetupConfig struct {
 	EnrollmentKey     string `yaml:"enrollment_key"`
 	EnrollmentAddress string `yaml:"enrollment_address"`
@@ -8,4 +15,20 @@ type SetupConfig struct {
 	KeyPath           string `yaml:"key_path"`
 	CertPath          string `yaml:"cert_path"`
 	// TODO: add agent mode
+}
+
+func LoadSetupConfig(path string) (cfg *SetupConfig, err error) {
+	if err := util.ReadYaml(path, &cfg); err != nil {
+		return nil, fmt.Errorf("failed to read yaml setup config: %w", err)
+	}
+	if cfg.CaPath == "" {
+		cfg.CaPath = model.DefaultCAPath
+	}
+	if cfg.CertPath == "" {
+		cfg.CertPath = model.DefaultAgentCertPath
+	}
+	if cfg.KeyPath == "" {
+		cfg.KeyPath = model.DefaultAgentKeyPath
+	}
+	return cfg, nil
 }

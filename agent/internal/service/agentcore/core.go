@@ -2,13 +2,26 @@ package agentcore
 
 import (
 	"agent/internal/config"
+	"agent/internal/grpc/enrollment_client"
 	"agent/internal/model"
+	"context"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"crypto/tls"
 	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"errors"
 	"fmt"
+	"os"
 	"sync/atomic"
+	"time"
 
 	"github.com/google/uuid"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 type CoreService struct {
@@ -44,6 +57,133 @@ func NewCore(setupCfg *config.SetupConfig, certStore model.CertStore) (*CoreServ
 
 func (c *CoreService) State() *model.AgentState {
 	return c.state
+}
+
+func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore model.CertStore) error {
+	if setupCfg == nil {
+		return fmt.Errorf(`setup config is required`)
+	}
+
+	if setupCfg.EnrollmentKey == model.EnrollmentKeyUsed {
+		return fmt.Errorf(`agent is already enrolled, use 'agent run --setupconfig="/path/to/setup/config"`)
+	}
+
+	privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	template := x509.CertificateRequest{
+		Subject:            pkix.Name{}, // CN больше не нужен — сервер назначает сам, см. прошлый разговор
+		SignatureAlgorithm: x509.ECDSAWithSHA256,
+	}
+	csrDER, err := x509.CreateCertificateRequest(rand.Reader, &template, privateKey)
+	if err != nil {
+		return fmt.Errorf(`failed to generate CSR: %w`, err)
+	}
+
+	caPEM, _ := os.ReadFile(setupCfg.CaPath)
+	caPool := x509.NewCertPool()
+	caPool.AppendCertsFromPEM(caPEM)
+	if err != nil {
+		return err
+	}
+
+	client, err := setupEnrollmentClient(setupCfg, caPool)
+	if err != nil {
+		return fmt.Errorf("failed to setup enrollment client")
+	}
+
+	res, err := client.Enroll(ctx, &model.EnrollParams{
+		EnrollmentKey: setupCfg.EnrollmentKey,
+		CsrDer:        csrDER,
+	})
+	if err != nil {
+		return err
+	}
+
+	// проверка полученного сертификата
+	cert, err := verifyCertificate(res.CertDer, res.CAChainDer, caPool, privateKey)
+	if err != nil {
+		return fmt.Errorf("received invalid enroll result: %w", err)
+	}
+
+	// сохраняем сертификат
+	err = certStore.SaveCertificate(cert.Raw)
+
+	// сохраняем ключ
+	keyBytes, err := x509.MarshalECPrivateKey(privateKey)
+	if err != nil {
+		return fmt.Errorf("failed to marshal agent key: %w", err)
+	}
+	keyFile, err := os.Open(setupCfg.KeyPath)
+	if err != nil {
+		return fmt.Errorf("failed to open agent key file: %w", err)
+	}
+	err = pem.Encode(keyFile, &pem.Block{Type: "EC PRIVATE KEY", Bytes: keyBytes})
+
+	if err != nil {
+		return fmt.Errorf("failed to encode agent key: %w", err)
+	}
+
+	return nil
+}
+
+func setupEnrollmentClient(setupCfg *config.SetupConfig, caPool *x509.CertPool) (*enrollment_client.EnrollmentClient, error) {
+	tlsConfig := &tls.Config{
+		RootCAs:    caPool, // для проверки сертификата сервера
+		MinVersion: tls.VersionTLS12,
+		// без сертификата агента, т.к. его еще нет
+	}
+	conn, err := grpc.NewClient(
+		setupCfg.EnrollmentAddress,
+		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create grpc client: %w", err)
+	}
+	return enrollment_client.NewEnrollmentClient(conn, setupCfg)
+}
+
+func verifyCertificate(certDER []byte, chainDER [][]byte, trustedCA *x509.CertPool, priv crypto.Signer) (*x509.Certificate, error) {
+	cert, err := x509.ParseCertificate(certDER)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse cert: %w", err)
+	}
+
+	intermediates := x509.NewCertPool()
+	for _, c := range chainDER {
+		ic, err := x509.ParseCertificate(c)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse intermediate CAs: %w", err)
+		}
+		intermediates.AddCert(ic)
+	}
+
+	// проверка сертификата
+	if _, err := cert.Verify(x509.VerifyOptions{
+		Roots:         trustedCA,
+		Intermediates: intermediates,
+		KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+	}); err != nil {
+		return nil, fmt.Errorf("failed to verify cert: %w", err)
+	}
+
+	// проверка соответствия публичного ключа приватному ключу агента
+	certPub, ok := cert.PublicKey.(*ecdsa.PublicKey)
+	if !ok {
+		return nil, errors.New("incorrect cert public key type")
+	}
+	myPub := priv.Public().(*ecdsa.PublicKey)
+	if !certPub.Equal(myPub) {
+		return nil, errors.New("cert public key doesn't match agent private key")
+	}
+
+	// проверка срока
+	if time.Now().After(cert.NotAfter) {
+		return nil, errors.New("cert already expired")
+	}
+	if cert.Subject.CommonName == "" {
+		return nil, errors.New("cert without CN")
+	}
+
+	return cert, nil
 }
 
 func getAgentIDFromCert(cert tls.Certificate) (uuid.UUID, error) {

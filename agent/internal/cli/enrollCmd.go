@@ -1,11 +1,11 @@
 package cli
 
 import (
+	"agent/internal/app"
 	"agent/internal/config"
-	"agent/internal/model"
+	"agent/internal/service/agentcore"
 	"fmt"
 
-	"github.com/nougght/monitoring-system/shared/go/util"
 	"github.com/spf13/cobra"
 )
 
@@ -17,22 +17,22 @@ func newEnrollCmd(setupConfigPath *string) *cobra.Command {
 			if setupConfigPath == nil {
 				return fmt.Errorf("enroll command didn't get receive setup config path")
 			}
-			var cfg config.SetupConfig
-			if err := util.ReadYaml(*setupConfigPath, &cfg); err != nil {
-				return fmt.Errorf("failed to read yaml setup config: %w", err)
+
+			cfg, err := config.LoadSetupConfig(*setupConfigPath)
+			if err != nil {
+				return fmt.Errorf("failed to load setup config: %w", err)
 			}
-			if cfg.EnrollmentKey == model.EnrollmentKeyUsed {
-				return fmt.Errorf(`agent is already enrolled, use 'agent run --setupconfig="/path/to/setup/config"`)
-			}
-			if err := enrollAgent(cfg); err != nil {
+			if err := agentcore.EnrollAgent(cmd.Context(), cfg,
+				agentcore.NewCertStore(cfg.CertPath, cfg.KeyPath)); err != nil {
 				return fmt.Errorf("enroll agent error: %w", err)
+			}
+
+			// default run after enrollment
+			if err := app.RunAgent(cfg); err != nil {
+				return fmt.Errorf("run agent error: %w", err)
 			}
 			return nil
 		},
 	}
 	return runCmd
-}
-
-func enrollAgent(setupConfig config.SetupConfig) error {
-
 }
