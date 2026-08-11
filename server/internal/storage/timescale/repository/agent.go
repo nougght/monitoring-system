@@ -58,6 +58,7 @@ func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent.Agent,
 	if err != nil {
 		return nil, fmt.Errorf("select failed: %w", err)
 	}
+	defer rows.Close()
 
 	res, err = pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[agent.Agent])
 	if err != nil {
@@ -71,7 +72,7 @@ func (r *AgentRepository) UpdateStatus(ctx context.Context, agentID uuid.UUID, s
 	query := `
 	UPDATE agents SET status = $1 WHERE ID = $2
 	`
-	_, err := r.db(ctx).Query(ctx, query, status, agentID)
+	_, err := r.db(ctx).Exec(ctx, query, status, agentID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return fmt.Errorf("insert failed: %w", ErrNotFound)

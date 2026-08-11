@@ -88,11 +88,14 @@ func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, des
 		return nil, fmt.Errorf("failed to generate enrollment key: %w", err)
 	}
 
-	_, err = s.enrollmentKeysRepo.CreateKey(ctx, &agent_model.EnrollmentKey{
+	selector := uuid.New().String()
+	key, err := s.enrollmentKeysRepo.CreateKey(ctx, &agent_model.EnrollmentKey{
 		AgentID:    agent.ID,
 		HashString: keyHash,
+		Selector:   selector,
 		ExpiresAt:  time.Now().Add(time.Minute * 20),
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to create enrollment key: %w", err)
 	}
@@ -103,7 +106,7 @@ func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, des
 	}
 	return &agent_model.CreateAgentResult{
 		Agent:         *agent,
-		EnrollmentKey: *enrollmentKey,
+		EnrollmentKey: fmt.Sprintf("%s.%s", key.Selector, *enrollmentKey),
 	}, nil
 }
 
@@ -116,7 +119,7 @@ func (s *AgentRegistryService) GenerateAgentSetupConfig(ctx context.Context, age
 }
 
 // TODO: return agent token
-func (s *AgentRegistryService) EnrollAgent(ctx context.Context, params *agent.EnrollParams) (*agent.EnrollResult, error) {
+func (s *AgentRegistryService) Enroll(ctx context.Context, params *agent.EnrollParams) (*agent.EnrollResult, error) {
 	tx, err := s.transactor.Begin(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed begin transaction: %w", err)
@@ -131,10 +134,10 @@ func (s *AgentRegistryService) EnrollAgent(ctx context.Context, params *agent.En
 
 	agentID, pubKey, err := s.validateAgentEnrollment(ctx, params.EnrollmentKey, params.CsrDer)
 	if err != nil {
-		log.Println("failed to validate agent enrollment:%w", err)
+		log.Printf("failed to validate agent enrollment:%s", err.Error())
 		return nil, fmt.Errorf("failed to validate agent enrollment")
 	}
-
+	log.Printf("agent id: %s", agentID.String())
 	err = s.enrollmentKeysRepo.SetUsed(ctx, agentID, time.Now())
 	if errors.Is(err, repository.ErrNoAffectedRows) {
 		return nil, fmt.Errorf("enrollment key already used: %w", model.ErrBadRequest)
@@ -148,10 +151,14 @@ func (s *AgentRegistryService) EnrollAgent(ctx context.Context, params *agent.En
 	certNotAfter := time.Now().Add(agent.DefaultAgentCertificateDuration)
 	agentCert, err := s.issueCertificate(agentID, pubKey, certNotAfter)
 	if err != nil {
-		log.Println("failed issue agent certificate: %w", err)
+		log.Printf("failed issue agent certificate: %s", err.Error())
 		return nil, fmt.Errorf("failed issue agent certificate")
 	}
 
+	err = tx.Commit(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("commit transaction error: %w", err)
+	}
 	return &agent.EnrollResult{
 		CertDer:    agentCert.Raw,
 		CAChainDer: [][]byte{s.cert.CA.Raw},
@@ -168,22 +175,29 @@ func (s *AgentRegistryService) validateAgentEnrollment(ctx context.Context, enro
 		return uuid.Nil, nil, fmt.Errorf("CSR signature invalid: %w", err) // доказательство владения ключом провалено
 	}
 
-	agentID, err = uuid.Parse(csr.Subject.CommonName)
-	if err != nil {
-		return uuid.Nil, nil, err
+	// agentID, err = uuid.Parse(csr.Subject.CommonName)
+	// log.Printf("agent common name: %s", csr.Subject.CommonName)
+	// if err != nil {
+	// 	return uuid.Nil, nil, err
+	// }
+	parts := strings.SplitN(enrollmentKey, ".", 2)
+	if len(parts) != 2 {
+		return uuid.Nil, nil, fmt.Errorf("invalid enrollment key format: %w", model.ErrBadRequest)
 	}
+	selector, keyVerifier := parts[0], parts[1]
 
-	key, err := s.enrollmentKeysRepo.GetKeyByAgentId(ctx, agentID)
+	key, err := s.enrollmentKeysRepo.GetKeyBySelector(ctx, selector)
 	if errors.Is(err, sql.ErrNoRows) {
-		return uuid.Nil, nil, fmt.Errorf("key with id '%s' not found: %w", agentID.String(), model.ErrNotFound)
+		return uuid.Nil, nil, fmt.Errorf("key with selector '%s' not found: %w", selector, model.ErrBadRequest)
 	}
 	if err != nil {
-		return uuid.Nil, nil, fmt.Errorf("failed to get enrollment key: %w", err)
+		log.Printf("failed to get enrollment key by selector from bd: %s", err.Error())
+		return uuid.Nil, nil, fmt.Errorf("failed validate enrollment key")
 	}
 
 	// сверяем с хэшированным значением из бд
-	if ok, err := util.CompareHash(key.HashString, enrollmentKey); !ok || err != nil {
-		log.Println("failed to compare hash enrollment key: %w", err)
+	if ok, err := util.CompareHash(key.HashString, keyVerifier); !ok || err != nil {
+		log.Printf("failed to compare hash enrollment key: %s", err.Error())
 		return uuid.Nil, nil, fmt.Errorf("failed to validate enrollment key")
 	}
 
@@ -191,7 +205,7 @@ func (s *AgentRegistryService) validateAgentEnrollment(ctx context.Context, enro
 		return uuid.Nil, nil, fmt.Errorf("enrollment key expired: %w", model.ErrBadRequest)
 	}
 
-	return agentID, csr.PublicKey, nil
+	return key.AgentID, csr.PublicKey, nil
 }
 
 func (s *AgentRegistryService) issueCertificate(agentID uuid.UUID, pubKey any, notAfter time.Time) (*x509.Certificate, error) {

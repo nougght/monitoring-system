@@ -25,7 +25,7 @@ func NewCertStore(certPath string, keyPath string, caPath string) *CertStore {
 func (s *CertStore) LoadCertificate() (*tls.Certificate, error) {
 	cert, err := tls.LoadX509KeyPair(s.certPath, s.keyPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load agent cert")
+		return nil, fmt.Errorf("failed to load agent cert: %w", err)
 	}
 	return &cert, nil
 }
@@ -37,7 +37,7 @@ func (s *CertStore) SaveCertificate(cert []byte) error {
 		Bytes: cert,
 	}
 
-	certFile, err := os.Open(s.certPath)
+	certFile, err := os.Create(s.certPath)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (s *CertStore) LoadKey() (*ecdsa.PrivateKey, error) {
 	block, _ := pem.Decode(keyFile)
 	key, err := x509.ParseECPrivateKey(block.Bytes)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse agent key")
+		return nil, fmt.Errorf("failed to parse agent key: %w", err)
 	}
 	return key, nil
 }
@@ -71,7 +71,7 @@ func (s *CertStore) SaveKey(key *ecdsa.PrivateKey) error {
 		Bytes: keyBytes,
 	}
 
-	keyFile, err := os.Open(s.keyPath)
+	keyFile, err := os.Create(s.keyPath)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (s *CertStore) LoadCA() (*x509.CertPool, error) {
 	caPool := x509.NewCertPool()
 	ok := caPool.AppendCertsFromPEM(caFile)
 	if !ok {
-		return nil, fmt.Errorf("failed to add CA cert")
+		return nil, fmt.Errorf("failed to add CA cert: %w", err)
 	}
 	return caPool, nil
 }

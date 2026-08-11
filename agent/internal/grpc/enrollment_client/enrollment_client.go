@@ -28,7 +28,7 @@ func NewEnrollmentClient(conn *grpc.ClientConn, setupCfg *config.SetupConfig) (*
 func (c *EnrollmentClient) Enroll(ctx context.Context, params *model.EnrollParams) (*model.EnrollResult, error) {
 	resp, err := c.grpcClient.Enroll(ctx, convertEnrollParamsToProto(params))
 	if err != nil {
-		return nil, fmt.Errorf("enroll agent request failed")
+		return nil, fmt.Errorf("enroll agent request failed: %w", err)
 	}
 	return convertEnrollResultFromProto(resp), nil
 }

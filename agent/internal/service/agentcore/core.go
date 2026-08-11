@@ -16,7 +16,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"os"
 	"sync/atomic"
 	"time"
 
@@ -117,22 +116,14 @@ func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore mo
 	}
 	// сохраняем сертификат
 	err = certStore.SaveCertificate(buf.Bytes())
-
+	if err != nil {
+		return err
+	}
 	// сохраняем ключ
-	keyBytes, err := x509.MarshalECPrivateKey(privateKey)
+	err = certStore.SaveKey(privateKey)
 	if err != nil {
-		return fmt.Errorf("failed to marshal agent key: %w", err)
+		return err
 	}
-	keyFile, err := os.Open(setupCfg.KeyPath)
-	if err != nil {
-		return fmt.Errorf("failed to open agent key file: %w", err)
-	}
-	err = pem.Encode(keyFile, &pem.Block{Type: "EC PRIVATE KEY", Bytes: keyBytes})
-
-	if err != nil {
-		return fmt.Errorf("failed to encode agent key: %w", err)
-	}
-
 	return nil
 }
 

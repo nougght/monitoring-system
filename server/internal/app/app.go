@@ -2,7 +2,8 @@ package app
 
 import (
 	"context"
-	"crypto/ecdsa"
+	"crypto"
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"log"
@@ -16,26 +17,30 @@ import (
 	"github.com/nougght/monitoring-system/server/internal/service"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale/repository"
-	grpc_handler "github.com/nougght/monitoring-system/server/internal/transport/grpc"
+	agent_grpc "github.com/nougght/monitoring-system/server/internal/transport/grpc/agent_server"
+	enrollment_grpc "github.com/nougght/monitoring-system/server/internal/transport/grpc/enrollment_server"
 	"github.com/nougght/monitoring-system/server/internal/transport/rest"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/nougght/monitoring-system/shared/go/cert_store"
 )
 
 type App struct {
-	DB *pgxpool.Pool
+	Config *config.Config
+	DB     *pgxpool.Pool
 
 	Repositories *repository.Repositories
 
 	Services *service.Services
 
-	HTTPServer *http.Server
-	GRPCServer *grpc.Server
-	CertStore  *model.CertStore
+	HTTPServer           *http.Server
+	AgentGRPCServer      *grpc.Server
+	EnrollmentGRPCServer *grpc.Server
+	CertStore            *model.CertStore
 
 	ca     *x509.Certificate
-	key    *ecdsa.PrivateKey
+	key    crypto.Signer
 	rootCA *x509.CertPool
 }
 
@@ -43,17 +48,17 @@ func New(ctx context.Context, cfg *config.Config) *App {
 	certStore := cert_store.NewCertStore(cfg.Cert.IntCAPath, cfg.Cert.IntKeyPath, cfg.Cert.CAPath)
 
 	cert, err := certStore.LoadCertificate()
-	intCA := cert.Leaf
 	if err != nil {
-		log.Panic("failed load certs")
+		log.Panicf("failed load certs: %s", err.Error())
 	}
+	intCA := cert.Leaf
 	intKey, err := certStore.LoadKey()
 	if err != nil {
-		log.Panic("failed load certs")
+		log.Panicf("failed load certs: %s", err.Error())
 	}
 	rootCA, err := certStore.LoadCA()
 	if err != nil {
-		log.Panic("failed load certs")
+		log.Panicf("failed load certs: %s", err.Error())
 	}
 
 	err = verifyIntermediateCA(intCA, rootCA)
@@ -79,19 +84,39 @@ func New(ctx context.Context, cfg *config.Config) *App {
 
 	httpServer := rest.NewServer(cfg, *services)
 
-	grpcServer := grpc.NewServer()
-	agentService := grpc_handler.NewAgentService()
-	agentService.Register(grpcServer)
+	agentServer := grpc.NewServer(grpc.Creds(
+		credentials.NewTLS(&tls.Config{Certificates: []tls.Certificate{*cert},
+			ClientAuth: tls.RequireAndVerifyClientCert, //  mTLS
+			ClientCAs:  rootCA,
+			MinVersion: tls.VersionTLS12,
+		}),
+	))
+
+	agentService := agent_grpc.NewAgentService()
+	agentService.Register(agentServer)
+
+	enrollmentServer := grpc.NewServer(grpc.Creds(
+		credentials.NewTLS(&tls.Config{
+			Certificates: []tls.Certificate{*cert},
+			ClientAuth:   tls.NoClientCert, // явно НЕ требуем клиентский сертификат
+			MinVersion:   tls.VersionTLS12,
+		})),
+	)
+
+	enrollmentService := enrollment_grpc.NewEnrollmentService(services.AgentRegistry())
+	enrollmentService.Register(enrollmentServer)
 
 	return &App{
-		DB:           db,
-		Repositories: repository.New(db),
-		Services:     services,
-		HTTPServer:   httpServer,
-		GRPCServer:   grpcServer,
-		ca:           intCA,
-		key:          intKey,
-		rootCA:       rootCA,
+		Config:               cfg,
+		DB:                   db,
+		Repositories:         repository.New(db),
+		Services:             services,
+		HTTPServer:           httpServer,
+		AgentGRPCServer:      agentServer,
+		EnrollmentGRPCServer: enrollmentServer,
+		ca:                   intCA,
+		key:                  intKey,
+		rootCA:               rootCA,
 	}
 }
 
@@ -104,21 +129,35 @@ func (a *App) Run(ctx context.Context) error {
 		}
 	}()
 
-	l, err := net.Listen("tcp", fmt.Sprintf(":%d", 8092))
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", a.Config.GRPC.MainPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	grpcErrChan := make(chan error)
+	grpcAgentErrChan := make(chan error)
 	go func() {
-		log.Println("starting gRPC server")
-		if err := a.GRPCServer.Serve(l); err != nil {
-			grpcErrChan <- err
+		log.Printf("starting gRPC server :%d", a.Config.GRPC.MainPort)
+		if err := a.AgentGRPCServer.Serve(l); err != nil {
+			grpcAgentErrChan <- err
+		}
+	}()
+
+	l2, err := net.Listen("tcp", fmt.Sprintf(":%d", a.Config.GRPC.EnrollmentPort))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	grpEnrollmentErrChan := make(chan error)
+	go func() {
+		log.Printf("starting gRPC enrollment server :%d", a.Config.GRPC.EnrollmentPort)
+		if err := a.EnrollmentGRPCServer.Serve(l2); err != nil {
+			grpEnrollmentErrChan <- err
 		}
 	}()
 
 	select {
-	case err := <-grpcErrChan:
-		log.Fatalf("failed to serve gRPC: %v", err)
+	case err := <-grpcAgentErrChan:
+		log.Fatalf("failed to serve gRPC agent server: %v", err)
+	case err := <-grpEnrollmentErrChan:
+		log.Fatalf("failed to serve gRPC enrollment server: %v", err)
 	case err := <-httpErrChan:
 		log.Fatalf("failed to serve HTTP: %v", err)
 	}
@@ -130,7 +169,8 @@ func (a *App) Run(ctx context.Context) error {
 	)
 	defer cancel()
 
-	a.GRPCServer.GracefulStop()
+	a.AgentGRPCServer.GracefulStop()
+	a.EnrollmentGRPCServer.GracefulStop()
 	err = a.HTTPServer.Shutdown(shutdownCtx)
 	if err != nil && err != http.ErrServerClosed {
 		log.Fatalf("failed to shutdown HTTP server: %v", err)

@@ -12,6 +12,7 @@ const (
 
 type EnrollmentKey struct {
 	HashString string     `db:"key_hash"`
+	Selector   string     `db:"selector"`
 	AgentID    uuid.UUID  `db:"agent_id"`
 	ExpiresAt  time.Time  `db:"expires_at"`
 	UsedAt     *time.Time `db:"used_at"`

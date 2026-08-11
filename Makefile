@@ -29,13 +29,13 @@ run-server:
 	cd server && go run cmd/main.go
 
 timescale-up:
-	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system up -d --build timescale
+	docker compose --env-file ./server/.env -f ./server/docker/docker-compose.yaml -p monitoring-system up -d --build timescale
 
 server-build:
 	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system --build monitoring-backend
 
 server-up:
-	docker compose -f ./server/docker/docker-compose.yaml -p monitoring-system up -d --build monitoring-backend
+	docker compose --env-file ./server/.env -f ./server/docker/docker-compose.yaml -p monitoring-system up -d  --build monitoring-backend
 
 migrate-create: 
 ifndef MIGRATE_NAME
@@ -64,12 +64,12 @@ gen-swag-server:
 # temp
 gen-ca:
 # root — самоподписанный
-	openssl ecparam -genkey -name prime256v1 -out ./rootCA/root-ca.key
+	openssl ecparam -genkey -name prime256v1 -noout -out ./rootCA/root-ca.key
 	openssl req -x509 -new -key ./rootCA/root-ca.key -days 3650 \
 		-subj "/CN=Monitoring Root CA" -out ./rootCA/root-ca.crt
 
 # intermediate — CSR подписывается root
-	openssl ecparam -genkey -name prime256v1 -out ./server/creds/intermediate-ca.key
+	openssl ecparam -genkey -name prime256v1 -noout -out ./server/creds/intermediate-ca.key
 	openssl req -new -key ./server/creds/intermediate-ca.key -subj "/CN=Monitoring Intermediate CA" -out ./server/creds/intermediate-ca.csr
 	openssl x509 -req -in ./server/creds/intermediate-ca.csr -CA ./rootCA/root-ca.crt -CAkey ./rootCA/root-ca.key \
 		-CAcreateserial -days 1825 -extfile rootCA/int.cnf \

@@ -82,9 +82,9 @@ func MustLoadConfig(path string) *Config {
 		EnrollmentPort: grpcEnrollmentPort,
 	}
 
-	caPath := util.MustGetEnvVar("CA_PATH")
-	intCAPath := util.MustGetEnvVar("INT_CA_PATH")
-	intKeyPath := util.MustGetEnvVar("INT_KEY_PATH")
+	caPath := util.MustGetEnvVar("CONTAINER_CA_PATH")
+	intCAPath := util.MustGetEnvVar("CONTAINER_INT_CA_PATH")
+	intKeyPath := util.MustGetEnvVar("CONTAINER_INT_KEY_PATH")
 	cfg.Cert = &CertConfig{
 		CAPath:     caPath,
 		IntCAPath:  intCAPath,

@@ -22,6 +22,7 @@ services:
     ports:
       - "8091:8091"
       - "8092:8092"
+      - "8093:8093" 
       
     env_file:
       - ../.env
@@ -30,14 +31,14 @@ services:
       POSTGRES_HOST: "timescale"
       POSTGRES_PORT: "5432"
       CA_PATH: ${CONTAINER_CA_PATH}
-      INT_CA_PATH:  ${CONTAINER_CA_PATH}
-      INT_KEY_PATH: ${CONTAINER_KEY_PATH}
+      INT_CA_PATH:  ${CONTAINER_INT_CA_PATH}
+      INT_KEY_PATH: ${CONTAINER_INT_KEY_PATH}
 
     depends_on:
       - timescale
     stop_grace_period: 10s
     volumes:
-      - ${CA_PATH}:{CONTAINER_CREDS_PATH}
+      - .${HOST_CREDS_PATH}:${CONTAINER_CREDS_PATH}
 volumes:
   db-data:
   
