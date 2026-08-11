@@ -58,3 +58,19 @@ gen-swag-agent:
 
 gen-swag-server:
 	cd server && swag init -g cmd/main.go -o api --parseDependency --parseInternal 
+
+
+
+# temp
+gen-ca:
+# root — самоподписанный
+	openssl ecparam -genkey -name prime256v1 -out ./rootCA/root-ca.key
+	openssl req -x509 -new -key ./rootCA/root-ca.key -days 3650 \
+		-subj "/CN=Monitoring Root CA" -out ./rootCA/root-ca.crt
+
+# intermediate — CSR подписывается root
+	openssl ecparam -genkey -name prime256v1 -out ./server/creds/intermediate-ca.key
+	openssl req -new -key ./server/creds/intermediate-ca.key -subj "/CN=Monitoring Intermediate CA" -out ./server/creds/intermediate-ca.csr
+	openssl x509 -req -in ./server/creds/intermediate-ca.csr -CA ./rootCA/root-ca.crt -CAkey ./rootCA/root-ca.key \
+		-CAcreateserial -days 1825 -extfile rootCA/int.cnf \
+		-out ./server/creds/intermediate-ca.crt

@@ -3,11 +3,15 @@ package agentregistry
 import (
 	"context"
 	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"database/sql"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
+	"math"
+	"math/big"
 	"strings"
 	"time"
 
@@ -25,10 +29,11 @@ type AgentRegistryService struct {
 	agentRepo          *repository.AgentRepository
 	enrollmentKeysRepo *repository.EnrollmentKeysRepository
 	transactor         model.Transactor
+	cert               *model.Certs
 }
 
 func NewAgentRegistryService(cfg *config.Config, agentRepo *repository.AgentRepository,
-	enrollmentKeysRepo *repository.EnrollmentKeysRepository, transactor model.Transactor) (*AgentRegistryService, error) {
+	enrollmentKeysRepo *repository.EnrollmentKeysRepository, transactor model.Transactor, cert *model.Certs) (*AgentRegistryService, error) {
 	if cfg == nil || agentRepo == nil || enrollmentKeysRepo == nil || transactor == nil {
 		return nil, fmt.Errorf("params required")
 	}
@@ -37,6 +42,7 @@ func NewAgentRegistryService(cfg *config.Config, agentRepo *repository.AgentRepo
 		agentRepo:          agentRepo,
 		enrollmentKeysRepo: enrollmentKeysRepo,
 		transactor:         transactor,
+		cert:               cert,
 	}, nil
 }
 
@@ -110,10 +116,10 @@ func (s *AgentRegistryService) GenerateAgentSetupConfig(ctx context.Context, age
 }
 
 // TODO: return agent token
-func (s *AgentRegistryService) EnrollAgent(ctx context.Context, agentID uuid.UUID, enrollmentKey string) error {
+func (s *AgentRegistryService) EnrollAgent(ctx context.Context, params *agent.EnrollParams) (*agent.EnrollResult, error) {
 	tx, err := s.transactor.Begin(ctx)
 	if err != nil {
-		return fmt.Errorf("failed begin transaction: %w", err)
+		return nil, fmt.Errorf("failed begin transaction: %w", err)
 	}
 	defer func() {
 		err := tx.Rollback(ctx)
@@ -123,29 +129,89 @@ func (s *AgentRegistryService) EnrollAgent(ctx context.Context, agentID uuid.UUI
 	}()
 	ctx = context.WithValue(ctx, model.TxKey, tx)
 
-	key, err := s.enrollmentKeysRepo.GetKeyByAgentId(ctx, agentID)
-	if errors.Is(err, sql.ErrNoRows) {
-		return fmt.Errorf("key with id '%s' not found: %w", agentID.String(), model.ErrNotFound)
-	}
+	agentID, pubKey, err := s.validateAgentEnrollment(ctx, params.EnrollmentKey, params.CsrDer)
 	if err != nil {
-		return fmt.Errorf("failed to get enrollment key: %w", err)
-	}
-
-	if key.ExpiresAt.Before(time.Now()) {
-		return fmt.Errorf("enrollment key expired: %w", model.ErrBadRequest)
+		log.Println("failed to validate agent enrollment:%w", err)
+		return nil, fmt.Errorf("failed to validate agent enrollment")
 	}
 
 	err = s.enrollmentKeysRepo.SetUsed(ctx, agentID, time.Now())
 	if errors.Is(err, repository.ErrNoAffectedRows) {
-		return fmt.Errorf("enrollment key already used: %w", model.ErrBadRequest)
+		return nil, fmt.Errorf("enrollment key already used: %w", model.ErrBadRequest)
 	}
 
 	err = s.agentRepo.UpdateStatus(ctx, agentID, agent_model.AgentStatusActive)
 	if err != nil {
-		return fmt.Errorf("failed update agent status: %w", err)
+		return nil, fmt.Errorf("failed update agent status: %w", err)
 	}
 
-	return nil
+	certNotAfter := time.Now().Add(agent.DefaultAgentCertificateDuration)
+	agentCert, err := s.issueCertificate(agentID, pubKey, certNotAfter)
+	if err != nil {
+		log.Println("failed issue agent certificate: %w", err)
+		return nil, fmt.Errorf("failed issue agent certificate")
+	}
+
+	return &agent.EnrollResult{
+		CertDer:    agentCert.Raw,
+		CAChainDer: [][]byte{s.cert.CA.Raw},
+		NotAfter:   certNotAfter,
+	}, nil
+}
+
+func (s *AgentRegistryService) validateAgentEnrollment(ctx context.Context, enrollmentKey string, csrDER []byte) (agentID uuid.UUID, pubKey any, err error) {
+	csr, err := x509.ParseCertificateRequest(csrDER)
+	if err != nil {
+		return uuid.Nil, nil, err
+	}
+	if err := csr.CheckSignature(); err != nil {
+		return uuid.Nil, nil, fmt.Errorf("CSR signature invalid: %w", err) // доказательство владения ключом провалено
+	}
+
+	agentID, err = uuid.Parse(csr.Subject.CommonName)
+	if err != nil {
+		return uuid.Nil, nil, err
+	}
+
+	key, err := s.enrollmentKeysRepo.GetKeyByAgentId(ctx, agentID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return uuid.Nil, nil, fmt.Errorf("key with id '%s' not found: %w", agentID.String(), model.ErrNotFound)
+	}
+	if err != nil {
+		return uuid.Nil, nil, fmt.Errorf("failed to get enrollment key: %w", err)
+	}
+
+	// сверяем с хэшированным значением из бд
+	if ok, err := util.CompareHash(key.HashString, enrollmentKey); !ok || err != nil {
+		log.Println("failed to compare hash enrollment key: %w", err)
+		return uuid.Nil, nil, fmt.Errorf("failed to validate enrollment key")
+	}
+
+	if key.ExpiresAt.Before(time.Now()) {
+		return uuid.Nil, nil, fmt.Errorf("enrollment key expired: %w", model.ErrBadRequest)
+	}
+
+	return agentID, csr.PublicKey, nil
+}
+
+func (s *AgentRegistryService) issueCertificate(agentID uuid.UUID, pubKey any, notAfter time.Time) (*x509.Certificate, error) {
+	sn, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
+	if err != nil {
+		return nil, fmt.Errorf("failed to gen sn")
+	}
+	template := &x509.Certificate{
+		SerialNumber: sn,
+		Subject:      pkix.Name{CommonName: agentID.String()},
+		NotBefore:    time.Now(),
+		NotAfter:     notAfter,
+		KeyUsage:     x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+	}
+	derBytes, err := x509.CreateCertificate(rand.Reader, template, s.cert.CA, pubKey, s.cert.Key)
+	if err != nil {
+		return nil, err
+	}
+	return x509.ParseCertificate(derBytes)
 }
 
 func (s *AgentRegistryService) GetAllAgents(ctx context.Context) ([]*agent_model.Agent, error) {

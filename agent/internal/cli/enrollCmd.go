@@ -6,6 +6,7 @@ import (
 	"agent/internal/service/agentcore"
 	"fmt"
 
+	"github.com/nougght/monitoring-system/shared/go/cert_store"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +24,7 @@ func newEnrollCmd(setupConfigPath *string) *cobra.Command {
 				return fmt.Errorf("failed to load setup config: %w", err)
 			}
 			if err := agentcore.EnrollAgent(cmd.Context(), cfg,
-				agentcore.NewCertStore(cfg.CertPath, cfg.KeyPath)); err != nil {
+				cert_store.NewCertStore(cfg.CertPath, cfg.KeyPath, cfg.CaPath)); err != nil {
 				return fmt.Errorf("enroll agent error: %w", err)
 			}
 

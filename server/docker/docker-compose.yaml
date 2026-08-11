@@ -25,11 +25,19 @@ services:
       
     env_file:
       - ../.env
+      
     environment:
       POSTGRES_HOST: "timescale"
       POSTGRES_PORT: "5432"
+      CA_PATH: ${CONTAINER_CA_PATH}
+      INT_CA_PATH:  ${CONTAINER_CA_PATH}
+      INT_KEY_PATH: ${CONTAINER_KEY_PATH}
+
     depends_on:
       - timescale
     stop_grace_period: 10s
+    volumes:
+      - ${CA_PATH}:{CONTAINER_CREDS_PATH}
 volumes:
   db-data:
+  

@@ -20,6 +20,7 @@ type ServicesOptions struct {
 	Config       *config.Config
 	Repositories *repository.Repositories
 	Transactor   model.Transactor
+	Cert         *model.Certs
 }
 
 func New(opts ServicesOptions) *Services {
@@ -28,6 +29,7 @@ func New(opts ServicesOptions) *Services {
 		opts.Repositories.AgentRepository(),
 		opts.Repositories.EnrollmentKeysRepository(),
 		opts.Transactor,
+		opts.Cert,
 	)
 	if err != nil {
 		log.Panicf("failed initialize agent registry: %s", err.Error())

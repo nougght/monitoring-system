@@ -4,6 +4,7 @@ import (
 	"agent/internal/config"
 	"agent/internal/grpc/enrollment_client"
 	"agent/internal/model"
+	"bytes"
 	"context"
 	"crypto"
 	"crypto/ecdsa"
@@ -73,16 +74,15 @@ func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore mo
 		Subject:            pkix.Name{}, // CN больше не нужен — сервер назначает сам, см. прошлый разговор
 		SignatureAlgorithm: x509.ECDSAWithSHA256,
 	}
+
 	csrDER, err := x509.CreateCertificateRequest(rand.Reader, &template, privateKey)
 	if err != nil {
 		return fmt.Errorf(`failed to generate CSR: %w`, err)
 	}
 
-	caPEM, _ := os.ReadFile(setupCfg.CaPath)
-	caPool := x509.NewCertPool()
-	caPool.AppendCertsFromPEM(caPEM)
+	caPool, err := certStore.LoadCA()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to load CA")
 	}
 
 	client, err := setupEnrollmentClient(setupCfg, caPool)
@@ -104,8 +104,19 @@ func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore mo
 		return fmt.Errorf("received invalid enroll result: %w", err)
 	}
 
+	var buf bytes.Buffer
+	err = pem.Encode(&buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+	if err != nil {
+		return fmt.Errorf("failed to encode cert")
+	}
+	for _, der := range res.CAChainDer {
+		err = pem.Encode(&buf, &pem.Block{Type: "CERTIFICATE", Bytes: der})
+		if err != nil {
+			return fmt.Errorf("failed to encode cert")
+		}
+	}
 	// сохраняем сертификат
-	err = certStore.SaveCertificate(cert.Raw)
+	err = certStore.SaveCertificate(buf.Bytes())
 
 	// сохраняем ключ
 	keyBytes, err := x509.MarshalECPrivateKey(privateKey)

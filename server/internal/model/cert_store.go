@@ -6,6 +6,11 @@ import (
 	"crypto/x509"
 )
 
+type Certs struct {
+	CA     *x509.Certificate
+	Key    *ecdsa.PrivateKey
+	RootCA *x509.CertPool
+}
 type CertStore interface {
 	LoadCertificate() (*tls.Certificate, error)
 	SaveCertificate(cert []byte) error

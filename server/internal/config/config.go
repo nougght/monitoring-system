@@ -25,6 +25,12 @@ type GRPCConfig struct {
 	EnrollmentPort int
 }
 
+type CertConfig struct {
+	CAPath     string
+	IntCAPath  string
+	IntKeyPath string
+}
+
 type SettingsConfig struct {
 	AgentEnrollmentKeyLength int    `yaml:"enrollment_key_length"`
 	Address                  string `yaml:"address"`
@@ -39,6 +45,7 @@ type Config struct {
 	Postgres       *PostgresConfig
 	HTTP           *HTTPConfig
 	GRPC           *GRPCConfig
+	Cert           *CertConfig
 	SettingsConfig *SettingsConfig
 }
 
@@ -73,6 +80,15 @@ func MustLoadConfig(path string) *Config {
 	cfg.GRPC = &GRPCConfig{
 		MainPort:       grpcPort,
 		EnrollmentPort: grpcEnrollmentPort,
+	}
+
+	caPath := util.MustGetEnvVar("CA_PATH")
+	intCAPath := util.MustGetEnvVar("INT_CA_PATH")
+	intKeyPath := util.MustGetEnvVar("INT_KEY_PATH")
+	cfg.Cert = &CertConfig{
+		CAPath:     caPath,
+		IntCAPath:  intCAPath,
+		IntKeyPath: intKeyPath,
 	}
 	return cfg
 }

@@ -11,3 +11,9 @@
 
 */bin/*
 bin/*
+
+*.crt
+*.key
+*.cnf
+*.srl
+*.csr

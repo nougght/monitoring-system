@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/x509"
 	"fmt"
 	"log"
 	"net"
@@ -10,12 +12,15 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nougght/monitoring-system/server/internal/config"
+	"github.com/nougght/monitoring-system/server/internal/model"
 	"github.com/nougght/monitoring-system/server/internal/service"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale/repository"
 	grpc_handler "github.com/nougght/monitoring-system/server/internal/transport/grpc"
 	"github.com/nougght/monitoring-system/server/internal/transport/rest"
 	"google.golang.org/grpc"
+
+	"github.com/nougght/monitoring-system/shared/go/cert_store"
 )
 
 type App struct {
@@ -27,9 +32,35 @@ type App struct {
 
 	HTTPServer *http.Server
 	GRPCServer *grpc.Server
+	CertStore  *model.CertStore
+
+	ca     *x509.Certificate
+	key    *ecdsa.PrivateKey
+	rootCA *x509.CertPool
 }
 
 func New(ctx context.Context, cfg *config.Config) *App {
+	certStore := cert_store.NewCertStore(cfg.Cert.IntCAPath, cfg.Cert.IntKeyPath, cfg.Cert.CAPath)
+
+	cert, err := certStore.LoadCertificate()
+	intCA := cert.Leaf
+	if err != nil {
+		log.Panic("failed load certs")
+	}
+	intKey, err := certStore.LoadKey()
+	if err != nil {
+		log.Panic("failed load certs")
+	}
+	rootCA, err := certStore.LoadCA()
+	if err != nil {
+		log.Panic("failed load certs")
+	}
+
+	err = verifyIntermediateCA(intCA, rootCA)
+	if err != nil {
+		log.Panic("failed to validate intermediate CA")
+	}
+
 	db, err := timescale.ConnectToDB(ctx, cfg.Postgres)
 	if err != nil {
 		log.Panicf("failed to connect to database: %v", err)
@@ -39,6 +70,11 @@ func New(ctx context.Context, cfg *config.Config) *App {
 		Config:       cfg,
 		Repositories: repository.New(db),
 		Transactor:   db,
+		Cert: &model.Certs{
+			CA:     intCA,
+			Key:    intKey,
+			RootCA: rootCA,
+		},
 	})
 
 	httpServer := rest.NewServer(cfg, *services)
@@ -53,6 +89,9 @@ func New(ctx context.Context, cfg *config.Config) *App {
 		Services:     services,
 		HTTPServer:   httpServer,
 		GRPCServer:   grpcServer,
+		ca:           intCA,
+		key:          intKey,
+		rootCA:       rootCA,
 	}
 }
 
@@ -98,4 +137,9 @@ func (a *App) Run(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func verifyIntermediateCA(intermediateCA *x509.Certificate, rootPool *x509.CertPool) error {
+	_, err := intermediateCA.Verify(x509.VerifyOptions{Roots: rootPool})
+	return err
 }
