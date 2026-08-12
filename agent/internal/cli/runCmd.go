@@ -6,7 +6,6 @@ import (
 	"agent/internal/model"
 	"fmt"
 
-	"github.com/nougght/monitoring-system/shared/go/util"
 	"github.com/spf13/cobra"
 )
 
@@ -18,9 +17,10 @@ func newRunCmd(setupConfigPath *string) *cobra.Command {
 			if setupConfigPath == nil {
 				return fmt.Errorf("run command didn't get receive setup config path")
 			}
-			var cfg *config.SetupConfig
-			if err := util.ReadYaml(*setupConfigPath, cfg); err != nil {
-				return fmt.Errorf("failed to read yaml setup config: %w", err)
+
+			cfg, err := config.LoadSetupConfig(*setupConfigPath)
+			if err != nil {
+				return fmt.Errorf("failed to load setup config: %w", err)
 			}
 
 			if cfg.EnrollmentKey != model.EnrollmentKeyUsed {

@@ -103,6 +103,11 @@ func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore mo
 		return fmt.Errorf("received invalid enroll result: %w", err)
 	}
 
+	err = setupCfg.SetEnrollmentKeyUsed()
+	if err != nil {
+		return fmt.Errorf("failed to set entollment key used")
+	}
+
 	var buf bytes.Buffer
 	err = pem.Encode(&buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
 	if err != nil {
