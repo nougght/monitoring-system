@@ -2,21 +2,31 @@ package service
 
 import (
 	"agent/internal/config"
+	"agent/internal/service/agentcore"
 	"agent/internal/service/collector"
 	"agent/internal/service/metrics"
 	"context"
+	"fmt"
+
+	"github.com/nougght/monitoring-system/shared/go/cert_store"
 )
 
 type Service struct {
+	coreService      *agentcore.CoreService
 	collectorService *collector.CollectorService
 	metricsService   *metrics.MetricsService
 }
 
-func GetServices(cfg *config.Config) (*Service, error) {
+func GetServices(setupCfg *config.SetupConfig, cfg *config.Config) (*Service, error) {
+	coreService, err := agentcore.NewCore(setupCfg, cert_store.NewCertStore(setupCfg.CertPath, setupCfg.KeyPath, setupCfg.CaPath))
+	if err != nil {
+		return nil, fmt.Errorf("failed to init agent core service: %w", err)
+	}
 	collectorService := collector.NewCollectorService(cfg)
 	metricsService := metrics.NewMetricsService(cfg, collectorService.GetSpecifications)
 	collectorService.SetMetricsConsumer(metricsService)
 	return &Service{
+		coreService:      coreService,
 		collectorService: collectorService,
 		metricsService:   metricsService,
 	}, nil
@@ -28,6 +38,10 @@ func (s *Service) StartServices(ctx context.Context) {
 
 func (s *Service) StopServices() {
 	s.collectorService.StopCollectors()
+}
+
+func (s *Service) GetCoreService() *agentcore.CoreService {
+	return s.coreService
 }
 
 func (s *Service) GetMetricsService() *metrics.MetricsService {

@@ -1,0 +1,1 @@
+ALTER TABLE enrollment_keys DROP COLUMN selector;

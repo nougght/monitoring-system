@@ -1,14 +1,11 @@
 package config
 
 import (
-	"agent/internal/utils"
 	"fmt"
-	"io"
 	"log"
-	"os"
 	"time"
 
-	"gopkg.in/yaml.v3"
+	"github.com/nougght/monitoring-system/shared/go/util"
 )
 
 type Config struct {
@@ -21,24 +18,25 @@ type Config struct {
 	MetricsSendingInterval time.Duration `yaml:"metrics_sending_interval"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-	f, err := os.Open(path)
+func MustLoadConfig(path string) *Config {
+	cfg, err := LoadConfig(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open file %s: %w", path, err)
-	}
-	defer utils.CloseWithLog(f)
-	data, err := io.ReadAll(f)
-	if err != nil {
-		log.Panicf("failed to read file %s: %s", path, err.Error())
+		log.Panic(err)
 	}
 
+	return cfg
+}
+
+func LoadConfig(path string) (*Config, error) {
 	cfg := new(Config)
-	err = yaml.Unmarshal(data, cfg)
+	err := util.ReadYaml(path, cfg)
 	if err != nil {
-		log.Panicf("failed to decode config: %s", err.Error())
+		return nil, fmt.Errorf("failed to read yaml config")
 	}
+
 	if cfg.NetInterval < time.Second {
-		log.Panicf("net interval can't be less than 1 second")
+		return nil, fmt.Errorf("net interval can't be less than 1 second")
 	}
 	return cfg, nil
+
 }

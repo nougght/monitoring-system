@@ -1,4 +1,4 @@
-package grpc_client
+package agent_client
 
 import (
 	"agent/internal/config"

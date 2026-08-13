@@ -3,7 +3,6 @@ package ws
 import (
 	"agent/internal/localserver/mapper"
 	"agent/internal/service/metrics"
-	"agent/internal/utils"
 	"context"
 	"log"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/nougght/monitoring-system/shared/go/util"
 )
 
 type WsHandler struct {
@@ -41,7 +41,7 @@ func (h *WsHandler) HandleConnection(c *gin.Context) {
 }
 
 func (h *WsHandler) HandleMessages(conn *websocket.Conn) {
-	defer utils.CloseWithLog(conn)
+	defer util.CloseWithLog(conn)
 
 	ticker := time.NewTicker(time.Millisecond * 100)
 	defer ticker.Stop()

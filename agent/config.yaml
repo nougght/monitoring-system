@@ -10,3 +10,4 @@ process_collector_interval: 1s
 
 # интервал отправки по grpc
 metrics_sending_interval: 500ms
+

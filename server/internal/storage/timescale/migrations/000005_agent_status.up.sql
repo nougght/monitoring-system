@@ -1,0 +1,1 @@
+ALTER TABLE agents ADD status VARCHAR(32)
