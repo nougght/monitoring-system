@@ -14,6 +14,8 @@ func ReadYaml(path string, out interface{}) error {
 	if err != nil {
 		return fmt.Errorf("failed to open file %s: %w", path, err)
 	}
+	defer f.Close()
+
 	defer CloseWithLog(f)
 	data, err := io.ReadAll(f)
 	if err != nil {
@@ -28,10 +30,13 @@ func ReadYaml(path string, out interface{}) error {
 }
 
 func SaveYaml(path string, in interface{}) error {
-	f, err := os.Open(path)
+	f, err := os.OpenFile(path, os.O_RDWR, 0644)
+
 	if err != nil {
 		return fmt.Errorf("failed to open file %s: %w", path, err)
 	}
+	defer f.Close()
+
 	defer CloseWithLog(f)
 	encoded, err := yaml.Marshal(in)
 	if err != nil {
@@ -40,7 +45,7 @@ func SaveYaml(path string, in interface{}) error {
 
 	_, err = f.Write(encoded)
 	if err != nil {
-		fmt.Errorf("failed to write yaml to file: %w", err)
+		return fmt.Errorf("failed to write yaml to file: %w", err)
 	}
 	return nil
 }

@@ -8,7 +8,7 @@ import (
 
 type CertStore interface {
 	LoadCertificate() (*tls.Certificate, error)
-	SaveCertificate(cert []byte) error
+	SaveCertificate(cert []byte, encoded bool) error
 	SaveKey(key *ecdsa.PrivateKey) error
 	LoadKey() (*ecdsa.PrivateKey, error)
 	LoadCA() (*x509.CertPool, error)

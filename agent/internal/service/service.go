@@ -18,7 +18,7 @@ type Service struct {
 }
 
 func GetServices(setupCfg *config.SetupConfig, cfg *config.Config) (*Service, error) {
-	coreService, err := agentcore.NewCore(setupCfg, cert_store.NewCertStore(setupCfg.CaPath, setupCfg.KeyPath, setupCfg.CaPath))
+	coreService, err := agentcore.NewCore(setupCfg, cert_store.NewCertStore(setupCfg.CertPath, setupCfg.KeyPath, setupCfg.CaPath))
 	if err != nil {
 		return nil, fmt.Errorf("failed to init agent core service: %w", err)
 	}

@@ -19,7 +19,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 func RunAgent(setupConfig *config.SetupConfig) error {
@@ -76,7 +76,10 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 		shutdownChan <- err
 	}()
 
-	grpcClient, err := grpc.NewClient("127.0.0.1:8092", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	grpcTLS := service.GetCoreService().TLSConfigForGRPC()
+	grpcClient, err := grpc.NewClient(setupConfig.ServerAddress,
+		grpc.WithTransportCredentials(credentials.NewTLS(grpcTLS)),
+	)
 	if err != nil {
 		return fmt.Errorf("failed to create grpc client: %w", err)
 	}

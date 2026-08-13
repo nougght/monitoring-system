@@ -31,17 +31,22 @@ func (s *CertStore) LoadCertificate() (*tls.Certificate, error) {
 }
 
 // TODO: сделать безопасное сохранение/редактирование файлов
-func (s *CertStore) SaveCertificate(cert []byte) error {
-	block := &pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: cert,
-	}
+func (s *CertStore) SaveCertificate(cert []byte, encoded bool) error {
 
 	certFile, err := os.Create(s.certPath)
 	if err != nil {
 		return err
 	}
-	_, err = certFile.Write(pem.EncodeToMemory(block))
+
+	if !encoded {
+		block := &pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: cert,
+		}
+		cert = pem.EncodeToMemory(block)
+	}
+
+	_, err = certFile.Write(cert)
 	if err != nil {
 		return err
 	}

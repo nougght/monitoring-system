@@ -29,6 +29,7 @@ type CoreService struct {
 	state     *model.AgentState
 	certStore model.CertStore
 	cert      atomic.Pointer[tls.Certificate]
+	ca        atomic.Pointer[x509.CertPool]
 }
 
 // func New(cfg Config, store CertStore) *Core {
@@ -40,6 +41,8 @@ func NewCore(setupCfg *config.SetupConfig, certStore model.CertStore) (*CoreServ
 	if err != nil {
 		return nil, err
 	}
+	ca, err := certStore.LoadCA()
+
 	agentID, err := getAgentIDFromCert(*cert)
 	if err != nil {
 		return nil, err
@@ -50,13 +53,23 @@ func NewCore(setupCfg *config.SetupConfig, certStore model.CertStore) (*CoreServ
 		state:     model.NewAgentState(agentID),
 		certStore: certStore,
 		cert:      atomic.Pointer[tls.Certificate]{},
+		ca:        atomic.Pointer[x509.CertPool]{},
 	}
 	core.cert.Store(cert)
+	core.ca.Store(ca)
 	return core, nil
 }
 
 func (c *CoreService) State() *model.AgentState {
 	return c.state
+}
+
+func (c *CoreService) TLSConfigForGRPC() *tls.Config {
+	return &tls.Config{
+		Certificates: []tls.Certificate{*c.cert.Load()},
+		RootCAs:      c.ca.Load(),
+		MinVersion:   tls.VersionTLS12,
+	}
 }
 
 func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore model.CertStore) error {
@@ -105,7 +118,7 @@ func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore mo
 
 	err = setupCfg.SetEnrollmentKeyUsed()
 	if err != nil {
-		return fmt.Errorf("failed to set entollment key used")
+		return fmt.Errorf("failed to set entollment key used: %w", err)
 	}
 
 	var buf bytes.Buffer
@@ -120,7 +133,7 @@ func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore mo
 		}
 	}
 	// сохраняем сертификат
-	err = certStore.SaveCertificate(buf.Bytes())
+	err = certStore.SaveCertificate(buf.Bytes(), true)
 	if err != nil {
 		return err
 	}

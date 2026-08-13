@@ -3,6 +3,7 @@ package config
 import (
 	"agent/internal/model"
 	"fmt"
+	"log"
 
 	"github.com/nougght/monitoring-system/shared/go/util"
 )
@@ -41,5 +42,6 @@ func (c *SetupConfig) SetEnrollmentKeyUsed() error {
 	if err != nil {
 		return fmt.Errorf("failed to save updated yaml config: %w", err)
 	}
+	log.Printf("saved key used config: %s", c.path)
 	return nil
 }
