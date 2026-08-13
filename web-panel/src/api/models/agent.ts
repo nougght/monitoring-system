@@ -12,4 +12,5 @@ export interface Agent {
   isOnline?: boolean;
   lastSeenAt?: string;
   name?: string;
+  status?: string;
 }

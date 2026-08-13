@@ -11,6 +11,7 @@ type AgentDTO struct {
 	Name        string    `json:"name"`
 	Description *string   `json:"description,omitempty"`
 	CreatedAt   time.Time `json:"createdAt"`
+	Status      *string   `json:"status,omitempty"`
 	LastSeenAt  time.Time `json:"lastSeenAt"`
 	IsOnline    bool      `json:"isOnline"`
 } // @Name Agent

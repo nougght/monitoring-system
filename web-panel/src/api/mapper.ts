@@ -9,6 +9,7 @@ export const convertAgentFromDTO = (agentDTO: AgentDTO): Agent => {
         name: agentDTO.name ?? '',
         description: agentDTO.description,
         createdAt: agentDTO.createdAt ?? '',
+        status: agentDTO.status,
         lastSeenAt: agentDTO.lastSeenAt ? new Date(agentDTO.lastSeenAt) : undefined,
         isOnline: agentDTO.isOnline ?? false
     }

@@ -32,11 +32,13 @@ export const AgentsPage = () => {
             <main>
                 <div className="agent-cards-container">
                     {agents?.agents != null && agents?.agents.length > 0 &&
-                        agents?.agents?.map((agent) => (
+                        agents?.agents?.filter((a) => a.status != null).map((agent) => 
+                            // {agent.status != null &&
                             <div key={agent.id}>
                                 <AgentCard agent={agent} />
                             </div>
-                        ))
+                            // }
+                        )
                     }
                 </div>
                 <div className='bottomArea'>

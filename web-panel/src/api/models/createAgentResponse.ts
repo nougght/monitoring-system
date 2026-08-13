@@ -13,4 +13,5 @@ export interface CreateAgentResponse {
   isOnline?: boolean;
   lastSeenAt?: string;
   name?: string;
+  status?: string;
 }

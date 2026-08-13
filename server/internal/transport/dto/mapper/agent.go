@@ -17,6 +17,7 @@ func AgentToDTO(domain *agent.Agent) (res *dto.AgentDTO) {
 		Description: domain.Description,
 		CreatedAt:   domain.CreatedAt,
 		LastSeenAt:  domain.LastSeenAt,
+		Status:      domain.Status,
 		IsOnline:    domain.IsOnline,
 	}
 	return
