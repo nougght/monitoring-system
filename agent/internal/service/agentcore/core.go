@@ -70,7 +70,7 @@ func EnrollAgent(ctx context.Context, setupCfg *config.SetupConfig, certStore mo
 
 	privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	template := x509.CertificateRequest{
-		Subject:            pkix.Name{}, // CN больше не нужен — сервер назначает сам, см. прошлый разговор
+		Subject:            pkix.Name{},
 		SignatureAlgorithm: x509.ECDSAWithSHA256,
 	}
 

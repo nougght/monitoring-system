@@ -3,6 +3,7 @@ import { useCreateAgents } from "../hooks/useCreateAgent";
 import type { postAgentsResponse, postAgentsResponseSuccess } from "../api/client/monitoringServerAPI";
 import type { CreateAgentResponse } from "../api/models";
 import { useDownloadConfig } from "../hooks/useDownloadConfig";
+import { CopyButton } from "../components/copyButton";
 
 
 interface NewAgentProps {
@@ -60,7 +61,7 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                 }
             },
             {
-                onError:(error)=> {
+                onError: (error) => {
                     setWarning(`ошибка:${error}`)
                 }
             }
@@ -90,7 +91,10 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                         <h3>
                             Ключ подключения агента
                         </h3>
-                        <p>{isSuccess ? resp?.enrollmentKey : "....."}</p>
+                        <div className="keyField">
+                            <p>{isSuccess ? resp?.enrollmentKey : "....."}</p>
+                            <CopyButton text={resp?.enrollmentKey ?? ""} />
+                        </div>
                         <div>
                             <button onClick={handleDownloadInstaller}>Скачать установщик</button>
                             <button onClick={handleDownloadConfig}>Скачать конфиг</button>
@@ -101,7 +105,7 @@ export const NewAgentPage = (_props: NewAgentProps) => {
             {
                 warning != null &&
                 <div>
-                <p>{warning}</p>
+                    <p>{warning}</p>
                 </div>
             }
             {

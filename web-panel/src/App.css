@@ -41,3 +41,15 @@ main{
 .keyContainer{
     text-align: center;
 }
+
+.copyButton{
+    height: min-content;
+        width: min-content;
+    margin: 15px;
+}
+.keyField{
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
