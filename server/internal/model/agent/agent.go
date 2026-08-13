@@ -19,8 +19,8 @@ type Agent struct {
 	Description *string   `db:"description"`
 	CreatedAt   time.Time `db:"created_at"`
 	LastSeenAt  time.Time `db:"last_seen_at"`
-	Status      string    `db:"status"`
-	IsOnline    bool
+	Status      *string   `db:"status"`
+	IsOnline    bool      `db:"-"`
 }
 
 type CreateAgentResult struct {

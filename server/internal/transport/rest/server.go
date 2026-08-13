@@ -17,6 +17,9 @@ func NewServer(cfg *config.Config, services service.Services) *http.Server {
 	handlers := newHandlers(&services)
 
 	r := gin.New()
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},

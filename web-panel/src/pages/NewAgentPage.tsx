@@ -78,7 +78,7 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                         required onChange={e => setName(e.target.value)} />
                     <br />
                     <label htmlFor="description">Описание</label>
-                    <input type="text" id="name" name="name" value={description ?? ""} onChange={e => setName(e.target.value)} />
+                    <input type="text" id="name" name="name" value={description ?? ""} onChange={e => setDescription(e.target.value)} />
                     <br />
                     <button onClick={handleCreate}>Создать</button>
                 </div>

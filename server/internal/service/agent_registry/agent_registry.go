@@ -22,6 +22,7 @@ import (
 	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale/repository"
 	"github.com/nougght/monitoring-system/server/internal/util"
+	utilShared "github.com/nougght/monitoring-system/shared/go/util"
 )
 
 type AgentRegistryService struct {
@@ -76,7 +77,7 @@ func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, des
 	agent, err := s.agentRepo.CreateAgent(ctx, &agent_model.Agent{
 		Name:        name,
 		Description: description,
-		Status:      string(agent_model.AgentStatusNotEnrolled),
+		Status:      utilShared.Ptr(string(agent_model.AgentStatusNotEnrolled)),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create agent: %w", err)

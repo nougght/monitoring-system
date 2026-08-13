@@ -1,4 +1,4 @@
-.bottomArea{
+.bottomArea {
     position: fixed;
     bottom: 10px;
     left: 0;
@@ -9,12 +9,13 @@
     justify-content: space-around;
     /* background-color: red; */
 }
-.addAgentButton{
+
+.addAgentButton {
     font-size: 20px;
 
 }
 
-.infoMessage{
+.infoMessage {
     font-size: 18px;
     width: fit-content;
     height: fit-content;
@@ -22,34 +23,54 @@
     border-radius: 10px;
     padding: 0 5px;
     max-width: 70%;
-    position:fixed;
+    position: fixed;
     bottom: 20px;
-    left:0;
-    right:0;
+    left: 0;
+    right: 0;
     margin: 0 auto;
 }
 
-.app, main {
+.app,
+main {
     height: 100%;
 }
 
-main{
-}
+main {}
 
 
 
-.keyContainer{
+.keyContainer {
     text-align: center;
 }
 
-.copyButton{
+.copyButton {
     height: min-content;
-        width: min-content;
+    width: min-content;
     margin: 15px;
 }
-.keyField{
-    display:flex;
+
+.keyField {
+    display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+}
+
+
+.agent-cards-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 5px;
+    /* border: 2px red solid; */
+    padding: 5px;
+    margin: 10px
+}
+
+.agent-card {
+    border: 1px grey solid;
+    border-radius: 15px;
+    padding: 4px 10px;
+    background-color: lightblue;
+
+    /* width: fit-content; */
 }
