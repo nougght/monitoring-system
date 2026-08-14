@@ -13,6 +13,7 @@ import (
 	"math"
 	"math/big"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -31,6 +32,8 @@ type AgentRegistryService struct {
 	enrollmentKeysRepo *repository.EnrollmentKeysRepository
 	transactor         model.Transactor
 	cert               *model.Certs
+	sessions           map[uuid.UUID]*agent.AgentSession
+	mu                 *sync.RWMutex
 }
 
 func NewAgentRegistryService(cfg *config.Config, agentRepo *repository.AgentRepository,
@@ -57,6 +60,27 @@ func (s *AgentRegistryService) genEnrollmentKey() *string {
 	return &keyString
 }
 
+func (s *AgentRegistryService) CreateSession(agentID uuid.UUID) *agent.AgentSession {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	session := agent.NewAgentSession(agentID)
+	s.sessions[agentID] = session
+	return session
+}
+
+func (s *AgentRegistryService) GetSession(agentID uuid.UUID) (*agent.AgentSession, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	session, ok := s.sessions[agentID]
+	return session, ok
+}
+
+func (s *AgentRegistryService) RemoveSession(agentID uuid.UUID) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.sessions, agentID)
+}
+
 func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, description *string) (*agent_model.CreateAgentResult, error) {
 	if strings.TrimSpace(name) == "" {
 		return nil, fmt.Errorf("agent name can't be blank: %w", model.ErrBadRequest)
@@ -72,7 +96,7 @@ func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, des
 			log.Printf("rollback failed: %s", err.Error())
 		}
 	}()
-	ctx = context.WithValue(ctx, model.TxKey, tx)
+	ctx = context.WithValue(ctx, model.ContextKeyTx, tx)
 
 	agent, err := s.agentRepo.CreateAgent(ctx, &agent_model.Agent{
 		Name:        name,
@@ -131,7 +155,7 @@ func (s *AgentRegistryService) Enroll(ctx context.Context, params *agent.EnrollP
 			log.Printf("rollback failed: %s", err.Error())
 		}
 	}()
-	ctx = context.WithValue(ctx, model.TxKey, tx)
+	ctx = context.WithValue(ctx, model.ContextKeyTx, tx)
 
 	agentID, pubKey, err := s.validateAgentEnrollment(ctx, params.EnrollmentKey, params.CsrDer)
 	if err != nil {

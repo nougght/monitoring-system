@@ -24,7 +24,7 @@ func NewAgentRepository(db DB) *AgentRepository {
 
 func (r *AgentRepository) db(ctx context.Context) DB {
 	res := r.pool
-	if tx := ctx.Value(model.TxKey); tx != nil {
+	if tx := ctx.Value(model.ContextKeyTx); tx != nil {
 		res = tx.(DB)
 	}
 	return res

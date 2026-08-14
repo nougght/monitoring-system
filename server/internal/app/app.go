@@ -84,15 +84,17 @@ func New(ctx context.Context, cfg *config.Config) *App {
 
 	httpServer := rest.NewServer(cfg, *services)
 
-	agentServer := grpc.NewServer(grpc.Creds(
-		credentials.NewTLS(&tls.Config{Certificates: []tls.Certificate{*cert},
-			ClientAuth: tls.RequireAndVerifyClientCert, //  mTLS
-			ClientCAs:  rootCA,
-			MinVersion: tls.VersionTLS12,
-		}),
-	))
+	agentServer := grpc.NewServer(
+		grpc.StreamInterceptor(agent_grpc.BidirectionalServerInterceptor),
+		grpc.Creds(
+			credentials.NewTLS(&tls.Config{Certificates: []tls.Certificate{*cert},
+				ClientAuth: tls.RequireAndVerifyClientCert, //  mTLS
+				ClientCAs:  rootCA,
+				MinVersion: tls.VersionTLS12,
+			}),
+		))
 
-	agentService := agent_grpc.NewAgentService()
+	agentService := agent_grpc.NewAgentService(services.AgentRegistry())
 	agentService.Register(agentServer)
 
 	enrollmentServer := grpc.NewServer(grpc.Creds(

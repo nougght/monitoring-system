@@ -5,14 +5,21 @@ import (
 	"io"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
+	agentregistry "github.com/nougght/monitoring-system/server/internal/service/agent_registry"
+	"github.com/nougght/monitoring-system/server/internal/util"
 	pb "github.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type AgentService struct {
 	pb.UnimplementedAgentServiceServer
+
+	registryService *agentregistry.AgentRegistryService
 	// metricsService metrics.MetricsService
 	toSend          chan *pb.ServerMessage
 	commandResults  chan *pb.CommandResult
@@ -21,10 +28,11 @@ type AgentService struct {
 	wg              sync.WaitGroup
 }
 
-func NewAgentService() *AgentService {
+func NewAgentService(registryService *agentregistry.AgentRegistryService) *AgentService {
 	return &AgentService{
-		toSend:          make(chan *pb.ServerMessage),
-		commandResults:  make(chan *pb.CommandResult),
+		registryService: registryService,
+		toSend:          make(chan *pb.ServerMessage, 100),
+		commandResults:  make(chan *pb.CommandResult, 100),
 		pendingCommands: make(map[string]*pb.Command),
 		wg:              sync.WaitGroup{},
 	}
@@ -36,10 +44,48 @@ func (s *AgentService) Register(server *grpc.Server) {
 
 func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 	log.Println("grpc client connected")
+
+	handshakeChan := make(chan *pb.AgentMessage, 1)
+	go func() {
+		msg, err := stream.Recv()
+		if err != nil {
+			log.Println("error receiving handshake message:", err)
+			return
+		}
+		handshakeChan <- msg
+	}()
+
+	t := time.NewTimer(time.Minute * 5)
+
+	var handshakeMsg *pb.Handshake
+	select {
+	case <-t.C:
+		return status.Error(codes.DeadlineExceeded, "handshake timeout")
+	case msg := <-handshakeChan:
+		if msg.GetHandshake() == nil {
+			return status.Error(codes.InvalidArgument, "expected handshake message")
+		}
+		handshakeMsg = msg.GetHandshake()
+	}
+
+	idFromTLS, err := util.GetAgentIDFromContext(stream.Context())
+	if err != nil {
+		return status.Error(codes.Unauthenticated, "invalid agent ID")
+	}
+
+	if idFromTLS.String() != handshakeMsg.GetAgentUuid() {
+		return status.Error(codes.Unauthenticated, "agent ID mismatch")
+	}
+
+	s.registryService.CreateSession(idFromTLS)
+
 	s.runReader(stream)
 	s.runWriter(stream)
 	s.RequestSpecifications()
 	s.wg.Wait()
+
+	s.registryService.RemoveSession(idFromTLS)
+
 	return nil
 }
 

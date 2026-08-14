@@ -25,7 +25,7 @@ func NewEnrollmentKeysRepository(db DB) *EnrollmentKeysRepository {
 
 func (r *EnrollmentKeysRepository) db(ctx context.Context) DB {
 	res := r.pool
-	if tx := ctx.Value(model.TxKey); tx != nil {
+	if tx := ctx.Value(model.ContextKeyTx); tx != nil {
 		res = tx.(DB)
 	}
 	return res
