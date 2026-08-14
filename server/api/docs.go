@@ -21,6 +21,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Get all agents",
+                "operationId": "getAllAgents",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -34,19 +35,22 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -59,6 +63,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Create new agent",
+                "operationId": "createAgent",
                 "parameters": [
                     {
                         "description": "Create agent body",
@@ -80,19 +85,22 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -107,6 +115,7 @@ const docTemplate = `{
                     "application/x-yaml"
                 ],
                 "summary": "Download agent setup config",
+                "operationId": "downloadAgentConfig",
                 "parameters": [
                     {
                         "type": "string",
@@ -135,19 +144,22 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -245,10 +257,6 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        },
-        "gin.H": {
-            "type": "object",
-            "additionalProperties": {}
         }
     }
 }`

@@ -14,6 +14,7 @@
                     "application/json"
                 ],
                 "summary": "Get all agents",
+                "operationId": "getAllAgents",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -27,19 +28,22 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -52,6 +56,7 @@
                     "application/json"
                 ],
                 "summary": "Create new agent",
+                "operationId": "createAgent",
                 "parameters": [
                     {
                         "description": "Create agent body",
@@ -73,19 +78,22 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -100,6 +108,7 @@
                     "application/x-yaml"
                 ],
                 "summary": "Download agent setup config",
+                "operationId": "downloadAgentConfig",
                 "parameters": [
                     {
                         "type": "string",
@@ -128,19 +137,22 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -238,10 +250,6 @@
                     "type": "string"
                 }
             }
-        },
-        "gin.H": {
-            "type": "object",
-            "additionalProperties": {}
         }
     }
 }

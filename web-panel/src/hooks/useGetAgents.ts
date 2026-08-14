@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { getAgents as getAgentsDTO } from '../api/client/monitoringServerAPI';
+import { getAllAgents as getAllAgents } from '../api/client/monitoringServerAPI';
 import { convertAgentFromDTO } from '../api/mapper';
 import type { Agent } from '../domain/agent';
 
@@ -16,7 +16,7 @@ interface UseAgentsResult {
 }
 
 const getAgents = async (): Promise<UseAgentsResult> => {
-    const resp = await getAgentsDTO();
+    const resp = await getAllAgents();
     return resp.status == 200 ?
     {
         agents: resp.data.map(convertAgentFromDTO),

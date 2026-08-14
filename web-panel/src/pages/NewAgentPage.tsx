@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { useCreateAgents } from "../hooks/useCreateAgent";
-import type { postAgentsResponse, postAgentsResponseSuccess } from "../api/client/monitoringServerAPI";
 import type { CreateAgentResponse } from "../api/models";
 import { useDownloadConfig } from "../hooks/useDownloadConfig";
 import { CopyButton } from "../components/copyButton";
@@ -23,8 +22,8 @@ export const NewAgentPage = (_props: NewAgentProps) => {
     const [warning, setWarning] = useState<string | null>()
     const [info, setInfo] = useState<string | null>()
 
-    const { mutate, isPending, isError, isSuccess } = useCreateAgents()
-    const { mutate: downloadConfig, isPending: isPendingConfig, isError: isErrorConfig, isSuccess: isSuccessError } = useDownloadConfig()
+    const { mutate, isPending: _isCreateAgentPending, isError: _isCreateAgentError, isSuccess } = useCreateAgents()
+    const { mutate: downloadConfig, isPending: _isPendingConfig, isError: _isErrorConfig, isSuccess: _isSuccessError } = useDownloadConfig()
 
 
     const handleCreate = () => {

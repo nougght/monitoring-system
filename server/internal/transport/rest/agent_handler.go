@@ -40,14 +40,15 @@ func (h *AgentHandler) RegisterRoutes(r *gin.RouterGroup) {
 }
 
 // CreateAgent godoc
+// @Id createAgent
 // @Summary Create new agent
 // @Accept json
 // @Produce json
 // @Param request body dto.CreateAgentBody true "Create agent body"
 // @Success 200 {object} dto.CreateAgentResponse
-// @Failure      400  {object}  gin.H
-// @Failure      404  {object}  gin.H
-// @Failure      500  {object}  gin.H
+// @Failure      400  {object}  map[string]any
+// @Failure      404  {object}  map[string]any
+// @Failure      500  {object}  map[string]any
 // @Router /agents [post]
 func (h *AgentHandler) CreateAgent(c *gin.Context) {
 	var body *dto.CreateAgentBody
@@ -67,15 +68,16 @@ func (h *AgentHandler) CreateAgent(c *gin.Context) {
 }
 
 // DownloadAgentConfig godoc
+// @Id downloadAgentConfig
 // @Summary Download agent setup config
 // @Accept json
 // @Produce application/x-yaml
 // @Param agentID path string true "Agent ID"
 // @Param request body dto.AgentConfigBody true "Download agent config body"
 // @Success 200 {object} dto.AgentConfigResponse
-// @Failure      400  {object}  gin.H
-// @Failure      404  {object}  gin.H
-// @Failure      500  {object}  gin.H
+// @Failure      400  {object}  map[string]any
+// @Failure      404  {object}  map[string]any
+// @Failure      500  {object}  map[string]any
 // @Router /agents/{agentID}/setupconfig [post]
 func (h *AgentHandler) DownloadAgentConfig(c *gin.Context) {
 	agentID, err := uuid.Parse(c.Param("agentID"))
@@ -97,12 +99,13 @@ func (h *AgentHandler) DownloadAgentConfig(c *gin.Context) {
 }
 
 // GetAllAgents godoc
+// @Id getAllAgents
 // @Summary Get all agents
 // @Produce json
 // @Success 200 {array} dto.AgentDTO
-// @Failure      400  {object}  gin.H
-// @Failure      404  {object}  gin.H
-// @Failure      500  {object}  gin.H
+// @Failure      400  {object}  map[string]any
+// @Failure      404  {object}  map[string]any
+// @Failure      500  {object}  map[string]any
 // @Router /agents [get]
 func (h *AgentHandler) GetAllAgents(c *gin.Context) {
 	res, err := h.agentRegistryService.GetAllAgents(c.Request.Context())

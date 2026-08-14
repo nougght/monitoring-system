@@ -41,7 +41,7 @@ export const useDownloadConfig = () => {
             }
         },
 
-        onSuccess: (err) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['post-agents-config'] })
         },
 

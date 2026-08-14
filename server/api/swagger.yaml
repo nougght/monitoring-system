@@ -59,9 +59,6 @@ definitions:
       status:
         type: string
     type: object
-  gin.H:
-    additionalProperties: {}
-    type: object
 host: localhost:8091
 info:
   contact: {}
@@ -70,6 +67,7 @@ info:
 paths:
   /agents:
     get:
+      operationId: getAllAgents
       produces:
       - application/json
       responses:
@@ -82,19 +80,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Get all agents
     post:
       consumes:
       - application/json
+      operationId: createAgent
       parameters:
       - description: Create agent body
         in: body
@@ -112,20 +114,24 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Create new agent
   /agents/{agentID}/setupconfig:
     post:
       consumes:
       - application/json
+      operationId: downloadAgentConfig
       parameters:
       - description: Agent ID
         in: path
@@ -148,14 +154,17 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Download agent setup config
 swagger: "2.0"
