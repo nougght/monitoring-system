@@ -35,9 +35,13 @@ func New(opts ServicesOptions) *Services {
 		log.Panicf("failed initialize agent registry: %s", err.Error())
 	}
 
+	agentInteraction, err := agent.NewAgentInteractionService(
+		opts.Config,
+		agentRegistry,
+	)
 	return &Services{
 		agentRegistry: agentRegistry,
-		agent:         &agent.AgentInteractionService{},
+		agent:         agentInteraction,
 	}
 }
 

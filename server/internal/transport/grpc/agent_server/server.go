@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	agentregistry "github.com/nougght/monitoring-system/server/internal/service/agent_registry"
+	agent "github.com/nougght/monitoring-system/server/internal/service/agent_interaction"
 	"github.com/nougght/monitoring-system/server/internal/util"
 	pb "github.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1"
 	"google.golang.org/grpc"
@@ -20,22 +20,21 @@ import (
 type AgentService struct {
 	pb.UnimplementedAgentServiceServer
 
-	registryService *agentregistry.AgentRegistryService
-	// metricsService metrics.MetricsService
-	toSend          chan *pb.ServerMessage
-	commandResults  chan *pb.CommandResult
-	pendingCommands map[string]*pb.Command
-	mu              sync.Mutex
-	wg              sync.WaitGroup
+	agentInteractionService *agent.AgentInteractionService
+	toSend                  chan *pb.ServerMessage
+	commandResults          chan *pb.CommandResult
+	pendingCommands         map[string]*pb.Command
+	mu                      sync.Mutex
+	wg                      sync.WaitGroup
 }
 
-func NewAgentService(registryService *agentregistry.AgentRegistryService) *AgentService {
+func NewAgentService(interactionService *agent.AgentInteractionService) *AgentService {
 	return &AgentService{
-		registryService: registryService,
-		toSend:          make(chan *pb.ServerMessage, 100),
-		commandResults:  make(chan *pb.CommandResult, 100),
-		pendingCommands: make(map[string]*pb.Command),
-		wg:              sync.WaitGroup{},
+		agentInteractionService: interactionService,
+		toSend:                  make(chan *pb.ServerMessage, 100),
+		commandResults:          make(chan *pb.CommandResult, 100),
+		pendingCommands:         make(map[string]*pb.Command),
+		wg:                      sync.WaitGroup{},
 	}
 }
 
@@ -78,7 +77,7 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 		return status.Error(codes.Unauthenticated, "agent ID mismatch")
 	}
 
-	s.registryService.CreateSession(idFromTLS)
+	s.agentInteractionService.HandleConnection(idFromTLS)
 
 	ctx, cancel := context.WithCancel(stream.Context())
 	s.runReader(
@@ -92,7 +91,7 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 	s.RequestSpecifications()
 	s.wg.Wait()
 
-	s.registryService.RemoveSession(idFromTLS)
+	s.agentInteractionService.HandleDisconnection(idFromTLS)
 
 	return nil
 }

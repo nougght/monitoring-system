@@ -94,7 +94,7 @@ func New(ctx context.Context, cfg *config.Config) *App {
 			}),
 		))
 
-	agentService := agent_grpc.NewAgentService(services.AgentRegistry())
+	agentService := agent_grpc.NewAgentService(services.AgentInteractionService())
 	agentService.Register(agentServer)
 
 	enrollmentServer := grpc.NewServer(grpc.Creds(
@@ -105,7 +105,7 @@ func New(ctx context.Context, cfg *config.Config) *App {
 		})),
 	)
 
-	enrollmentService := enrollment_grpc.NewEnrollmentService(services.AgentRegistry())
+	enrollmentService := enrollment_grpc.NewEnrollmentService(services.AgentInteractionService())
 	enrollmentService.Register(enrollmentServer)
 
 	return &App{
