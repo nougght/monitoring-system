@@ -5,6 +5,7 @@ import (
 	"agent/internal/model"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"time"
@@ -21,14 +22,16 @@ type MetricsProvider interface {
 type AgentClient struct {
 	conn            *grpc.ClientConn
 	config          *config.Config
+	state           *model.AgentState
 	grpcClient      pb.AgentServiceClient
 	metricsProvider MetricsProvider
 }
 
-func NewAgentClient(conn *grpc.ClientConn, config *config.Config, metricsProvider MetricsProvider) *AgentClient {
+func NewAgentClient(conn *grpc.ClientConn, config *config.Config, state *model.AgentState, metricsProvider MetricsProvider) *AgentClient {
 	return &AgentClient{
 		conn:            conn,
 		config:          config,
+		state:           state,
 		grpcClient:      pb.NewAgentServiceClient(conn),
 		metricsProvider: metricsProvider,
 	}
@@ -39,6 +42,20 @@ func (c *AgentClient) Connect(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
+	err = stream.Send(
+		&pb.AgentMessage{
+			Payload: &pb.AgentMessage_Handshake{
+				Handshake: &pb.Handshake{
+					AgentUuid: c.state.AgentID().String(),
+				},
+			},
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to send handshake message: %w", err)
+	}
+
 	c.runReader(stream)
 	err = c.runWriter(stream)
 	if err != nil {

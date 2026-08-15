@@ -83,7 +83,13 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 	if err != nil {
 		return fmt.Errorf("failed to create grpc client: %w", err)
 	}
-	grpcAgentClient := grpc_client.NewAgentClient(grpcClient, cfg, service.GetMetricsService())
+
+	grpcAgentClient := grpc_client.NewAgentClient(grpcClient,
+		cfg,
+		service.GetCoreService().State(),
+		service.GetMetricsService(),
+	)
+
 	err = grpcAgentClient.Connect(rootCtx)
 	// TODO: add retrying
 	if err != nil {

@@ -36,6 +36,7 @@ type CoreService struct {
 
 // }
 
+// TODO: add ability to work in serverless mode
 func NewCore(setupCfg *config.SetupConfig, certStore model.CertStore) (*CoreService, error) {
 	cert, err := certStore.LoadCertificate()
 	if err != nil {
@@ -57,6 +58,7 @@ func NewCore(setupCfg *config.SetupConfig, certStore model.CertStore) (*CoreServ
 	}
 	core.cert.Store(cert)
 	core.ca.Store(ca)
+
 	return core, nil
 }
 
