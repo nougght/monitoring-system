@@ -3,13 +3,13 @@ package enrollment_server
 import (
 	"context"
 
-	"github.com/nougght/monitoring-system/server/internal/model/agent"
+	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 	pb "github.com/nougght/monitoring-system/shared/go/proto/gen/enrollment/v1"
 	"google.golang.org/grpc"
 )
 
 type Enroller interface {
-	Enroll(ctx context.Context, params *agent.EnrollParams) (*agent.EnrollResult, error)
+	Enroll(ctx context.Context, params *agent_model.EnrollParams) (*agent_model.EnrollResult, error)
 }
 
 type EnrollmentService struct {

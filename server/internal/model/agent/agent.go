@@ -1,4 +1,4 @@
-package agent
+package agent_model
 
 import (
 	"time"
@@ -20,7 +20,7 @@ type Agent struct {
 	CreatedAt   time.Time `db:"created_at"`
 	LastSeenAt  time.Time `db:"last_seen_at"`
 	Status      *string   `db:"status"`
-	IsOnline    bool      `db:"-"`
+	IsOnline    *bool     `db:"-"`
 }
 
 type CreateAgentResult struct {

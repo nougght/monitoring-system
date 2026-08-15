@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/nougght/monitoring-system/server/internal/model"
-	"github.com/nougght/monitoring-system/server/internal/model/agent"
+	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 )
 
 type AgentRepository struct {
@@ -30,7 +30,7 @@ func (r *AgentRepository) db(ctx context.Context) DB {
 	return res
 }
 
-func (r *AgentRepository) CreateAgent(ctx context.Context, agent *agent.Agent) (*agent.Agent, error) {
+func (r *AgentRepository) CreateAgent(ctx context.Context, agent *agent_model.Agent) (*agent_model.Agent, error) {
 	query := `
 	INSERT INTO agents (name, description) 
 	VALUES($1, $2)
@@ -44,7 +44,7 @@ func (r *AgentRepository) CreateAgent(ctx context.Context, agent *agent.Agent) (
 	return agent, nil
 }
 
-func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent.Agent, err error) {
+func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent_model.Agent, err error) {
 	query := `
 		SELECT * FROM agents;
 		`
@@ -60,7 +60,7 @@ func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent.Agent,
 	}
 	defer rows.Close()
 
-	res, err = pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[agent.Agent])
+	res, err = pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[agent_model.Agent])
 	if err != nil {
 		return nil, fmt.Errorf("collect rows failed: %w", err)
 	}
@@ -68,7 +68,7 @@ func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent.Agent,
 	return res, nil
 }
 
-func (r *AgentRepository) UpdateStatus(ctx context.Context, agentID uuid.UUID, status agent.AgentStatus) error {
+func (r *AgentRepository) UpdateStatus(ctx context.Context, agentID uuid.UUID, status agent_model.AgentStatus) error {
 	query := `
 	UPDATE agents SET status = $1 WHERE ID = $2
 	`

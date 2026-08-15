@@ -1,6 +1,7 @@
 package agent_server
 
 import (
+	"context"
 	"errors"
 	"io"
 	"log"
@@ -70,7 +71,7 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 
 	idFromTLS, err := util.GetAgentIDFromContext(stream.Context())
 	if err != nil {
-		return status.Error(codes.Unauthenticated, "invalid agent ID")
+		return status.Errorf(codes.Unauthenticated, "invalid agent ID: %s", err.Error())
 	}
 
 	if idFromTLS.String() != handshakeMsg.GetAgentUuid() {
@@ -79,8 +80,15 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 
 	s.registryService.CreateSession(idFromTLS)
 
-	s.runReader(stream)
-	s.runWriter(stream)
+	ctx, cancel := context.WithCancel(stream.Context())
+	s.runReader(
+		stream,
+		func() {
+			cancel()
+		},
+	)
+	s.runWriter(ctx, stream)
+
 	s.RequestSpecifications()
 	s.wg.Wait()
 
@@ -89,7 +97,7 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 	return nil
 }
 
-func (s *AgentService) runReader(stream pb.AgentService_ConnectServer) {
+func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, onClose func()) {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
@@ -101,6 +109,7 @@ func (s *AgentService) runReader(stream pb.AgentService_ConnectServer) {
 					return
 				}
 				log.Println("error receiving message from grpc client:", err)
+				onClose()
 				return
 			}
 
@@ -121,17 +130,23 @@ func (s *AgentService) runReader(stream pb.AgentService_ConnectServer) {
 	}()
 }
 
-func (s *AgentService) runWriter(stream pb.AgentService_ConnectServer) {
+func (s *AgentService) runWriter(ctx context.Context, stream pb.AgentService_ConnectServer) {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
 		for {
-			msg := <-s.toSend
-			err := stream.Send(msg)
-			if err != nil {
-				log.Println("error sending message to grpc client:", err)
+			select {
+			case msg := <-s.toSend:
+				err := stream.Send(msg)
+				if err != nil {
+					log.Println("error sending message to grpc client:", err)
+					return
+				}
+			case <-ctx.Done():
+				log.Println("writer context closed")
 				return
 			}
+
 		}
 	}()
 }

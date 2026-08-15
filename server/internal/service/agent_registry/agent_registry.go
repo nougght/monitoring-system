@@ -19,7 +19,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/nougght/monitoring-system/server/internal/config"
 	"github.com/nougght/monitoring-system/server/internal/model"
-	"github.com/nougght/monitoring-system/server/internal/model/agent"
 	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale/repository"
 	"github.com/nougght/monitoring-system/server/internal/util"
@@ -32,8 +31,8 @@ type AgentRegistryService struct {
 	enrollmentKeysRepo *repository.EnrollmentKeysRepository
 	transactor         model.Transactor
 	cert               *model.Certs
-	sessions           map[uuid.UUID]*agent.AgentSession
-	mu                 *sync.RWMutex
+	sessions           map[uuid.UUID]*agent_model.AgentSession
+	mu                 sync.RWMutex
 }
 
 func NewAgentRegistryService(cfg *config.Config, agentRepo *repository.AgentRepository,
@@ -47,6 +46,7 @@ func NewAgentRegistryService(cfg *config.Config, agentRepo *repository.AgentRepo
 		enrollmentKeysRepo: enrollmentKeysRepo,
 		transactor:         transactor,
 		cert:               cert,
+		sessions:           make(map[uuid.UUID]*agent_model.AgentSession, 10),
 	}, nil
 }
 
@@ -60,15 +60,15 @@ func (s *AgentRegistryService) genEnrollmentKey() *string {
 	return &keyString
 }
 
-func (s *AgentRegistryService) CreateSession(agentID uuid.UUID) *agent.AgentSession {
+func (s *AgentRegistryService) CreateSession(agentID uuid.UUID) *agent_model.AgentSession {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	session := agent.NewAgentSession(agentID)
+	session := agent_model.NewAgentSession(agentID)
 	s.sessions[agentID] = session
 	return session
 }
 
-func (s *AgentRegistryService) GetSession(agentID uuid.UUID) (*agent.AgentSession, bool) {
+func (s *AgentRegistryService) GetSession(agentID uuid.UUID) (*agent_model.AgentSession, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	session, ok := s.sessions[agentID]
@@ -79,6 +79,23 @@ func (s *AgentRegistryService) RemoveSession(agentID uuid.UUID) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.sessions, agentID)
+}
+
+func (s *AgentRegistryService) OnlineList() []uuid.UUID {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	onlineAgents := make([]uuid.UUID, 0, len(s.sessions))
+	for agentID := range s.sessions {
+		onlineAgents = append(onlineAgents, agentID)
+	}
+	return onlineAgents
+}
+
+func (s *AgentRegistryService) IsOnline(agentID uuid.UUID) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	_, ok := s.sessions[agentID]
+	return ok
 }
 
 func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, description *string) (*agent_model.CreateAgentResult, error) {
@@ -135,7 +152,7 @@ func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, des
 	}, nil
 }
 
-func (s *AgentRegistryService) GenerateAgentSetupConfig(ctx context.Context, agentID uuid.UUID, enrollmentKey string) *agent.AgentSetupConfig {
+func (s *AgentRegistryService) GenerateAgentSetupConfig(ctx context.Context, agentID uuid.UUID, enrollmentKey string) *agent_model.AgentSetupConfig {
 	return &agent_model.AgentSetupConfig{
 		EnrollmentKey:     enrollmentKey,
 		EnrollmentAddress: fmt.Sprintf("%s:%d", s.cfg.SettingsConfig.Address, s.cfg.GRPC.EnrollmentPort),
@@ -144,7 +161,7 @@ func (s *AgentRegistryService) GenerateAgentSetupConfig(ctx context.Context, age
 }
 
 // TODO: return agent token
-func (s *AgentRegistryService) Enroll(ctx context.Context, params *agent.EnrollParams) (*agent.EnrollResult, error) {
+func (s *AgentRegistryService) Enroll(ctx context.Context, params *agent_model.EnrollParams) (*agent_model.EnrollResult, error) {
 	tx, err := s.transactor.Begin(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed begin transaction: %w", err)
@@ -173,7 +190,7 @@ func (s *AgentRegistryService) Enroll(ctx context.Context, params *agent.EnrollP
 		return nil, fmt.Errorf("failed update agent status: %w", err)
 	}
 
-	certNotAfter := time.Now().Add(agent.DefaultAgentCertificateDuration)
+	certNotAfter := time.Now().Add(agent_model.DefaultAgentCertificateDuration)
 	agentCert, err := s.issueCertificate(agentID, pubKey, certNotAfter)
 	if err != nil {
 		log.Printf("failed issue agent certificate: %s", err.Error())
@@ -184,7 +201,7 @@ func (s *AgentRegistryService) Enroll(ctx context.Context, params *agent.EnrollP
 	if err != nil {
 		return nil, fmt.Errorf("commit transaction error: %w", err)
 	}
-	return &agent.EnrollResult{
+	return &agent_model.EnrollResult{
 		CertDer:    agentCert.Raw,
 		CAChainDer: [][]byte{s.cert.CA.Raw},
 		NotAfter:   certNotAfter,
@@ -259,5 +276,8 @@ func (s *AgentRegistryService) GetAllAgents(ctx context.Context) ([]*agent_model
 		return nil, fmt.Errorf("failed to get agents: %w", err)
 	}
 
+	for i, agent := range agents {
+		agents[i].IsOnline = utilShared.Ptr(s.IsOnline(agent.ID))
+	}
 	return agents, nil
 }

@@ -17,17 +17,19 @@ import (
 // wrappedServerStream оборачивает стандартный поток для перехвата сообщений
 type wrappedServerStream struct {
 	grpc.ServerStream
+	ctx context.Context
 }
 
 func (w *wrappedServerStream) RecvMsg(m any) error {
 	err := w.ServerStream.RecvMsg(m)
 	if err == nil {
 		log.Printf("[Server Stream] Получено сообщение типа: %T", m)
-		_, err := authInterceptor(w.ServerStream.Context())
+		ctx, err := authInterceptor(w.ServerStream.Context())
 		if err != nil {
 			log.Printf("[Server Stream] Ошибка аутентификации: %v", err)
 			return status.Error(codes.Unauthenticated, "authentication failed")
 		}
+		w.ctx = ctx
 	}
 	return err
 }
@@ -35,6 +37,10 @@ func (w *wrappedServerStream) RecvMsg(m any) error {
 func (w *wrappedServerStream) SendMsg(m any) error {
 	log.Printf("[Server Stream] Отправка сообщения типа: %T", m)
 	return w.ServerStream.SendMsg(m)
+}
+
+func (w *wrappedServerStream) Context() context.Context {
+	return w.ctx
 }
 
 func BidirectionalServerInterceptor(
