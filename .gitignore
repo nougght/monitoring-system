@@ -3,11 +3,7 @@
 node_modules/*
 */node_modules/*
 
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.bmp
+
 
 *.exe
 .env
