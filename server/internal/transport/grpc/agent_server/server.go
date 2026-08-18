@@ -82,6 +82,7 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 	ctx, cancel := context.WithCancel(stream.Context())
 	s.runReader(
 		stream,
+		idFromTLS,
 		func() {
 			cancel()
 		},
@@ -96,7 +97,7 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 	return nil
 }
 
-func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, onClose func()) {
+func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, agentID uuid.UUID, onClose func()) {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
@@ -116,6 +117,10 @@ func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, onClose f
 			case *pb.AgentMessage_Metrics:
 				metrics := msg.GetMetrics()
 				log.Println("Metrics received:", metrics)
+				// TODO: check context
+				s.agentInteractionService.HandleMetricsBatch(context.Background(),
+					convertMetricsBatchWithAgentIDFromProto(metrics, agentID),
+				)
 
 			case *pb.AgentMessage_CommandResult:
 				commandResult := msg.GetCommandResult()

@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/nougght/monitoring-system/server/internal/config"
 	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
+	"github.com/nougght/monitoring-system/server/internal/model/metrics"
 	agentregistry "github.com/nougght/monitoring-system/server/internal/service/agent_registry"
 )
 
@@ -35,4 +36,8 @@ func (s *AgentInteractionService) HandleDisconnection(agentID uuid.UUID) {
 
 func (s *AgentInteractionService) Enroll(ctx context.Context, params *agent_model.EnrollParams) (*agent_model.EnrollResult, error) {
 	return s.registry.Enroll(ctx, params)
+}
+
+func (s *AgentInteractionService) HandleMetricsBatch(ctx context.Context, batch *metrics.MetricsBatch) {
+
 }

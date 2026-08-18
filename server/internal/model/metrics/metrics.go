@@ -1,10 +1,20 @@
-package model
+package metrics
 
-// type Metrics struct {
-// 	FocusedWindow *FocusedWindowMetric
-// 	CpuPercent    *CpuPercentMetric
-// 	MemoryUsage   *MemoryMetric
-// 	DiskUsage     *DiskMetric
-// 	NetworkUsage  *NetIOMetric
-// 	Process       *ProcessMetric
-// } // @name Metrics
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type MetricSample struct {
+	Kind      int32
+	Label     string
+	Value     float64
+	Timestamp time.Time
+}
+
+type MetricsBatch struct {
+	ID      uint64
+	AgentID uuid.UUID
+	Metrics []*MetricSample
+}

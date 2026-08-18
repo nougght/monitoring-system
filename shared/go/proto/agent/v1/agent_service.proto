@@ -25,12 +25,12 @@ enum MetricKind {
 
 message MetricSample {
   MetricKind                kind  = 1;
-  google.protobuf.Timestamp ts    = 2;
+  google.protobuf.Timestamp timestamp    = 2;
   string                    label = 3;            // метка для метрик с несколькими значениями на один вид
   double                    value = 4;
 }
 
-message MetricBatch {
+message MetricsBatch {
   uint64                batch_id = 1;      
   repeated MetricSample samples  = 2;
 }
@@ -38,7 +38,7 @@ message MetricBatch {
 message AgentMessage {
   oneof payload {
     Handshake     handshake      = 1;
-    MetricBatch   metrics        = 2;
+    MetricsBatch   metrics        = 2;
     CommandResult command_result = 3;
     // Heartbeat heartbeat = 4;
   }
