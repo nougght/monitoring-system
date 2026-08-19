@@ -81,7 +81,7 @@ func (c *AgentClient) runReader(stream pb.AgentService_ConnectClient) {
 			switch msg.Payload.(type) {
 			case *pb.ServerMessage_Command:
 				command := msg.GetCommand()
-				log.Println("command received:", command)
+				log.Println("command received:", command.CommandUuid)
 				switch command.Payload.(type) {
 				case *pb.Command_SpecificationsRequest:
 					specs, err := c.metricsProvider.GetSpecs(stream.Context())
@@ -92,6 +92,7 @@ func (c *AgentClient) runReader(stream pb.AgentService_ConnectClient) {
 					err = stream.Send(&pb.AgentMessage{
 						Payload: &pb.AgentMessage_CommandResult{
 							CommandResult: &pb.CommandResult{
+								CommandUuid: command.GetCommandUuid(),
 								Payload: &pb.CommandResult_SpecificationsResponse{
 									SpecificationsResponse: &pb.SpecificationsResponse{
 										Specs: convertSpecsToProto(specs),

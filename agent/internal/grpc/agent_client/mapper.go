@@ -2,7 +2,6 @@ package agent_client
 
 import (
 	"agent/internal/model"
-	"strconv"
 
 	pb "github.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -69,7 +68,7 @@ func convertDiskSpecsToProto(disk *model.DiskSpecs) *pb.DiskSpecs {
 
 func convertMemorySpecsToProto(memory *model.MemorySpecs) *pb.MemorySpecs {
 	pbSpecs := pb.MemorySpecs{
-		Total:          strconv.FormatUint(memory.Total, 10),
+		Total:          memory.Total,
 		PhysicalMemory: make([]*pb.PhysicalMemoryInfo, len(memory.PhysicalMemoryList)),
 	}
 	for i, m := range memory.PhysicalMemoryList {
@@ -96,67 +95,85 @@ func convertPhysicalMemoryInfoToProto(physicalMemory *model.PhysicalMemoryInfo) 
 	}
 }
 
-func convertCpuPercentMetricToProto(cpuPercent *model.CpuPercentMetric) *pb.CpuPercentMetric {
+func convertCpuPercentMetricToProto(cpuPercent *model.CpuPercentMetric) *pb.MetricSample {
 	if cpuPercent == nil {
 		return nil
 	}
-	return &pb.CpuPercentMetric{
+	return &pb.MetricSample{
+		Kind:      pb.MetricKind_CPU_PERCENT,
 		Value:     cpuPercent.Value(),
 		Timestamp: timestamppb.New(cpuPercent.Timestamp()),
 	}
 }
 
-func convertFocusedWindowMetricToProto(focusedWindow *model.FocusedWindowMetric) *pb.FocusedWindowMetric {
-	if focusedWindow == nil {
-		return nil
-	}
-	return &pb.FocusedWindowMetric{
-		Value:     focusedWindow.Value(),
-		Timestamp: timestamppb.New(focusedWindow.Timestamp()),
-	}
-}
+// func convertFocusedWindowMetricToProto(focusedWindow *model.FocusedWindowMetric) *pb.FocusedWindowMetric {
+// 	if focusedWindow == nil {
+// 		return nil
+// 	}
+// 	return &pb.FocusedWindowMetric{
+// 		Value:     focusedWindow.Value(),
+// 		Timestamp: timestamppb.New(focusedWindow.Timestamp()),
+// 	}
+// }
 
-func convertMemoryUsageMetricToProto(memoryUsage *model.MemoryMetric) *pb.MemoryUsageMetric {
+func convertMemoryUsageMetricToProto(memoryUsage *model.MemoryMetric) *pb.MetricSample {
 	if memoryUsage == nil {
 		return nil
 	}
-	return &pb.MemoryUsageMetric{
-		Value:     memoryUsage.Value(),
+	return &pb.MetricSample{
+		Kind:      pb.MetricKind_MEM_USED,
+		Value:     float64(memoryUsage.Value()),
 		Timestamp: timestamppb.New(memoryUsage.Timestamp()),
 	}
 }
 
-func convertDiskUsageMetricToProto(diskUsage *model.DiskMetric) *pb.DiskUsageMetric {
+func convertDiskUsageMetricToProto(diskUsage *model.DiskMetric) []*pb.MetricSample {
 	if diskUsage == nil {
 		return nil
 	}
-	return &pb.DiskUsageMetric{
-		Value:     diskUsage.Value(),
-		Timestamp: timestamppb.New(diskUsage.Timestamp()),
+	res := make([]*pb.MetricSample, len(diskUsage.Value()))
+	for label, value := range diskUsage.Value() {
+		res = append(res, &pb.MetricSample{
+			Kind:      pb.MetricKind_DISK_USED,
+			Label:     label,
+			Value:     float64(value),
+			Timestamp: timestamppb.New(diskUsage.Timestamp()),
+		})
 	}
+	return res
 }
 
-func convertNetworkUsageMetricToProto(networkUsage *model.NetIOMetric) *pb.NetworkUsageMetric {
+func convertNetworkUsageMetricToProto(networkUsage *model.NetIOMetric) []*pb.MetricSample {
 	if networkUsage == nil {
 		return nil
 	}
-	return &pb.NetworkUsageMetric{
-		UploadMbps:   networkUsage.UploadMbps(),
-		DownloadMbps: networkUsage.DownloadMbps(),
-		Timestamp:    timestamppb.New(networkUsage.Timestamp()),
+	return []*pb.MetricSample{
+		{
+			Kind:      pb.MetricKind_NET_DOWNLOAD,
+			Value:     float64(networkUsage.DownloadMbps()),
+			Timestamp: timestamppb.New(networkUsage.Timestamp()),
+		},
+		{
+			Kind:      pb.MetricKind_NET_UPLOAD,
+			Value:     float64(networkUsage.UploadMbps()),
+			Timestamp: timestamppb.New(networkUsage.Timestamp()),
+		},
 	}
 }
 
-func convertMetricsToProto(metrics *model.Metrics) *pb.Metrics {
+// TEMP
+func convertMetricsToProto(metrics *model.Metrics) *pb.MetricsBatch {
 	if metrics == nil {
 		return nil
 	}
-	return &pb.Metrics{
-		CpuPercent:    convertCpuPercentMetricToProto(metrics.CpuPercent),
-		FocusedWindow: convertFocusedWindowMetricToProto(metrics.FocusedWindow),
-		MemoryUsage:   convertMemoryUsageMetricToProto(metrics.MemoryUsage),
-		DiskUsage:     convertDiskUsageMetricToProto(metrics.DiskUsage),
-		NetworkUsage:  convertNetworkUsageMetricToProto(metrics.NetworkUsage),
-		Timestamp:     timestamppb.New(metrics.Timestamp),
+	batch := &pb.MetricsBatch{
+		BatchId: 0,
+		Samples: []*pb.MetricSample{
+			convertCpuPercentMetricToProto(metrics.CpuPercent),
+			convertMemoryUsageMetricToProto(metrics.MemoryUsage),
+		},
 	}
+	batch.Samples = append(batch.Samples, convertDiskUsageMetricToProto(metrics.DiskUsage)...)
+	batch.Samples = append(batch.Samples, convertNetworkUsageMetricToProto(metrics.NetworkUsage)...)
+	return batch
 }
