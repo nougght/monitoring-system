@@ -18,27 +18,27 @@ enum MetricKind {
 //   MEM_SWAP_USED    = 40;
   DISK_USED               = 50;   // label = точка монтирования
   NET_UPLOAD              = 60;   // label = интерфейс
-  NET_DOWNLOAD            = 70;   
+  NET_DOWNLOAD            = 70;
 //   GPU_UTIL                = 40;   // label = gpu0
   // ...
 }
 
 message MetricSample {
-  MetricKind                kind  = 1;
-  google.protobuf.Timestamp timestamp    = 2;
-  string                    label = 3;            // метка для метрик с несколькими значениями на один вид
-  double                    value = 4;
+  MetricKind                kind      = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string                    label     = 3;            // метка для метрик с несколькими значениями на один вид
+  double                    value     = 4;
 }
 
 message MetricsBatch {
-  uint64                batch_id = 1;      
+  uint64                batch_id = 1;
   repeated MetricSample samples  = 2;
 }
 
 message AgentMessage {
   oneof payload {
     Handshake     handshake      = 1;
-    MetricsBatch   metrics        = 2;
+    MetricsBatch  metrics        = 2;
     CommandResult command_result = 3;
     // Heartbeat heartbeat = 4;
   }
@@ -117,14 +117,18 @@ message ProcessMetric {
 }
 
 message Command {
+  string command_uuid = 1;
   oneof payload {
-    SpecificationsRequest specifications_request = 1;
+    SpecificationsRequest specifications_request = 2;
   }
 }
 
 message CommandResult {
+
+  string command_uuid = 1;
+
   oneof payload {
-    SpecificationsResponse specifications_response = 1;
+    SpecificationsResponse specifications_response = 2;
   }
 }
 
@@ -181,7 +185,7 @@ message DiskSpecs {
 }
 
 message MemorySpecs {
-  string                      total           = 1; // общий объем памяти
+  uint64                      total           = 1; // общий объем памяти
   repeated PhysicalMemoryInfo physical_memory = 2;
 }
 

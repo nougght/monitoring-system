@@ -3,6 +3,7 @@ package agent_server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"sync"
@@ -21,19 +22,22 @@ type AgentService struct {
 	pb.UnimplementedAgentServiceServer
 
 	agentInteractionService *agent.AgentInteractionService
-	toSend                  chan *pb.ServerMessage
-	commandResults          chan *pb.CommandResult
-	pendingCommands         map[string]*pb.Command
-	mu                      sync.Mutex
-	wg                      sync.WaitGroup
+
+	messagesByAgentID map[uuid.UUID]*messages
+	mu                sync.RWMutex
+	wg                sync.WaitGroup
+}
+
+type messages struct {
+	toSend          chan *pb.ServerMessage
+	pendingCommands map[string]chan *pb.CommandResult
+	mu              sync.Mutex
 }
 
 func NewAgentService(interactionService *agent.AgentInteractionService) *AgentService {
 	return &AgentService{
 		agentInteractionService: interactionService,
-		toSend:                  make(chan *pb.ServerMessage, 100),
-		commandResults:          make(chan *pb.CommandResult, 100),
-		pendingCommands:         make(map[string]*pb.Command),
+		messagesByAgentID:       make(map[uuid.UUID]*messages, 10),
 		wg:                      sync.WaitGroup{},
 	}
 }
@@ -77,6 +81,24 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 		return status.Error(codes.Unauthenticated, "agent ID mismatch")
 	}
 
+	messages := &messages{
+		toSend:          make(chan *pb.ServerMessage, 100),
+		pendingCommands: make(map[string]chan *pb.CommandResult),
+	}
+
+	s.mu.Lock()
+	s.messagesByAgentID[idFromTLS] = messages
+	s.mu.Unlock()
+
+	defer func() {
+		s.mu.Lock()
+		delete(s.messagesByAgentID, idFromTLS)
+		for _, c := range messages.pendingCommands {
+			close(c)
+		}
+		s.mu.Unlock()
+	}()
+
 	s.agentInteractionService.HandleConnection(idFromTLS)
 
 	ctx, cancel := context.WithCancel(stream.Context())
@@ -87,9 +109,8 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 			cancel()
 		},
 	)
-	s.runWriter(ctx, stream)
+	s.runWriter(ctx, messages.toSend, stream)
 
-	s.RequestSpecifications()
 	s.wg.Wait()
 
 	s.agentInteractionService.HandleDisconnection(idFromTLS)
@@ -124,8 +145,7 @@ func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, agentID u
 
 			case *pb.AgentMessage_CommandResult:
 				commandResult := msg.GetCommandResult()
-				log.Println("Command result received:", commandResult)
-				s.commandResults <- commandResult
+				s.handleCommandResult(agentID, commandResult)
 
 			default:
 				log.Println("unknown message received:", msg)
@@ -134,13 +154,13 @@ func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, agentID u
 	}()
 }
 
-func (s *AgentService) runWriter(ctx context.Context, stream pb.AgentService_ConnectServer) {
+func (s *AgentService) runWriter(ctx context.Context, toSend chan *pb.ServerMessage, stream pb.AgentService_ConnectServer) {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
 		for {
 			select {
-			case msg := <-s.toSend:
+			case msg := <-toSend:
 				err := stream.Send(msg)
 				if err != nil {
 					log.Println("error sending message to grpc client:", err)
@@ -153,6 +173,59 @@ func (s *AgentService) runWriter(ctx context.Context, stream pb.AgentService_Con
 
 		}
 	}()
+}
+
+func (s *AgentService) sendCommand(ctx context.Context, agentID uuid.UUID, command *pb.Command) (*pb.CommandResult, error) {
+	s.mu.RLock()
+	commands := s.messagesByAgentID[agentID]
+	s.mu.RUnlock()
+
+	// add chan to pending map to receive result
+	commandID := uuid.NewString()
+	resultChan := make(chan *pb.CommandResult, 1)
+	commands.mu.Lock()
+	commands.pendingCommands[commandID] = resultChan
+	select {
+	case commands.toSend <- &pb.ServerMessage{
+		Payload: &pb.ServerMessage_Command{
+			Command: command,
+		},
+	}:
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+	commands.mu.Unlock()
+
+	defer func() {
+		s.mu.Lock()
+		delete(commands.pendingCommands, commandID)
+		s.mu.Unlock()
+	}()
+
+	select {
+	case result, ok := <-resultChan:
+		if !ok {
+			return nil, fmt.Errorf("result chan closed")
+		}
+		return result, nil
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+func (s *AgentService) handleCommandResult(agentID uuid.UUID, result *pb.CommandResult) {
+	s.mu.Lock()
+	agentCommands := s.messagesByAgentID[agentID]
+	s.mu.Unlock()
+
+	agentCommands.mu.Lock()
+	resChan, ok := agentCommands.pendingCommands[result.CommandUuid]
+	if !ok {
+		log.Printf("CommandResult commandUUID not found in pending commands: %#v", result)
+		return
+	}
+
+	resChan <- result
 }
 
 func (s *AgentService) RequestSpecifications() {

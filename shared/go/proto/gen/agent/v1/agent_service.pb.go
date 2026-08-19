@@ -531,7 +531,8 @@ func (x *ProcessMetric) GetProcessList() []*Process {
 }
 
 type Command struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	CommandUuid string                 `protobuf:"bytes,1,opt,name=command_uuid,json=commandUuid,proto3" json:"command_uuid,omitempty"`
 	// Types that are valid to be assigned to Payload:
 	//
 	//	*Command_SpecificationsRequest
@@ -570,6 +571,13 @@ func (*Command) Descriptor() ([]byte, []int) {
 	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{7}
 }
 
+func (x *Command) GetCommandUuid() string {
+	if x != nil {
+		return x.CommandUuid
+	}
+	return ""
+}
+
 func (x *Command) GetPayload() isCommand_Payload {
 	if x != nil {
 		return x.Payload
@@ -591,13 +599,14 @@ type isCommand_Payload interface {
 }
 
 type Command_SpecificationsRequest struct {
-	SpecificationsRequest *SpecificationsRequest `protobuf:"bytes,1,opt,name=specifications_request,json=specificationsRequest,proto3,oneof"`
+	SpecificationsRequest *SpecificationsRequest `protobuf:"bytes,2,opt,name=specifications_request,json=specificationsRequest,proto3,oneof"`
 }
 
 func (*Command_SpecificationsRequest) isCommand_Payload() {}
 
 type CommandResult struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	CommandUuid string                 `protobuf:"bytes,1,opt,name=command_uuid,json=commandUuid,proto3" json:"command_uuid,omitempty"`
 	// Types that are valid to be assigned to Payload:
 	//
 	//	*CommandResult_SpecificationsResponse
@@ -636,6 +645,13 @@ func (*CommandResult) Descriptor() ([]byte, []int) {
 	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{8}
 }
 
+func (x *CommandResult) GetCommandUuid() string {
+	if x != nil {
+		return x.CommandUuid
+	}
+	return ""
+}
+
 func (x *CommandResult) GetPayload() isCommandResult_Payload {
 	if x != nil {
 		return x.Payload
@@ -657,7 +673,7 @@ type isCommandResult_Payload interface {
 }
 
 type CommandResult_SpecificationsResponse struct {
-	SpecificationsResponse *SpecificationsResponse `protobuf:"bytes,1,opt,name=specifications_response,json=specificationsResponse,proto3,oneof"`
+	SpecificationsResponse *SpecificationsResponse `protobuf:"bytes,2,opt,name=specifications_response,json=specificationsResponse,proto3,oneof"`
 }
 
 func (*CommandResult_SpecificationsResponse) isCommandResult_Payload() {}
@@ -1164,7 +1180,7 @@ func (x *DiskSpecs) GetTotal() uint64 {
 
 type MemorySpecs struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	Total          string                 `protobuf:"bytes,1,opt,name=total,proto3" json:"total,omitempty"` // общий объем памяти
+	Total          uint64                 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"` // общий объем памяти
 	PhysicalMemory []*PhysicalMemoryInfo  `protobuf:"bytes,2,rep,name=physical_memory,json=physicalMemory,proto3" json:"physical_memory,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -1200,11 +1216,11 @@ func (*MemorySpecs) Descriptor() ([]byte, []int) {
 	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *MemorySpecs) GetTotal() string {
+func (x *MemorySpecs) GetTotal() uint64 {
 	if x != nil {
 		return x.Total
 	}
-	return ""
+	return 0
 }
 
 func (x *MemorySpecs) GetPhysicalMemory() []*PhysicalMemoryInfo {
@@ -1391,12 +1407,14 @@ const file_agent_v1_agent_service_proto_rawDesc = "" +
 	"\f_cpu_percentB\x0e\n" +
 	"\f_memory_used\"P\n" +
 	"\rProcessMetric\x12?\n" +
-	"\fprocess_list\x18\x01 \x03(\v2\x1c.monitoring.agent.v1.ProcessR\vprocessList\"y\n" +
-	"\aCommand\x12c\n" +
-	"\x16specifications_request\x18\x01 \x01(\v2*.monitoring.agent.v1.SpecificationsRequestH\x00R\x15specificationsRequestB\t\n" +
-	"\apayload\"\x82\x01\n" +
-	"\rCommandResult\x12f\n" +
-	"\x17specifications_response\x18\x01 \x01(\v2+.monitoring.agent.v1.SpecificationsResponseH\x00R\x16specificationsResponseB\t\n" +
+	"\fprocess_list\x18\x01 \x03(\v2\x1c.monitoring.agent.v1.ProcessR\vprocessList\"\x9c\x01\n" +
+	"\aCommand\x12!\n" +
+	"\fcommand_uuid\x18\x01 \x01(\tR\vcommandUuid\x12c\n" +
+	"\x16specifications_request\x18\x02 \x01(\v2*.monitoring.agent.v1.SpecificationsRequestH\x00R\x15specificationsRequestB\t\n" +
+	"\apayload\"\xa5\x01\n" +
+	"\rCommandResult\x12!\n" +
+	"\fcommand_uuid\x18\x01 \x01(\tR\vcommandUuid\x12f\n" +
+	"\x17specifications_response\x18\x02 \x01(\v2+.monitoring.agent.v1.SpecificationsResponseH\x00R\x16specificationsResponseB\t\n" +
 	"\apayload\"\x17\n" +
 	"\x15SpecificationsRequest\"J\n" +
 	"\x16SpecificationsResponse\x120\n" +
@@ -1441,7 +1459,7 @@ const file_agent_v1_agent_service_proto_rawDesc = "" +
 	"\afs_type\x18\x02 \x01(\tR\x06fsType\x12\x14\n" +
 	"\x05total\x18\x03 \x01(\x04R\x05total\"u\n" +
 	"\vMemorySpecs\x12\x14\n" +
-	"\x05total\x18\x01 \x01(\tR\x05total\x12P\n" +
+	"\x05total\x18\x01 \x01(\x04R\x05total\x12P\n" +
 	"\x0fphysical_memory\x18\x02 \x03(\v2'.monitoring.agent.v1.PhysicalMemoryInfoR\x0ephysicalMemory\"\xd1\x03\n" +
 	"\x12PhysicalMemoryInfo\x12%\n" +
 	"\x0edevice_locator\x18\x01 \x01(\tR\rdeviceLocator\x12\x1f\n" +
