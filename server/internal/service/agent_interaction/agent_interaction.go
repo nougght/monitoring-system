@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/nougght/monitoring-system/server/internal/config"
@@ -11,9 +12,15 @@ import (
 	agentregistry "github.com/nougght/monitoring-system/server/internal/service/agent_registry"
 )
 
+// TEMP: replace with single SendCommand method
+type Requester interface {
+	RequestSpecifications(ctx context.Context, agentID uuid.UUID) (*agent_model.Specs, error)
+}
+
 type AgentInteractionService struct {
-	cfg      *config.Config
-	registry *agentregistry.AgentRegistryService
+	cfg       *config.Config
+	registry  *agentregistry.AgentRegistryService
+	requester Requester
 }
 
 func NewAgentInteractionService(cfg *config.Config, registry *agentregistry.AgentRegistryService) (*AgentInteractionService, error) {
@@ -26,8 +33,23 @@ func NewAgentInteractionService(cfg *config.Config, registry *agentregistry.Agen
 	}, nil
 }
 
+func (s *AgentInteractionService) SetRequester(requester Requester) {
+	s.requester = requester
+}
+
 func (s *AgentInteractionService) HandleConnection(agentID uuid.UUID) {
 	s.registry.CreateSession(agentID)
+	specs, err := s.RequestSpecifications(context.Background(), agentID)
+	if err != nil {
+		log.Printf("failed to request specifications: %s", err.Error())
+		return
+	}
+	specs.AgentID = agentID
+	err = s.registry.UpdateSpecifications(context.Background(), agentID, specs)
+	if err != nil {
+		log.Printf("failed to update specifications: %s", err.Error())
+	}
+
 }
 
 func (s *AgentInteractionService) HandleDisconnection(agentID uuid.UUID) {
@@ -36,6 +58,17 @@ func (s *AgentInteractionService) HandleDisconnection(agentID uuid.UUID) {
 
 func (s *AgentInteractionService) Enroll(ctx context.Context, params *agent_model.EnrollParams) (*agent_model.EnrollResult, error) {
 	return s.registry.Enroll(ctx, params)
+}
+
+func (s *AgentInteractionService) RequestSpecifications(ctx context.Context, agentID uuid.UUID) (*agent_model.Specs, error) {
+	if s.requester == nil {
+		return nil, fmt.Errorf("requester is nil")
+	}
+	return s.requester.RequestSpecifications(ctx, agentID)
+}
+
+func (s *AgentInteractionService) HandleSpecifications(ctx context.Context, agentID uuid.UUID, specifications *agent_model.Specs) error {
+	return s.registry.UpdateSpecifications(ctx, agentID, specifications)
 }
 
 func (s *AgentInteractionService) HandleMetricsBatch(ctx context.Context, batch *metrics.MetricsBatch) {

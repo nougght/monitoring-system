@@ -14,7 +14,7 @@ CREATE TABLE
 CREATE TABLE metric_series (
   id       INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   agent_id UUID NOT NULL REFERENCES agents(id),
-  kind     SMALLINT NOT NULL REFERENCES,  -- вид метрики
+  kind     SMALLINT NOT NULL REFERENCES metric_kinds(kind),  -- вид метрики
   label    TEXT NOT NULL DEFAULT '',   -- метка для метрик одного вида(например названия дисков)
   UNIQUE (agent_id, kind, label)
 );

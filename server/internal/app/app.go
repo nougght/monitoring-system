@@ -68,7 +68,16 @@ func New(ctx context.Context, cfg *config.Config) *App {
 
 	db, err := timescale.ConnectToDB(ctx, cfg.Postgres)
 	if err != nil {
-		log.Panicf("failed to connect to database: %v", err)
+		log.Println("failed to connect to database, retry after 500ms")
+		select {
+		case <-time.After(time.Microsecond * 500):
+			db, err = timescale.ConnectToDB(ctx, cfg.Postgres)
+			if err != nil {
+				log.Panicf("failed to connect to database: %s", err.Error())
+			}
+		case <-ctx.Done():
+			log.Panicf("%s", ctx.Err().Error())
+		}
 	}
 
 	services := service.New(service.ServicesOptions{
@@ -96,6 +105,8 @@ func New(ctx context.Context, cfg *config.Config) *App {
 
 	agentService := agent_grpc.NewAgentService(services.AgentInteractionService())
 	agentService.Register(agentServer)
+
+	services.AgentInteractionService().SetRequester(agentService)
 
 	enrollmentServer := grpc.NewServer(grpc.Creds(
 		credentials.NewTLS(&tls.Config{

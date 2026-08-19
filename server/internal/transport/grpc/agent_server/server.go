@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 	agent "github.com/nougght/monitoring-system/server/internal/service/agent_interaction"
 	"github.com/nougght/monitoring-system/server/internal/util"
 	pb "github.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1"
@@ -99,8 +100,6 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 		s.mu.Unlock()
 	}()
 
-	s.agentInteractionService.HandleConnection(idFromTLS)
-
 	ctx, cancel := context.WithCancel(stream.Context())
 	s.runReader(
 		stream,
@@ -110,6 +109,8 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 		},
 	)
 	s.runWriter(ctx, messages.toSend, stream)
+
+	s.agentInteractionService.HandleConnection(idFromTLS)
 
 	s.wg.Wait()
 
@@ -137,7 +138,8 @@ func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, agentID u
 			switch msg.Payload.(type) {
 			case *pb.AgentMessage_Metrics:
 				metrics := msg.GetMetrics()
-				log.Println("Metrics received:", metrics)
+				log.Println("Metrics received:")
+				//, metrics)
 				// TODO: check context
 				s.agentInteractionService.HandleMetricsBatch(context.Background(),
 					convertMetricsBatchWithAgentIDFromProto(metrics, agentID),
@@ -175,6 +177,12 @@ func (s *AgentService) runWriter(ctx context.Context, toSend chan *pb.ServerMess
 	}()
 }
 
+func (s *AgentService) sendCommandWithTimeout(ctx context.Context, agentID uuid.UUID, command *pb.Command) (*pb.CommandResult, error) {
+	commandCtx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+	return s.sendCommand(commandCtx, agentID, command)
+}
+
 func (s *AgentService) sendCommand(ctx context.Context, agentID uuid.UUID, command *pb.Command) (*pb.CommandResult, error) {
 	s.mu.RLock()
 	commands := s.messagesByAgentID[agentID]
@@ -182,6 +190,7 @@ func (s *AgentService) sendCommand(ctx context.Context, agentID uuid.UUID, comma
 
 	// add chan to pending map to receive result
 	commandID := uuid.NewString()
+	command.CommandUuid = commandID
 	resultChan := make(chan *pb.CommandResult, 1)
 	commands.mu.Lock()
 	commands.pendingCommands[commandID] = resultChan
@@ -219,6 +228,7 @@ func (s *AgentService) handleCommandResult(agentID uuid.UUID, result *pb.Command
 	s.mu.Unlock()
 
 	agentCommands.mu.Lock()
+	defer agentCommands.mu.Unlock()
 	resChan, ok := agentCommands.pendingCommands[result.CommandUuid]
 	if !ok {
 		log.Printf("CommandResult commandUUID not found in pending commands: %#v", result)
@@ -228,18 +238,20 @@ func (s *AgentService) handleCommandResult(agentID uuid.UUID, result *pb.Command
 	resChan <- result
 }
 
-func (s *AgentService) RequestSpecifications() {
-	command := &pb.Command{
+func (s *AgentService) RequestSpecifications(ctx context.Context, agentID uuid.UUID) (*agent_model.Specs, error) {
+	res, err := s.sendCommandWithTimeout(ctx, agentID, &pb.Command{
 		Payload: &pb.Command_SpecificationsRequest{
 			SpecificationsRequest: &pb.SpecificationsRequest{},
 		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to send specifications command: %w", err)
 	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.pendingCommands[uuid.New().String()] = command
-	s.toSend <- &pb.ServerMessage{
-		Payload: &pb.ServerMessage_Command{
-			Command: command,
-		},
+
+	specs, ok := res.Payload.(*pb.CommandResult_SpecificationsResponse)
+	if !ok {
+		return nil, fmt.Errorf("incorrect command result type")
 	}
+
+	return convertSpecsFromProto(specs.SpecificationsResponse.Specs), nil
 }

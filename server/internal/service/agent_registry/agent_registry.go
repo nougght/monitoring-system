@@ -29,6 +29,7 @@ type AgentRegistryService struct {
 	cfg                *config.Config
 	agentRepo          *repository.AgentRepository
 	enrollmentKeysRepo *repository.EnrollmentKeysRepository
+	specsRepo          *repository.SpecsRepository
 	transactor         model.Transactor
 	cert               *model.Certs
 	sessions           map[uuid.UUID]*agent_model.AgentSession
@@ -36,7 +37,9 @@ type AgentRegistryService struct {
 }
 
 func NewAgentRegistryService(cfg *config.Config, agentRepo *repository.AgentRepository,
-	enrollmentKeysRepo *repository.EnrollmentKeysRepository, transactor model.Transactor, cert *model.Certs) (*AgentRegistryService, error) {
+	enrollmentKeysRepo *repository.EnrollmentKeysRepository,
+	specsRepo *repository.SpecsRepository,
+	transactor model.Transactor, cert *model.Certs) (*AgentRegistryService, error) {
 	if cfg == nil || agentRepo == nil || enrollmentKeysRepo == nil || transactor == nil {
 		return nil, fmt.Errorf("params required")
 	}
@@ -44,6 +47,7 @@ func NewAgentRegistryService(cfg *config.Config, agentRepo *repository.AgentRepo
 		cfg:                cfg,
 		agentRepo:          agentRepo,
 		enrollmentKeysRepo: enrollmentKeysRepo,
+		specsRepo:          specsRepo,
 		transactor:         transactor,
 		cert:               cert,
 		sessions:           make(map[uuid.UUID]*agent_model.AgentSession, 10),
@@ -280,4 +284,22 @@ func (s *AgentRegistryService) GetAllAgents(ctx context.Context) ([]*agent_model
 		agents[i].IsOnline = utilShared.Ptr(s.IsOnline(agent.ID))
 	}
 	return agents, nil
+}
+
+// specifications
+
+func (s *AgentRegistryService) GetSpecifications(ctx context.Context, agentID uuid.UUID) (*agent_model.Specs, error) {
+	specs, err := s.specsRepo.GetCurrentSpecs(ctx, agentID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get specifications: %w", err)
+	}
+	return specs, nil
+}
+
+func (s *AgentRegistryService) UpdateSpecifications(ctx context.Context, agentID uuid.UUID, specifications *agent_model.Specs) error {
+	_, err := s.specsRepo.CreateOrUpdateSpecs(ctx, specifications)
+	if err != nil {
+		return fmt.Errorf("failed to update specifications: %w", err)
+	}
+	return nil
 }

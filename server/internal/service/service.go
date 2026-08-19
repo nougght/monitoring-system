@@ -28,6 +28,7 @@ func New(opts ServicesOptions) *Services {
 		opts.Config,
 		opts.Repositories.AgentRepository(),
 		opts.Repositories.EnrollmentKeysRepository(),
+		opts.Repositories.SpecsRepository(),
 		opts.Transactor,
 		opts.Cert,
 	)

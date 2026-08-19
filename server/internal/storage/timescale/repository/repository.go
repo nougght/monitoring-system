@@ -16,12 +16,14 @@ type DB interface {
 type Repositories struct {
 	agentRpository           *AgentRepository
 	enrollmentKeysRepository *EnrollmentKeysRepository
+	specsRepository          *SpecsRepository
 }
 
 func New(db DB) *Repositories {
 	return &Repositories{
 		agentRpository:           NewAgentRepository(db),
 		enrollmentKeysRepository: NewEnrollmentKeysRepository(db),
+		specsRepository:          NewSpecsRepository(db),
 	}
 }
 
@@ -31,4 +33,8 @@ func (r *Repositories) AgentRepository() *AgentRepository {
 
 func (r *Repositories) EnrollmentKeysRepository() *EnrollmentKeysRepository {
 	return r.enrollmentKeysRepository
+}
+
+func (r *Repositories) SpecsRepository() *SpecsRepository {
+	return r.specsRepository
 }
