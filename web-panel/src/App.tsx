@@ -1,6 +1,7 @@
 import './App.css'
 import { BrowserRouter, Navigate, Route, Routes, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { AgentsPage } from './pages/AgentsPage'
+import { AgentPage } from './pages/AgentPage'
 import { NewAgentPage } from './pages/NewAgentPage'
 import { SideBar, type SideBarData, type NavItem } from './components/sideBar'
 import { useEffect, useState } from 'react'
@@ -27,11 +28,12 @@ const AppLayout = () => {
         [location]
     )
     return (
-        <div style={{ display: `flex`, flexDirection: `row`, height: `100%`, alignItems:`stretch`}}>
+        <div style={{ display: `flex`, flexDirection: `row`, height: `100%`, alignItems: `stretch` }}>
             <SideBar
                 data={sideBarData}
             />
-            <Outlet/>
+            <div style={{ flexGrow: 1, overflow: `auto` }}><Outlet /></div>
+
         </div>
     )
 }
@@ -46,6 +48,7 @@ function App() {
                         <Route path="/" element={<Navigate to="/agents" replace />} />
                         <Route path="/dashboard" element={<p>not implemented</p>} />
                         <Route path="/agents" element={<AgentsPage />} />
+                        <Route path="/agents/:id" element={<AgentPage />} />
                         <Route path="/agents/new" element={<NewAgentPage />} />
                     </Route>
                     {/* <Route path="*" element={<NotFoundPage />} /> */}

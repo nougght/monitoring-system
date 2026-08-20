@@ -1,11 +1,8 @@
-import type { CpuSpecsArchitecture } from "../api/models/cpuSpecsArchitecture";
-import type { CpuSpecsAvailability } from "../api/models/cpuSpecsAvailability";
-import type { PhysicalMemoryInfoFormFactor } from "../api/models/physicalMemoryInfoFormFactor";
-import type { PhysicalMemoryInfoMemoryType } from "../api/models/physicalMemoryInfoMemoryType";
+
 
 export interface CpuSpecs {
-    architecture?: CpuSpecsArchitecture;
-    availability?: CpuSpecsAvailability;
+    architecture?: string;
+    availability?: string;
     currentClockSpeed?: number;
     dataWidth?: number;
     l2CacheSize?: number;
@@ -53,13 +50,13 @@ export interface PhysicalMemoryInfo {
     /** расположение памяти */
     deviceLocator?: string;
     /** форм-фактор памяти */
-    formFactor?: PhysicalMemoryInfoFormFactor;
+    formFactor?: string;
     /** можно менять память без выключения системы */
     hotSwappable?: boolean;
     /** производитель */
     manufacturer?: string;
     /** тип памяти */
-    memoryType?: PhysicalMemoryInfoMemoryType;
+    memoryType?: string;
     /** модель/партия памяти */
     modelName?: string;
     /** можно ли вынимать память */

@@ -30,12 +30,17 @@
     margin: 0 auto;
 }
 
+body {
+    height: 100vh;
+    overflow: hidden;
+}
+
+#root,
 .app,
 main {
     height: 100%;
 }
 
-main {}
 
 
 
@@ -83,13 +88,15 @@ main {}
 
 
 .side-bar {
-    /* height: 100%; */
+    height: 100vh;
+    /* position:fixed; */
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: start;
     background-color: lightblue;
-    border: 1px rgb(197, 197, 197) solid;
+    border-right: 1px rgb(197, 197, 197) solid;
+    margin-right: 5px;
 }
 
 .side-bar > nav {
@@ -133,4 +140,27 @@ main {}
 
 .side-bar  .side-bar-button.active {
     background-color: rgb(240, 162, 61);
+}
+
+.tabBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.tabBar > .tab-button {
+    border-radius: 10px;
+    border: 1px solid rgb(178, 183, 185);
+    padding: 5px;
+    margin: 5px;
+}
+
+.tabBar > .tab-button:hover {
+    background-color: rgb(240, 231, 216);
+}
+
+.tabBar > .tab-button.active {
+    border: 2px solid rgb(240, 162, 61);
+    padding: 4px;
 }

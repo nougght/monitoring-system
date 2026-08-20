@@ -8,6 +8,7 @@ import type {
   Agent,
   AgentConfigBody,
   AgentConfigResponse,
+  AgentSpecs,
   CreateAgent400,
   CreateAgent404,
   CreateAgent500,
@@ -16,6 +17,9 @@ import type {
   DownloadAgentConfig400,
   DownloadAgentConfig404,
   DownloadAgentConfig500,
+  GetAgentSpecs400,
+  GetAgentSpecs404,
+  GetAgentSpecs500,
   GetAllAgents400,
   GetAllAgents404,
   GetAllAgents500
@@ -197,9 +201,68 @@ export const downloadAgentConfig = async (agentID: string,
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  // @ts-ignore
   const data: downloadAgentConfigResponse['data'] = body !== null ? body : ''
   return { data, status: res.status, headers: res.headers } as downloadAgentConfigResponse
+}
+
+
+
+export type getAgentSpecsResponse200 = {
+  data: AgentSpecs
+  status: 200
+}
+
+export type getAgentSpecsResponse400 = {
+  data: GetAgentSpecs400
+  status: 400
+}
+
+export type getAgentSpecsResponse404 = {
+  data: GetAgentSpecs404
+  status: 404
+}
+
+export type getAgentSpecsResponse500 = {
+  data: GetAgentSpecs500
+  status: 500
+}
+
+export type getAgentSpecsResponseSuccess = (getAgentSpecsResponse200) & {
+  headers: Headers;
+};
+export type getAgentSpecsResponseError = (getAgentSpecsResponse400 | getAgentSpecsResponse404 | getAgentSpecsResponse500) & {
+  headers: Headers;
+};
+
+export type getAgentSpecsResponse = (getAgentSpecsResponseSuccess | getAgentSpecsResponseError)
+
+export const getGetAgentSpecsUrl = (agentID: string,) => {
+
+
+
+
+  return `http://127.0.0.1:8091/api/v1/agents/${agentID}/specifications`
+}
+
+/**
+ * @summary Get agent specifications
+ */
+export const getAgentSpecs = async (agentID: string, options?: RequestInit): Promise<getAgentSpecsResponse> => {
+
+  const res = await fetch(getGetAgentSpecsUrl(agentID),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAgentSpecsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getAgentSpecsResponse
 }
 
 

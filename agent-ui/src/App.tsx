@@ -3,12 +3,12 @@ import {
     useState
 } from 'react'
 
-import TabBar from './components/TabBar';
+import TabBar from '../../shared/ui/src/components/TabBar';
 import Monitoring from './components/Monitoring';
-import Specifications from './components/Specifications';
+import Specifications from '../../shared/ui/src/components/Specifications';
 import './App.css';
 import type { Metrics } from './domain/metrics';
-import type { Specs } from './domain/specs';
+import type { Specs } from '../../shared/ui/src/domain/specs';
 import { getSpecs } from './api/client/monitoringAgentAPI';
 
 interface Tab {

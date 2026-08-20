@@ -290,6 +290,9 @@ func (s *AgentRegistryService) GetAllAgents(ctx context.Context) ([]*agent_model
 
 func (s *AgentRegistryService) GetSpecifications(ctx context.Context, agentID uuid.UUID) (*agent_model.Specs, error) {
 	specs, err := s.specsRepo.GetCurrentSpecs(ctx, agentID)
+	if errors.Is(err, repository.ErrNotFound) {
+		err = model.ErrNotFound
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to get specifications: %w", err)
 	}

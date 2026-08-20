@@ -1,15 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AgentConfigBody } from "../api/models";
+import type {Error} from './common'
 
 interface SetupConfigVariables {
     agentID: string
     dto: AgentConfigBody
 }
-interface Error {
-    status: number
-    message: string
-}
-
 async function downloadConfig(vars: SetupConfigVariables): Promise<Error | void> {
     const res = await fetch(`http://127.0.0.1:8091/api/v1/agents/${vars.agentID}/setupconfig`, {
         method: 'POST',

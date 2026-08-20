@@ -262,22 +262,75 @@
                     "type": "string"
                 },
                 "cpuSpecs": {
-                    "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.CpuSpecs"
+                    "$ref": "#/definitions/CpuSpecs"
                 },
                 "diskSpecs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.DiskSpecs"
+                        "$ref": "#/definitions/DiskSpecs"
                     }
                 },
                 "hostSpecs": {
-                    "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.HostSpecs"
+                    "$ref": "#/definitions/HostSpecs"
                 },
                 "memorySpecs": {
-                    "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.MemorySpecs"
+                    "$ref": "#/definitions/MemorySpecs"
                 },
                 "updatedAt": {
                     "type": "string"
+                }
+            }
+        },
+        "CpuSpecs": {
+            "type": "object",
+            "properties": {
+                "architecture": {
+                    "type": "string"
+                },
+                "availability": {
+                    "type": "string"
+                },
+                "currentClockSpeed": {
+                    "type": "integer"
+                },
+                "data_width": {
+                    "type": "integer"
+                },
+                "l2CacheSize": {
+                    "type": "integer"
+                },
+                "l3CacheSize": {
+                    "type": "integer"
+                },
+                "manufacturer": {
+                    "type": "string"
+                },
+                "maxClockSpeed": {
+                    "type": "integer"
+                },
+                "modelName": {
+                    "type": "string"
+                },
+                "numberOfCores": {
+                    "type": "integer"
+                },
+                "numberOfEnabledCores": {
+                    "type": "integer"
+                },
+                "numberOfLogicalProcessors": {
+                    "type": "integer"
+                },
+                "processorId": {
+                    "type": "string"
+                },
+                "socketDesignation": {
+                    "type": "string"
+                },
+                "stepping": {
+                    "type": "string"
+                },
+                "virtualizationFirmwareEnabled": {
+                    "type": "boolean"
                 }
             }
         },
@@ -324,66 +377,13 @@
                 }
             }
         },
-        "github_com_nougght_monitoring-system_server_internal_model_agent.CpuSpecs": {
-            "type": "object",
-            "properties": {
-                "architecture": {
-                    "type": "string"
-                },
-                "availability": {
-                    "type": "string"
-                },
-                "current_clock_speed": {
-                    "type": "integer"
-                },
-                "data_width": {
-                    "type": "integer"
-                },
-                "l2_cache_size": {
-                    "type": "integer"
-                },
-                "l3_cache_size": {
-                    "type": "integer"
-                },
-                "manufacturer": {
-                    "type": "string"
-                },
-                "max_clock_speed": {
-                    "type": "integer"
-                },
-                "model_name": {
-                    "type": "string"
-                },
-                "number_of_cores": {
-                    "type": "integer"
-                },
-                "number_of_enabled_cores": {
-                    "type": "integer"
-                },
-                "number_of_logical_processors": {
-                    "type": "integer"
-                },
-                "processor_id": {
-                    "type": "string"
-                },
-                "socket_designation": {
-                    "type": "string"
-                },
-                "stepping": {
-                    "type": "string"
-                },
-                "virtualization_firmware_enabled": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "github_com_nougght_monitoring-system_server_internal_model_agent.DiskSpecs": {
+        "DiskSpecs": {
             "type": "object",
             "properties": {
                 "device": {
                     "type": "string"
                 },
-                "fs_type": {
+                "fsType": {
                     "type": "string"
                 },
                 "total": {
@@ -391,36 +391,36 @@
                 }
             }
         },
-        "github_com_nougght_monitoring-system_server_internal_model_agent.HostSpecs": {
+        "HostSpecs": {
             "type": "object",
             "properties": {
                 "hostname": {
                     "type": "string"
                 },
+                "kernelVersion": {
+                    "type": "string"
+                },
                 "os": {
                     "type": "string"
                 },
-                "os_arch": {
+                "osArch": {
                     "type": "string"
                 },
-                "os_kernel_version": {
+                "osType": {
                     "type": "string"
                 },
-                "os_type": {
-                    "type": "string"
-                },
-                "os_version": {
+                "osVersion": {
                     "type": "string"
                 }
             }
         },
-        "github_com_nougght_monitoring-system_server_internal_model_agent.MemorySpecs": {
+        "MemorySpecs": {
             "type": "object",
             "properties": {
-                "physical_memory": {
+                "physicalMemoryInfo": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.PhysicalMemoryInfo"
+                        "$ref": "#/definitions/PhysicalMemoryInfo"
                     }
                 },
                 "total": {
@@ -428,34 +428,34 @@
                 }
             }
         },
-        "github_com_nougght_monitoring-system_server_internal_model_agent.PhysicalMemoryInfo": {
+        "PhysicalMemoryInfo": {
             "type": "object",
             "properties": {
-                "bank_label": {
+                "bankLabel": {
                     "type": "string"
                 },
                 "capacity": {
                     "type": "integer"
                 },
-                "configured_clock_speed": {
+                "configuredClockSpeed": {
                     "type": "integer"
                 },
-                "device_locator": {
+                "deviceLocator": {
                     "type": "string"
                 },
                 "form_factor": {
                     "type": "string"
                 },
-                "hot_swappable": {
+                "hotSwappable": {
                     "type": "boolean"
                 },
                 "manufacturer": {
                     "type": "string"
                 },
-                "memory_type": {
+                "memoryType": {
                     "type": "string"
                 },
-                "model_name": {
+                "modelName": {
                     "type": "string"
                 },
                 "removable": {
@@ -464,7 +464,7 @@
                 "replaceable": {
                     "type": "boolean"
                 },
-                "serial_number": {
+                "serialNumber": {
                     "type": "string"
                 },
                 "speed": {

@@ -3,12 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getAllAgents as getAllAgents } from '../api/client/monitoringServerAPI';
 import { convertAgentFromDTO } from '../api/mapper';
 import type { Agent } from '../domain/agent';
-
-
-interface Error {
-    status: number
-    message: string
-}
+import type {Error} from './common'
 
 interface UseAgentsResult {
     agents: Agent[] | undefined

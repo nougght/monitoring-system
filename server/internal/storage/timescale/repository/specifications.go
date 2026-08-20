@@ -31,11 +31,21 @@ func (r *SpecsRepository) db(ctx context.Context) DB {
 
 func (r *SpecsRepository) CreateOrUpdateSpecs(ctx context.Context, specs *agent_model.Specs) (*agent_model.Specs, error) {
 	query := `
-	INSERT INTO agent_specs (agent_id, hostname, os_type, os, os_arch, cpu_cores_count, memory_total, full_specs) 
+	INSERT INTO agent_specs (agent_id, hostname, os_type, os, os_arch, cpu_cores_count, memory_total, full_specs, updated_at) 
 	VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
-	RETURNING updated_at
+	ON CONFLICT (agent_id) 
+	DO UPDATE SET 
+		agent_id = EXCLUDED.agent_id,
+		hostname = EXCLUDED.hostname,
+		os_type = EXCLUDED.os_type,
+		os = EXCLUDED.os,
+		os_arch = EXCLUDED.os_arch,
+		cpu_cores_count = EXCLUDED.cpu_cores_count,
+		memory_total = EXCLUDED.memory_total,
+		full_specs = EXCLUDED.full_specs,
+		updated_at = EXCLUDED.updated_at;
 	`
-	err := r.db(ctx).QueryRow(ctx, query,
+	_, err := r.db(ctx).Exec(ctx, query,
 		specs.AgentID,
 		specs.HostSpecs.Hostname,
 		specs.HostSpecs.OSType,
@@ -45,7 +55,7 @@ func (r *SpecsRepository) CreateOrUpdateSpecs(ctx context.Context, specs *agent_
 		specs.MemorySpecs.Total,
 		specs,
 		time.Now().UTC(),
-	).Scan(&specs.UpdatedAt)
+	)
 
 	if err != nil {
 		return nil, fmt.Errorf("insert failed: %w", err)
@@ -64,7 +74,7 @@ func (r *SpecsRepository) GetCurrentSpecs(ctx context.Context, agentID uuid.UUID
 	}
 	defer rows.Close()
 	if !rows.Next() {
-		return nil, fmt.Errorf("no rows returned")
+		return nil, fmt.Errorf("no rows returned: %w", ErrNotFound)
 	}
 
 	specs = &agent_model.Specs{}

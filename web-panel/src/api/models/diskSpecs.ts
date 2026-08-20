@@ -5,6 +5,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface GithubComNougghtMonitoringSystemServerInternalTransportDtoTypesAgentConfigBody {
-  enrollmentKey?: string;
+export interface DiskSpecs {
+  device?: string;
+  fsType?: string;
+  total?: number;
 }

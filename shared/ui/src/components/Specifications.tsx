@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { getSpecs } from "../api/client/monitoringAgentAPI";
+import { getSpecs } from "../../../../agent-ui/src/api/client/monitoringAgentAPI";
 import type { Specs } from "../domain/specs";
-import { convertBytesToGB } from "../util/units";
+import { convertBytesToGB } from "../../../../agent-ui/src/util/units";
 
 interface SpecificationsProps {
     specs: Specs
