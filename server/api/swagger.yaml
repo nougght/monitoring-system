@@ -31,6 +31,23 @@ definitions:
       serverAddress:
         type: string
     type: object
+  AgentSpecs:
+    properties:
+      agentId:
+        type: string
+      cpuSpecs:
+        $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.CpuSpecs'
+      diskSpecs:
+        items:
+          $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.DiskSpecs'
+        type: array
+      hostSpecs:
+        $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.HostSpecs'
+      memorySpecs:
+        $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.MemorySpecs'
+      updatedAt:
+        type: string
+    type: object
   CreateAgentBody:
     properties:
       description:
@@ -58,6 +75,103 @@ definitions:
         type: string
       status:
         type: string
+    type: object
+  github_com_nougght_monitoring-system_server_internal_model_agent.CpuSpecs:
+    properties:
+      architecture:
+        type: string
+      availability:
+        type: string
+      current_clock_speed:
+        type: integer
+      data_width:
+        type: integer
+      l2_cache_size:
+        type: integer
+      l3_cache_size:
+        type: integer
+      manufacturer:
+        type: string
+      max_clock_speed:
+        type: integer
+      model_name:
+        type: string
+      number_of_cores:
+        type: integer
+      number_of_enabled_cores:
+        type: integer
+      number_of_logical_processors:
+        type: integer
+      processor_id:
+        type: string
+      socket_designation:
+        type: string
+      stepping:
+        type: string
+      virtualization_firmware_enabled:
+        type: boolean
+    type: object
+  github_com_nougght_monitoring-system_server_internal_model_agent.DiskSpecs:
+    properties:
+      device:
+        type: string
+      fs_type:
+        type: string
+      total:
+        type: integer
+    type: object
+  github_com_nougght_monitoring-system_server_internal_model_agent.HostSpecs:
+    properties:
+      hostname:
+        type: string
+      os:
+        type: string
+      os_arch:
+        type: string
+      os_kernel_version:
+        type: string
+      os_type:
+        type: string
+      os_version:
+        type: string
+    type: object
+  github_com_nougght_monitoring-system_server_internal_model_agent.MemorySpecs:
+    properties:
+      physical_memory:
+        items:
+          $ref: '#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.PhysicalMemoryInfo'
+        type: array
+      total:
+        type: integer
+    type: object
+  github_com_nougght_monitoring-system_server_internal_model_agent.PhysicalMemoryInfo:
+    properties:
+      bank_label:
+        type: string
+      capacity:
+        type: integer
+      configured_clock_speed:
+        type: integer
+      device_locator:
+        type: string
+      form_factor:
+        type: string
+      hot_swappable:
+        type: boolean
+      manufacturer:
+        type: string
+      memory_type:
+        type: string
+      model_name:
+        type: string
+      removable:
+        type: boolean
+      replaceable:
+        type: boolean
+      serial_number:
+        type: string
+      speed:
+        type: integer
     type: object
 host: localhost:8091
 info:
@@ -167,4 +281,36 @@ paths:
             additionalProperties: true
             type: object
       summary: Download agent setup config
+  /agents/{agentID}/specifications:
+    get:
+      operationId: getAgentSpecs
+      parameters:
+      - description: Agent ID
+        in: path
+        name: agentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AgentSpecs'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get agent specifications
 swagger: "2.0"

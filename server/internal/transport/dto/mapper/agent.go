@@ -53,3 +53,18 @@ func AgentConfigToDTO(domain *agent_model.AgentSetupConfig) (res *dto.AgentConfi
 	}
 	return
 }
+
+func SpecsToDTO(domain *agent_model.Specs) (res *dto.SpecsDTO) {
+	if domain == nil {
+		return nil
+	}
+
+	return &dto.SpecsDTO{
+		AgentID:     domain.AgentID,
+		UpdatedAt:   domain.UpdatedAt,
+		HostSpecs:   domain.HostSpecs,
+		CpuSpecs:    domain.CpuSpecs,
+		MemorySpecs: domain.MemorySpecs,
+		DiskSpecs:   domain.DiskSpecs,
+	}
+}

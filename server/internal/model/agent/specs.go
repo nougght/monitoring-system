@@ -7,7 +7,7 @@ import (
 )
 
 type Specs struct {
-	AgentID     uuid.UUID    `json:"-"`
+	AgentID     uuid.UUID    `json:"-" db:"agent_id"`
 	UpdatedAt   time.Time    `json:"-" db:"updated_at"`
 	HostSpecs   HostSpecs    `json:"host_specs"`
 	CpuSpecs    CpuSpecs     `json:"cpu_specs"`

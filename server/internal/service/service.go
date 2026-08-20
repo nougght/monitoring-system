@@ -40,6 +40,9 @@ func New(opts ServicesOptions) *Services {
 		opts.Config,
 		agentRegistry,
 	)
+	if err != nil {
+		log.Panicf("failed initialize agent interaction service: %s", err.Error())
+	}
 	return &Services{
 		agentRegistry: agentRegistry,
 		agent:         agentInteraction,

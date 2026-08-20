@@ -43,6 +43,9 @@ func NewCore(setupCfg *config.SetupConfig, certStore model.CertStore) (*CoreServ
 		return nil, err
 	}
 	ca, err := certStore.LoadCA()
+	if err != nil {
+		return nil, err
+	}
 
 	agentID, err := getAgentIDFromCert(*cert)
 	if err != nil {

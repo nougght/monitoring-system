@@ -37,6 +37,7 @@ func (h *AgentHandler) RegisterRoutes(r *gin.RouterGroup) {
 	group.POST("", h.CreateAgent)
 	group.GET("", h.GetAllAgents)
 	group.POST("/:agentID/setupconfig", h.DownloadAgentConfig)
+	group.GET("/:agentID/specifications", h.GetAgentSpecs)
 }
 
 // CreateAgent godoc
@@ -115,4 +116,29 @@ func (h *AgentHandler) GetAllAgents(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, util.Map(res, mapper.AgentToDTO))
+}
+
+// GetAllAgents godoc
+// @Id getAgentSpecs
+// @Summary Get agent specifications
+// @Produce json
+// @Param agentID path string true "Agent ID"
+// @Success 200 {object} dto.SpecsDTO
+// @Failure      400  {object}  map[string]any
+// @Failure      404  {object}  map[string]any
+// @Failure      500  {object}  map[string]any
+// @Router /agents/{agentID}/specifications [get]
+func (h *AgentHandler) GetAgentSpecs(c *gin.Context) {
+	agentID, err := uuid.Parse(c.Param("agentID"))
+	if err != nil {
+		handleError(c, fmt.Errorf("invalid 'agentID' path parameter: %w", model.ErrBadRequest))
+		return
+	}
+	res, err := h.agentRegistryService.GetSpecifications(c.Request.Context(), agentID)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, mapper.SpecsToDTO(res))
 }

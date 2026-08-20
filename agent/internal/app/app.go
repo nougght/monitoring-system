@@ -32,7 +32,7 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 
 	service, err := service.GetServices(setupConfig, cfg)
 	if err != nil {
-		return fmt.Errorf("failed to setup services: ", err)
+		return fmt.Errorf("failed to setup services: %w", err)
 	}
 	service.StartServices(rootCtx)
 
@@ -105,7 +105,7 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 
 	err = <-shutdownChan
 	if err != nil {
-		return fmt.Errorf("http server shutdown error: ", err)
+		return fmt.Errorf("http server shutdown error: %w", err)
 	}
 	log.Println("http server stopped")
 	return nil

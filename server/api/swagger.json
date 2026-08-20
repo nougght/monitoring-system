@@ -157,6 +157,53 @@
                     }
                 }
             }
+        },
+        "/agents/{agentID}/specifications": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get agent specifications",
+                "operationId": "getAgentSpecs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent ID",
+                        "name": "agentID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AgentSpecs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -208,6 +255,32 @@
                 }
             }
         },
+        "AgentSpecs": {
+            "type": "object",
+            "properties": {
+                "agentId": {
+                    "type": "string"
+                },
+                "cpuSpecs": {
+                    "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.CpuSpecs"
+                },
+                "diskSpecs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.DiskSpecs"
+                    }
+                },
+                "hostSpecs": {
+                    "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.HostSpecs"
+                },
+                "memorySpecs": {
+                    "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.MemorySpecs"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "CreateAgentBody": {
             "type": "object",
             "required": [
@@ -248,6 +321,154 @@
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_nougght_monitoring-system_server_internal_model_agent.CpuSpecs": {
+            "type": "object",
+            "properties": {
+                "architecture": {
+                    "type": "string"
+                },
+                "availability": {
+                    "type": "string"
+                },
+                "current_clock_speed": {
+                    "type": "integer"
+                },
+                "data_width": {
+                    "type": "integer"
+                },
+                "l2_cache_size": {
+                    "type": "integer"
+                },
+                "l3_cache_size": {
+                    "type": "integer"
+                },
+                "manufacturer": {
+                    "type": "string"
+                },
+                "max_clock_speed": {
+                    "type": "integer"
+                },
+                "model_name": {
+                    "type": "string"
+                },
+                "number_of_cores": {
+                    "type": "integer"
+                },
+                "number_of_enabled_cores": {
+                    "type": "integer"
+                },
+                "number_of_logical_processors": {
+                    "type": "integer"
+                },
+                "processor_id": {
+                    "type": "string"
+                },
+                "socket_designation": {
+                    "type": "string"
+                },
+                "stepping": {
+                    "type": "string"
+                },
+                "virtualization_firmware_enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_nougght_monitoring-system_server_internal_model_agent.DiskSpecs": {
+            "type": "object",
+            "properties": {
+                "device": {
+                    "type": "string"
+                },
+                "fs_type": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_nougght_monitoring-system_server_internal_model_agent.HostSpecs": {
+            "type": "object",
+            "properties": {
+                "hostname": {
+                    "type": "string"
+                },
+                "os": {
+                    "type": "string"
+                },
+                "os_arch": {
+                    "type": "string"
+                },
+                "os_kernel_version": {
+                    "type": "string"
+                },
+                "os_type": {
+                    "type": "string"
+                },
+                "os_version": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_nougght_monitoring-system_server_internal_model_agent.MemorySpecs": {
+            "type": "object",
+            "properties": {
+                "physical_memory": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_nougght_monitoring-system_server_internal_model_agent.PhysicalMemoryInfo"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_nougght_monitoring-system_server_internal_model_agent.PhysicalMemoryInfo": {
+            "type": "object",
+            "properties": {
+                "bank_label": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "configured_clock_speed": {
+                    "type": "integer"
+                },
+                "device_locator": {
+                    "type": "string"
+                },
+                "form_factor": {
+                    "type": "string"
+                },
+                "hot_swappable": {
+                    "type": "boolean"
+                },
+                "manufacturer": {
+                    "type": "string"
+                },
+                "memory_type": {
+                    "type": "string"
+                },
+                "model_name": {
+                    "type": "string"
+                },
+                "removable": {
+                    "type": "boolean"
+                },
+                "replaceable": {
+                    "type": "boolean"
+                },
+                "serial_number": {
+                    "type": "string"
+                },
+                "speed": {
+                    "type": "integer"
                 }
             }
         }

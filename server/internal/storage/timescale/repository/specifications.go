@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/nougght/monitoring-system/server/internal/model"
@@ -30,7 +31,7 @@ func (r *SpecsRepository) db(ctx context.Context) DB {
 
 func (r *SpecsRepository) CreateOrUpdateSpecs(ctx context.Context, specs *agent_model.Specs) (*agent_model.Specs, error) {
 	query := `
-	INSERT INTO agent_specs (agent_id, hostname, os_type, os, os_arch, cpu_cores_count, memory_total, full_specs, updated_at) 
+	INSERT INTO agent_specs (agent_id, hostname, os_type, os, os_arch, cpu_cores_count, memory_total, full_specs) 
 	VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	RETURNING updated_at
 	`
@@ -43,7 +44,8 @@ func (r *SpecsRepository) CreateOrUpdateSpecs(ctx context.Context, specs *agent_
 		specs.CpuSpecs.NumberOfCores,
 		specs.MemorySpecs.Total,
 		specs,
-		specs.UpdatedAt).Scan(&specs.UpdatedAt)
+		time.Now().UTC(),
+	).Scan(&specs.UpdatedAt)
 
 	if err != nil {
 		return nil, fmt.Errorf("insert failed: %w", err)
@@ -54,19 +56,23 @@ func (r *SpecsRepository) CreateOrUpdateSpecs(ctx context.Context, specs *agent_
 
 func (r *SpecsRepository) GetCurrentSpecs(ctx context.Context, agentID uuid.UUID) (specs *agent_model.Specs, err error) {
 	query := `
-		SELECT agent_id, full_specs, updated_at FROM agent_specs WHERE agent_id = $1;
+		SELECT full_specs, agent_id, updated_at FROM agent_specs WHERE agent_id = $1;
 		`
-	rows, err := r.db(ctx).Query(ctx, query)
+	rows, err := r.db(ctx).Query(ctx, query, agentID)
 	if err != nil {
 		return nil, fmt.Errorf("select failed: %w", err)
 	}
 	defer rows.Close()
+	if !rows.Next() {
+		return nil, fmt.Errorf("no rows returned")
+	}
 
 	specs = &agent_model.Specs{}
-	err = rows.Scan(&specs.AgentID, &specs, &specs.UpdatedAt)
+	err = rows.Scan(specs, &specs.AgentID, &specs.UpdatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("scan failed: %w", err)
 	}
+	fmt.Printf("row scanned: %#v", specs)
 
 	return specs, nil
 }
