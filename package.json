@@ -14,7 +14,7 @@
     "dev:agent-ui": "npm run dev --workspace=agent-ui",
     "rmp": "npm run dev --workspace=.temp/rm"
   },
-  "dependencies": {
-    "react-router-dom": "^7.18.2"
+  "devDependencies": {
+    "@types/react": "^19.2.17"
   }
 }
