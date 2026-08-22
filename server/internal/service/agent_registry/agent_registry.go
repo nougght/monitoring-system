@@ -83,6 +83,7 @@ func (s *AgentRegistryService) RemoveSession(agentID uuid.UUID) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.sessions, agentID)
+	log.Printf("session removed: %s", agentID)
 }
 
 func (s *AgentRegistryService) OnlineList() []uuid.UUID {
@@ -274,6 +275,18 @@ func (s *AgentRegistryService) issueCertificate(agentID uuid.UUID, pubKey any, n
 	return x509.ParseCertificate(derBytes)
 }
 
+func (s *AgentRegistryService) GetAgentByID(ctx context.Context, id uuid.UUID) (*agent_model.Agent, error) {
+	agent, err := s.agentRepo.GetAgentByID(ctx, id)
+	if errors.Is(err, repository.ErrNotFound) {
+		return nil, model.ErrNotFound
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to get agent by ID: %w", err)
+	}
+
+	agent.IsOnline = utilShared.Ptr(s.IsOnline(agent.ID))
+	return agent, nil
+}
 func (s *AgentRegistryService) GetAllAgents(ctx context.Context) ([]*agent_model.Agent, error) {
 	agents, err := s.agentRepo.GetAllAgents(ctx)
 	if err != nil {

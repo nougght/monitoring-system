@@ -65,17 +65,6 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 		Handler: r.Handler(),
 	}
 
-	shutdownChan := make(chan error)
-	go func() {
-		defer close(shutdownChan)
-		<-rootCtx.Done()
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		err := server.Shutdown(ctx)
-		service.StopServices()
-		shutdownChan <- err
-	}()
-
 	grpcTLS := service.GetCoreService().TLSConfigForGRPC()
 	grpcClient, err := grpc.NewClient(setupConfig.ServerAddress,
 		grpc.WithTransportCredentials(credentials.NewTLS(grpcTLS)),
@@ -90,11 +79,34 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 		service.GetMetricsService(),
 	)
 
-	err = grpcAgentClient.Connect(rootCtx)
-	// TODO: add retrying
-	if err != nil {
-		log.Println("failed to connect to grpc server: ", err)
-	}
+	grpcCtx, cancel := context.WithCancel(rootCtx)
+	defer cancel()
+
+	go func() {
+		err = grpcAgentClient.Connect(grpcCtx)
+		// TODO: add retrying
+		if err != nil {
+			log.Println("failed to connect to grpc server: ", err)
+		}
+		cancel()
+	}()
+	go func() {
+		err = grpcAgentClient.StartStreamMJPEG(grpcCtx)
+		if err != nil {
+			log.Println("failed to connect to grpc streaming: ", err)
+		}
+	}()
+
+	shutdownChan := make(chan error)
+	go func() {
+		defer close(shutdownChan)
+		<-rootCtx.Done()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		err := server.Shutdown(ctx)
+		service.StopServices()
+		shutdownChan <- err
+	}()
 
 	log.Println("http server started on :8111")
 	err = server.ListenAndServe()

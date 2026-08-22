@@ -2,6 +2,7 @@ package rest
 
 import (
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,13 +18,17 @@ func handleError(c *gin.Context, err error) {
 		responseCode = http.StatusBadRequest
 	case errors.Is(err, model.ErrNotFound):
 		responseCode = http.StatusNotFound
+	case errors.Is(err, model.ErrServiceUnavailable):
+		responseCode = http.StatusServiceUnavailable
 	}
 
+	log.Println(err)
 	c.JSON(responseCode, gin.H{"error": err.Error()})
 }
 
 type Handlers struct {
-	agentHandler *AgentHandler
+	agentHandler  *AgentHandler
+	streamHandler *StreamHandler
 }
 
 func newHandlers(services *service.Services) *Handlers {
@@ -32,11 +37,21 @@ func newHandlers(services *service.Services) *Handlers {
 		services.AgentInteractionService(),
 	)
 
+	stream := newStreamHandler(
+		services.AgentRegistry(),
+		services.AgentInteractionService(),
+	)
+
 	return &Handlers{
-		agentHandler: agent,
+		agentHandler:  agent,
+		streamHandler: stream,
 	}
 }
 
 func (h *Handlers) AgentHandler() *AgentHandler {
 	return h.agentHandler
+}
+
+func (h *Handlers) StreamHandler() *StreamHandler {
+	return h.streamHandler
 }

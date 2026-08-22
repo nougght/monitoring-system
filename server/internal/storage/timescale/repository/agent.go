@@ -68,6 +68,26 @@ func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent_model.
 	return res, nil
 }
 
+func (r *AgentRepository) GetAgentByID(ctx context.Context, id uuid.UUID) (res *agent_model.Agent, err error) {
+	query := `
+		SELECT * FROM agents WHERE agents.id = $1;
+		`
+	rows, err := r.db(ctx).Query(ctx, query, id)
+	if err != nil {
+		return nil, fmt.Errorf("select failed: %w", err)
+	}
+	defer rows.Close()
+
+	res, err = pgx.CollectOneRow(rows, pgx.RowToAddrOfStructByName[agent_model.Agent])
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = ErrNotFound
+	}
+	if err != nil {
+		return nil, fmt.Errorf("collect row failed: %w", err)
+	}
+
+	return res, nil
+}
 func (r *AgentRepository) UpdateStatus(ctx context.Context, agentID uuid.UUID, status agent_model.AgentStatus) error {
 	query := `
 	UPDATE agents SET status = $1 WHERE ID = $2

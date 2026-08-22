@@ -70,7 +70,7 @@ func New(ctx context.Context, cfg *config.Config) *App {
 	if err != nil {
 		log.Println("failed to connect to database, retry after 500ms")
 		select {
-		case <-time.After(time.Microsecond * 500):
+		case <-time.After(time.Microsecond * 1000):
 			db, err = timescale.ConnectToDB(ctx, cfg.Postgres)
 			if err != nil {
 				log.Panicf("failed to connect to database: %s", err.Error())
@@ -94,6 +94,7 @@ func New(ctx context.Context, cfg *config.Config) *App {
 	httpServer := rest.NewServer(cfg, *services)
 
 	agentServer := grpc.NewServer(
+		grpc.ConnectionTimeout(5*time.Second),
 		grpc.StreamInterceptor(agent_grpc.BidirectionalServerInterceptor),
 		grpc.Creds(
 			credentials.NewTLS(&tls.Config{Certificates: []tls.Certificate{*cert},
@@ -119,7 +120,7 @@ func New(ctx context.Context, cfg *config.Config) *App {
 	enrollmentService := enrollment_grpc.NewEnrollmentService(services.AgentInteractionService())
 	enrollmentService.Register(enrollmentServer)
 
-	return &App{
+	app := &App{
 		Config:               cfg,
 		DB:                   db,
 		Repositories:         repository.New(db),
@@ -131,6 +132,13 @@ func New(ctx context.Context, cfg *config.Config) *App {
 		key:                  intKey,
 		rootCA:               rootCA,
 	}
+
+	go func() {
+		<-ctx.Done()
+		log.Println("broadcast shutdown")
+		agentService.BroadcastShutdown()
+	}()
+	return app
 }
 
 func (a *App) Run(ctx context.Context) error {
@@ -173,17 +181,27 @@ func (a *App) Run(ctx context.Context) error {
 		log.Fatalf("failed to serve gRPC enrollment server: %v", err)
 	case err := <-httpErrChan:
 		log.Fatalf("failed to serve HTTP: %v", err)
+	case <-ctx.Done():
+		log.Println("root ctx done start shutdown")
 	}
 
-	<-ctx.Done()
+	// go func() {
+	// 	time.Sleep(5 * time.Second)
+	// 	buf := make([]byte, 1<<20)
+	// 	n := runtime.Stack(buf, true)
+	// 	log.Printf("=== goroutines ===\n%s", buf[:n])
+	// }()
+
+	log.Println("start agent grpc stop")
+	a.AgentGRPCServer.GracefulStop()
+	log.Println("start enrollment grpc stop")
+	a.EnrollmentGRPCServer.GracefulStop()
+	log.Println("start http shutdwon")
 	shutdownCtx, cancel := context.WithTimeout(
 		context.Background(),
 		10*time.Second,
 	)
 	defer cancel()
-
-	a.AgentGRPCServer.GracefulStop()
-	a.EnrollmentGRPCServer.GracefulStop()
 	err = a.HTTPServer.Shutdown(shutdownCtx)
 	if err != nil && err != http.ErrServerClosed {
 		log.Fatalf("failed to shutdown HTTP server: %v", err)
