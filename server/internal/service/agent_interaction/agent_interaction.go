@@ -115,11 +115,11 @@ func (s *AgentInteractionService) HandleFrame(frame []byte, agentID uuid.UUID) {
 	defer s.mu.Unlock()
 	subs, ok := s.viewerChans[agentID]
 	if !ok {
-		log.Printf("no subs for agent: %s", agentID.String())
+		// log.Printf("no subs for agent: %s", agentID.String())
 		return
 	}
 	if len(subs) == 0 {
-		log.Println("not found stream subs")
+		// log.Println("not found stream subs")
 	}
 	for _, ch := range subs {
 		select {

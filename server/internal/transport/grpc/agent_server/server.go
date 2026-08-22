@@ -24,12 +24,11 @@ type AgentService struct {
 
 	agentInteractionService *agent.AgentInteractionService
 
-	messagesByAgentID map[uuid.UUID]*messages
-	mu                sync.RWMutex
-	wg                sync.WaitGroup
+	connByAgentID map[uuid.UUID]*conn
+	mu            sync.RWMutex
 }
 
-type messages struct {
+type conn struct {
 	toSend          chan *pb.ServerMessage
 	pendingCommands map[string]chan *pb.CommandResult
 	mu              sync.Mutex
@@ -38,13 +37,27 @@ type messages struct {
 func NewAgentService(interactionService *agent.AgentInteractionService) *AgentService {
 	return &AgentService{
 		agentInteractionService: interactionService,
-		messagesByAgentID:       make(map[uuid.UUID]*messages, 10),
-		wg:                      sync.WaitGroup{},
+		connByAgentID:           make(map[uuid.UUID]*conn, 10),
 	}
 }
 
 func (s *AgentService) Register(server *grpc.Server) {
 	pb.RegisterAgentServiceServer(server, s)
+}
+
+func (s *AgentService) BroadcastShutdown() {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for _, c := range s.connByAgentID {
+		select {
+		case c.toSend <- &pb.ServerMessage{
+			Payload: &pb.ServerMessage_Status{
+				Status: &pb.HandshakeStatus{Connected: false},
+			},
+		}:
+		default:
+		}
+	}
 }
 
 func (s *AgentService) StartStreamMJPEG(stream pb.AgentService_StartStreamMJPEGServer) error {
@@ -61,16 +74,27 @@ func (s *AgentService) StartStreamMJPEG(stream pb.AgentService_StartStreamMJPEGS
 			return status.Errorf(codes.Unauthenticated, "invalid agent ID: %s", err.Error())
 		}
 	}
+	if _, ok := s.connByAgentID[idFromTLS]; !ok {
+		log.Println("client with agentID is not connected to main stream")
+		return status.Errorf(codes.Unauthenticated, "agent is not connected")
+	}
+	log.Println("run streaming reader")
 	log.Printf("id: %s", idFromTLS.String())
-	err = s.runStreamingReader(stream, idFromTLS)
-	s.wg.Wait()
+	wg := sync.WaitGroup{}
+	err = s.runStreamingReader(stream, &wg, idFromTLS)
+	wg.Wait()
+
+	log.Println("streaming grpc finished")
 	return err
 }
 
-func (s *AgentService) runStreamingReader(stream pb.AgentService_StartStreamMJPEGServer, agentID uuid.UUID) error {
-	s.wg.Add(1)
+func (s *AgentService) runStreamingReader(stream pb.AgentService_StartStreamMJPEGServer, wg *sync.WaitGroup, agentID uuid.UUID) error {
+
+	wg.Add(1)
 	go func() {
-		defer s.wg.Done()
+		defer func() {
+			wg.Done()
+		}()
 		for {
 			msg, err := stream.Recv()
 			if err != nil {
@@ -132,56 +156,68 @@ func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 		return status.Error(codes.Unauthenticated, "agent ID mismatch")
 	}
 
-	messages := &messages{
+	conn := &conn{
 		toSend:          make(chan *pb.ServerMessage, 100),
 		pendingCommands: make(map[string]chan *pb.CommandResult),
 	}
 
 	s.mu.Lock()
-	s.messagesByAgentID[idFromTLS] = messages
+	s.connByAgentID[idFromTLS] = conn
 	s.mu.Unlock()
+
+	err = stream.Send(
+		&pb.ServerMessage{
+			Payload: &pb.ServerMessage_Status{
+				Status: &pb.HandshakeStatus{
+					Connected: true,
+				},
+			},
+		},
+	)
 
 	defer func() {
 		s.mu.Lock()
-		delete(s.messagesByAgentID, idFromTLS)
-		for _, c := range messages.pendingCommands {
+		delete(s.connByAgentID, idFromTLS)
+		for _, c := range conn.pendingCommands {
 			close(c)
 		}
 		s.mu.Unlock()
 	}()
 
+	wg := sync.WaitGroup{}
 	ctx, cancel := context.WithCancel(stream.Context())
 	s.runReader(
 		stream,
+		&wg,
 		idFromTLS,
-		func() {
-			cancel()
-		},
+		cancel,
 	)
-	s.runWriter(ctx, messages.toSend, stream)
+	s.runWriter(ctx, &wg, idFromTLS, conn.toSend, stream)
 
 	s.agentInteractionService.HandleConnection(idFromTLS)
 
-	s.wg.Wait()
-
+	wg.Wait()
+	log.Println("main grpc finished")
 	s.agentInteractionService.HandleDisconnection(idFromTLS)
 
 	return nil
 }
 
-func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, agentID uuid.UUID, onClose func()) {
-	s.wg.Add(1)
+func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, wg *sync.WaitGroup, agentID uuid.UUID, onClose func()) {
+	wg.Add(1)
 	go func() {
-		defer s.wg.Done()
+		defer func() {
+			wg.Done()
+		}()
 		for {
 			msg, err := stream.Recv()
 			if err != nil {
+				onClose()
 				if errors.Is(err, io.EOF) {
 					log.Println("grpc client disconnected")
 					return
 				}
 				log.Println("error receiving message from grpc client:", err)
-				onClose()
 				return
 			}
 
@@ -206,10 +242,12 @@ func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, agentID u
 	}()
 }
 
-func (s *AgentService) runWriter(ctx context.Context, toSend chan *pb.ServerMessage, stream pb.AgentService_ConnectServer) {
-	s.wg.Add(1)
+func (s *AgentService) runWriter(ctx context.Context, wg *sync.WaitGroup, agentID uuid.UUID, toSend chan *pb.ServerMessage, stream pb.AgentService_ConnectServer) {
+	wg.Add(1)
 	go func() {
-		defer s.wg.Done()
+		defer func() {
+			wg.Done()
+		}()
 		for {
 			select {
 			case msg := <-toSend:
@@ -235,7 +273,7 @@ func (s *AgentService) sendCommandWithTimeout(ctx context.Context, agentID uuid.
 
 func (s *AgentService) sendCommand(ctx context.Context, agentID uuid.UUID, command *pb.Command) (*pb.CommandResult, error) {
 	s.mu.RLock()
-	commands := s.messagesByAgentID[agentID]
+	commands := s.connByAgentID[agentID]
 	s.mu.RUnlock()
 
 	// add chan to pending map to receive result
@@ -274,7 +312,7 @@ func (s *AgentService) sendCommand(ctx context.Context, agentID uuid.UUID, comma
 
 func (s *AgentService) handleCommandResult(agentID uuid.UUID, result *pb.CommandResult) {
 	s.mu.Lock()
-	agentCommands := s.messagesByAgentID[agentID]
+	agentCommands := s.connByAgentID[agentID]
 	s.mu.Unlock()
 
 	agentCommands.mu.Lock()

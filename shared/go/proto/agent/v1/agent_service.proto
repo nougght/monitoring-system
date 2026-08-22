@@ -48,6 +48,7 @@ message AgentMessage {
 message ServerMessage {
   oneof payload {
     Command command = 1;
+    HandshakeStatus status = 2;
     // PollingConfig config_update = 2;
     // Ack ack = 3;
   }
@@ -58,6 +59,9 @@ message Handshake {
   // string agent_mode = 2;
 }
 
+message HandshakeStatus {
+  bool connected = 1;
+}
 // message Metrics {
 //     CpuPercentMetric cpu_percent = 1;
 //     FocusedWindowMetric focused_window = 2;
