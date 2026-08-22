@@ -9,8 +9,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/nougght/monitoring-system/server/internal/config"
 	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
-	"github.com/nougght/monitoring-system/server/internal/model/metrics"
+	metrics_model "github.com/nougght/monitoring-system/server/internal/model/metrics"
 	agentregistry "github.com/nougght/monitoring-system/server/internal/service/agent_registry"
+	"github.com/nougght/monitoring-system/server/internal/service/metrics"
 )
 
 // TEMP: replace with single SendCommand method
@@ -21,6 +22,7 @@ type Requester interface {
 type AgentInteractionService struct {
 	cfg       *config.Config
 	registry  *agentregistry.AgentRegistryService
+	metrics   *metrics.MetricsService
 	requester Requester
 
 	// lastFrames  map[uuid.UUID][]byte
@@ -77,8 +79,8 @@ func (s *AgentInteractionService) HandleSpecifications(ctx context.Context, agen
 	return s.registry.UpdateSpecifications(ctx, agentID, specifications)
 }
 
-func (s *AgentInteractionService) HandleMetricsBatch(ctx context.Context, batch *metrics.MetricsBatch) {
-
+func (s *AgentInteractionService) HandleMetricsBatch(ctx context.Context, batch *metrics_model.MetricsBatch) error {
+	return s.metrics.HandleMetrics(ctx, batch.AgentID, *batch)
 }
 
 func (s *AgentInteractionService) SubStreaming(agentID, viewerID uuid.UUID) (<-chan []byte, error) {

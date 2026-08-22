@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	metrics_model "github.com/nougght/monitoring-system/server/internal/model/metrics"
 	model "github.com/nougght/monitoring-system/server/internal/model/metrics"
 )
 
@@ -19,10 +20,11 @@ func NewSnapshotCache() *SnapshotCache {
 	}
 }
 
-func (s *SnapshotCache) Update(agentID uuid.UUID, snapshot *model.Snapshot) {
+func (s *SnapshotCache) UpdateMetrics(agentID uuid.UUID, batch metrics_model.MetricsBatch) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.cache[agentID] = snapshot
+	snapshot := s.cache[agentID]
+	s.mu.Unlock()
+	snapshot.UpdateMetrics(batch.Metrics)
 }
 
 func (s *SnapshotCache) Get(agentID uuid.UUID) (snapshot *model.Snapshot, ok bool) {

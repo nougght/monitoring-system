@@ -227,9 +227,13 @@ func (s *AgentService) runReader(stream pb.AgentService_ConnectServer, wg *sync.
 				log.Println("Metrics received:")
 				//, metrics)
 				// TODO: check context
-				s.agentInteractionService.HandleMetricsBatch(context.Background(),
+				err = s.agentInteractionService.HandleMetricsBatch(context.Background(),
 					convertMetricsBatchWithAgentIDFromProto(metrics, agentID),
 				)
+				if err != nil {
+					// TODO: add response to agent
+					log.Println(err.Error())
+				}
 
 			case *pb.AgentMessage_CommandResult:
 				commandResult := msg.GetCommandResult()

@@ -3,17 +3,17 @@ package agent_server
 import (
 	"github.com/google/uuid"
 	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
-	"github.com/nougght/monitoring-system/server/internal/model/metrics"
+	metrics_model "github.com/nougght/monitoring-system/server/internal/model/metrics"
 	agentv1 "github.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1"
 	"github.com/nougght/monitoring-system/shared/go/util"
 )
 
-func convertMetricSampleFromProto(p *agentv1.MetricSample) *metrics.MetricSample {
+func convertMetricSampleFromProto(p *agentv1.MetricSample) *metrics_model.MetricSample {
 	if p == nil {
 		return nil
 	}
 
-	return &metrics.MetricSample{
+	return &metrics_model.MetricSample{
 		Kind:      int32(p.Kind),
 		Label:     p.Label,
 		Value:     p.Value,
@@ -21,12 +21,12 @@ func convertMetricSampleFromProto(p *agentv1.MetricSample) *metrics.MetricSample
 	}
 }
 
-func convertMetricsBatchWithAgentIDFromProto(p *agentv1.MetricsBatch, agetnID uuid.UUID) *metrics.MetricsBatch {
+func convertMetricsBatchWithAgentIDFromProto(p *agentv1.MetricsBatch, agetnID uuid.UUID) *metrics_model.MetricsBatch {
 	if p == nil {
 		return nil
 	}
 
-	return &metrics.MetricsBatch{
+	return &metrics_model.MetricsBatch{
 		AgentID: agetnID,
 		ID:      p.BatchId,
 		Metrics: util.Map(p.Samples, convertMetricSampleFromProto),
