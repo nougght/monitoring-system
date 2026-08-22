@@ -3,9 +3,12 @@ package agent_client
 import (
 	"agent/internal/config"
 	"agent/internal/model"
+	"agent/internal/service/streaming"
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"image/jpeg"
 	"io"
 	"log"
 	"time"
@@ -14,6 +17,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TODO: add writer channels
 type MetricsProvider interface {
 	GetMetrics() *model.Metrics
 	GetSpecs(ctx context.Context) (*model.Specs, error)
@@ -127,6 +131,56 @@ func (c *AgentClient) runWriter(stream pb.AgentService_ConnectClient) error {
 				}
 			case <-stream.Context().Done():
 				log.Println("grpc stream closed")
+				return
+			}
+		}
+	}()
+	return nil
+}
+
+func (c *AgentClient) StartStreamMJPEG(ctx context.Context) error {
+	stream, err := c.grpcClient.StartStreamMJPEG(ctx)
+	if err != nil {
+		return err
+	}
+
+	// c.runStreamingReader(stream)
+	err = c.runStreamingWriter(stream, time.Millisecond*60)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	return nil
+}
+
+func (c *AgentClient) runStreamingWriter(stream pb.AgentService_StartStreamMJPEGClient, interval time.Duration) error {
+	ticker := time.NewTicker(interval)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				image, err := streaming.TakeScreenshot()
+				if err != nil {
+					log.Println(err.Error())
+				}
+				var raw bytes.Buffer
+				err = jpeg.Encode(&raw, image, &jpeg.Options{Quality: 60})
+				if err != nil {
+					log.Printf("failed to encode frame: %w", err)
+				}
+				err = stream.Send(&pb.StreamingAgentMessage{
+					Payload: &pb.StreamingAgentMessage_Frame{
+						Frame: &pb.VideoFrame{
+							Data: raw.Bytes(),
+						},
+					},
+				})
+				if err != nil {
+					log.Println("error sending frame:", err)
+					return
+				}
+				log.Println("frame send")
+			case <-stream.Context().Done():
+				log.Println("streaming grpc stream closed")
 				return
 			}
 		}

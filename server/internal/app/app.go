@@ -70,7 +70,7 @@ func New(ctx context.Context, cfg *config.Config) *App {
 	if err != nil {
 		log.Println("failed to connect to database, retry after 500ms")
 		select {
-		case <-time.After(time.Microsecond * 500):
+		case <-time.After(time.Microsecond * 1000):
 			db, err = timescale.ConnectToDB(ctx, cfg.Postgres)
 			if err != nil {
 				log.Panicf("failed to connect to database: %s", err.Error())

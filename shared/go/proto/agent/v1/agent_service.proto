@@ -8,6 +8,7 @@ option go_package = "github.com/nougght/monitoring-system/shared/go/proto/gen/ag
 
 service AgentService {
   rpc Connect(stream AgentMessage) returns (stream ServerMessage);
+  rpc StartStreamMJPEG(stream StreamingAgentMessage) returns (stream StreamingServerMessage );
 }
 
 enum MetricKind {
@@ -203,4 +204,34 @@ message PhysicalMemoryInfo {
   bool   hot_swappable          = 11; // можно менять память без выключения системы
   bool   removable              = 12; // можно ли вынимать память
   bool   replaceable            = 13; // можно ли заменять память
+}
+
+
+
+
+message StreamingAgentMessage {
+    oneof payload {
+        StreamingInfo info = 1;
+        VideoFrame frame = 2;
+    }
+}
+message StreamingInfo {
+
+}
+
+message VideoFrame {
+  bytes  data        = 1;
+  uint32 seq         = 2;
+  int64  captured_at = 3;
+  uint32 display_id  = 4;
+}
+
+message StreamingServerMessage {
+    oneof payload {
+        StreamingSettings settings = 1;
+    }
+}
+
+message StreamingSettings {
+  // TODO
 }

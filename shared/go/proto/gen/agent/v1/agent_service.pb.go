@@ -1370,6 +1370,294 @@ func (x *PhysicalMemoryInfo) GetReplaceable() bool {
 	return false
 }
 
+type StreamingAgentMessage struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*StreamingAgentMessage_Info
+	//	*StreamingAgentMessage_Frame
+	Payload       isStreamingAgentMessage_Payload `protobuf_oneof:"payload"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamingAgentMessage) Reset() {
+	*x = StreamingAgentMessage{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamingAgentMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamingAgentMessage) ProtoMessage() {}
+
+func (x *StreamingAgentMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamingAgentMessage.ProtoReflect.Descriptor instead.
+func (*StreamingAgentMessage) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *StreamingAgentMessage) GetPayload() isStreamingAgentMessage_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *StreamingAgentMessage) GetInfo() *StreamingInfo {
+	if x != nil {
+		if x, ok := x.Payload.(*StreamingAgentMessage_Info); ok {
+			return x.Info
+		}
+	}
+	return nil
+}
+
+func (x *StreamingAgentMessage) GetFrame() *VideoFrame {
+	if x != nil {
+		if x, ok := x.Payload.(*StreamingAgentMessage_Frame); ok {
+			return x.Frame
+		}
+	}
+	return nil
+}
+
+type isStreamingAgentMessage_Payload interface {
+	isStreamingAgentMessage_Payload()
+}
+
+type StreamingAgentMessage_Info struct {
+	Info *StreamingInfo `protobuf:"bytes,1,opt,name=info,proto3,oneof"`
+}
+
+type StreamingAgentMessage_Frame struct {
+	Frame *VideoFrame `protobuf:"bytes,2,opt,name=frame,proto3,oneof"`
+}
+
+func (*StreamingAgentMessage_Info) isStreamingAgentMessage_Payload() {}
+
+func (*StreamingAgentMessage_Frame) isStreamingAgentMessage_Payload() {}
+
+type StreamingInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamingInfo) Reset() {
+	*x = StreamingInfo{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamingInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamingInfo) ProtoMessage() {}
+
+func (x *StreamingInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamingInfo.ProtoReflect.Descriptor instead.
+func (*StreamingInfo) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{19}
+}
+
+type VideoFrame struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []byte                 `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Seq           uint32                 `protobuf:"varint,2,opt,name=seq,proto3" json:"seq,omitempty"`
+	CapturedAt    int64                  `protobuf:"varint,3,opt,name=captured_at,json=capturedAt,proto3" json:"captured_at,omitempty"`
+	DisplayId     uint32                 `protobuf:"varint,4,opt,name=display_id,json=displayId,proto3" json:"display_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VideoFrame) Reset() {
+	*x = VideoFrame{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VideoFrame) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VideoFrame) ProtoMessage() {}
+
+func (x *VideoFrame) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VideoFrame.ProtoReflect.Descriptor instead.
+func (*VideoFrame) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *VideoFrame) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *VideoFrame) GetSeq() uint32 {
+	if x != nil {
+		return x.Seq
+	}
+	return 0
+}
+
+func (x *VideoFrame) GetCapturedAt() int64 {
+	if x != nil {
+		return x.CapturedAt
+	}
+	return 0
+}
+
+func (x *VideoFrame) GetDisplayId() uint32 {
+	if x != nil {
+		return x.DisplayId
+	}
+	return 0
+}
+
+type StreamingServerMessage struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*StreamingServerMessage_Settings
+	Payload       isStreamingServerMessage_Payload `protobuf_oneof:"payload"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamingServerMessage) Reset() {
+	*x = StreamingServerMessage{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamingServerMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamingServerMessage) ProtoMessage() {}
+
+func (x *StreamingServerMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamingServerMessage.ProtoReflect.Descriptor instead.
+func (*StreamingServerMessage) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *StreamingServerMessage) GetPayload() isStreamingServerMessage_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *StreamingServerMessage) GetSettings() *StreamingSettings {
+	if x != nil {
+		if x, ok := x.Payload.(*StreamingServerMessage_Settings); ok {
+			return x.Settings
+		}
+	}
+	return nil
+}
+
+type isStreamingServerMessage_Payload interface {
+	isStreamingServerMessage_Payload()
+}
+
+type StreamingServerMessage_Settings struct {
+	Settings *StreamingSettings `protobuf:"bytes,1,opt,name=settings,proto3,oneof"`
+}
+
+func (*StreamingServerMessage_Settings) isStreamingServerMessage_Payload() {}
+
+type StreamingSettings struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamingSettings) Reset() {
+	*x = StreamingSettings{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamingSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamingSettings) ProtoMessage() {}
+
+func (x *StreamingSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamingSettings.ProtoReflect.Descriptor instead.
+func (*StreamingSettings) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{22}
+}
+
 var File_agent_v1_agent_service_proto protoreflect.FileDescriptor
 
 const file_agent_v1_agent_service_proto_rawDesc = "" +
@@ -1479,7 +1767,24 @@ const file_agent_v1_agent_service_proto_rawDesc = "" +
 	" \x01(\tR\tbankLabel\x12#\n" +
 	"\rhot_swappable\x18\v \x01(\bR\fhotSwappable\x12\x1c\n" +
 	"\tremovable\x18\f \x01(\bR\tremovable\x12 \n" +
-	"\vreplaceable\x18\r \x01(\bR\vreplaceable*y\n" +
+	"\vreplaceable\x18\r \x01(\bR\vreplaceable\"\x95\x01\n" +
+	"\x15StreamingAgentMessage\x128\n" +
+	"\x04info\x18\x01 \x01(\v2\".monitoring.agent.v1.StreamingInfoH\x00R\x04info\x127\n" +
+	"\x05frame\x18\x02 \x01(\v2\x1f.monitoring.agent.v1.VideoFrameH\x00R\x05frameB\t\n" +
+	"\apayload\"\x0f\n" +
+	"\rStreamingInfo\"r\n" +
+	"\n" +
+	"VideoFrame\x12\x12\n" +
+	"\x04data\x18\x01 \x01(\fR\x04data\x12\x10\n" +
+	"\x03seq\x18\x02 \x01(\rR\x03seq\x12\x1f\n" +
+	"\vcaptured_at\x18\x03 \x01(\x03R\n" +
+	"capturedAt\x12\x1d\n" +
+	"\n" +
+	"display_id\x18\x04 \x01(\rR\tdisplayId\"i\n" +
+	"\x16StreamingServerMessage\x12D\n" +
+	"\bsettings\x18\x01 \x01(\v2&.monitoring.agent.v1.StreamingSettingsH\x00R\bsettingsB\t\n" +
+	"\apayload\"\x13\n" +
+	"\x11StreamingSettings*y\n" +
 	"\n" +
 	"MetricKind\x12\x1b\n" +
 	"\x17METRIC_KIND_UNSPECIFIED\x10\x00\x12\x0f\n" +
@@ -1488,9 +1793,10 @@ const file_agent_v1_agent_service_proto_rawDesc = "" +
 	"\tDISK_USED\x102\x12\x0e\n" +
 	"\n" +
 	"NET_UPLOAD\x10<\x12\x10\n" +
-	"\fNET_DOWNLOAD\x10F2d\n" +
+	"\fNET_DOWNLOAD\x10F2\xd5\x01\n" +
 	"\fAgentService\x12T\n" +
-	"\aConnect\x12!.monitoring.agent.v1.AgentMessage\x1a\".monitoring.agent.v1.ServerMessage(\x010\x01BKZIgithub.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1;agentv1b\x06proto3"
+	"\aConnect\x12!.monitoring.agent.v1.AgentMessage\x1a\".monitoring.agent.v1.ServerMessage(\x010\x01\x12o\n" +
+	"\x10StartStreamMJPEG\x12*.monitoring.agent.v1.StreamingAgentMessage\x1a+.monitoring.agent.v1.StreamingServerMessage(\x010\x01BKZIgithub.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1;agentv1b\x06proto3"
 
 var (
 	file_agent_v1_agent_service_proto_rawDescOnce sync.Once
@@ -1505,7 +1811,7 @@ func file_agent_v1_agent_service_proto_rawDescGZIP() []byte {
 }
 
 var file_agent_v1_agent_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_agent_v1_agent_service_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_agent_v1_agent_service_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_agent_v1_agent_service_proto_goTypes = []any{
 	(MetricKind)(0),                // 0: monitoring.agent.v1.MetricKind
 	(*MetricSample)(nil),           // 1: monitoring.agent.v1.MetricSample
@@ -1526,11 +1832,16 @@ var file_agent_v1_agent_service_proto_goTypes = []any{
 	(*DiskSpecs)(nil),              // 16: monitoring.agent.v1.DiskSpecs
 	(*MemorySpecs)(nil),            // 17: monitoring.agent.v1.MemorySpecs
 	(*PhysicalMemoryInfo)(nil),     // 18: monitoring.agent.v1.PhysicalMemoryInfo
-	(*timestamppb.Timestamp)(nil),  // 19: google.protobuf.Timestamp
+	(*StreamingAgentMessage)(nil),  // 19: monitoring.agent.v1.StreamingAgentMessage
+	(*StreamingInfo)(nil),          // 20: monitoring.agent.v1.StreamingInfo
+	(*VideoFrame)(nil),             // 21: monitoring.agent.v1.VideoFrame
+	(*StreamingServerMessage)(nil), // 22: monitoring.agent.v1.StreamingServerMessage
+	(*StreamingSettings)(nil),      // 23: monitoring.agent.v1.StreamingSettings
+	(*timestamppb.Timestamp)(nil),  // 24: google.protobuf.Timestamp
 }
 var file_agent_v1_agent_service_proto_depIdxs = []int32{
 	0,  // 0: monitoring.agent.v1.MetricSample.kind:type_name -> monitoring.agent.v1.MetricKind
-	19, // 1: monitoring.agent.v1.MetricSample.timestamp:type_name -> google.protobuf.Timestamp
+	24, // 1: monitoring.agent.v1.MetricSample.timestamp:type_name -> google.protobuf.Timestamp
 	1,  // 2: monitoring.agent.v1.MetricsBatch.samples:type_name -> monitoring.agent.v1.MetricSample
 	5,  // 3: monitoring.agent.v1.AgentMessage.handshake:type_name -> monitoring.agent.v1.Handshake
 	2,  // 4: monitoring.agent.v1.AgentMessage.metrics:type_name -> monitoring.agent.v1.MetricsBatch
@@ -1546,13 +1857,18 @@ var file_agent_v1_agent_service_proto_depIdxs = []int32{
 	17, // 14: monitoring.agent.v1.Specs.memory:type_name -> monitoring.agent.v1.MemorySpecs
 	16, // 15: monitoring.agent.v1.DiskSpecsList.disk:type_name -> monitoring.agent.v1.DiskSpecs
 	18, // 16: monitoring.agent.v1.MemorySpecs.physical_memory:type_name -> monitoring.agent.v1.PhysicalMemoryInfo
-	3,  // 17: monitoring.agent.v1.AgentService.Connect:input_type -> monitoring.agent.v1.AgentMessage
-	4,  // 18: monitoring.agent.v1.AgentService.Connect:output_type -> monitoring.agent.v1.ServerMessage
-	18, // [18:19] is the sub-list for method output_type
-	17, // [17:18] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	20, // 17: monitoring.agent.v1.StreamingAgentMessage.info:type_name -> monitoring.agent.v1.StreamingInfo
+	21, // 18: monitoring.agent.v1.StreamingAgentMessage.frame:type_name -> monitoring.agent.v1.VideoFrame
+	23, // 19: monitoring.agent.v1.StreamingServerMessage.settings:type_name -> monitoring.agent.v1.StreamingSettings
+	3,  // 20: monitoring.agent.v1.AgentService.Connect:input_type -> monitoring.agent.v1.AgentMessage
+	19, // 21: monitoring.agent.v1.AgentService.StartStreamMJPEG:input_type -> monitoring.agent.v1.StreamingAgentMessage
+	4,  // 22: monitoring.agent.v1.AgentService.Connect:output_type -> monitoring.agent.v1.ServerMessage
+	22, // 23: monitoring.agent.v1.AgentService.StartStreamMJPEG:output_type -> monitoring.agent.v1.StreamingServerMessage
+	22, // [22:24] is the sub-list for method output_type
+	20, // [20:22] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_agent_v1_agent_service_proto_init() }
@@ -1575,13 +1891,20 @@ func file_agent_v1_agent_service_proto_init() {
 	file_agent_v1_agent_service_proto_msgTypes[8].OneofWrappers = []any{
 		(*CommandResult_SpecificationsResponse)(nil),
 	}
+	file_agent_v1_agent_service_proto_msgTypes[18].OneofWrappers = []any{
+		(*StreamingAgentMessage_Info)(nil),
+		(*StreamingAgentMessage_Frame)(nil),
+	}
+	file_agent_v1_agent_service_proto_msgTypes[21].OneofWrappers = []any{
+		(*StreamingServerMessage_Settings)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_v1_agent_service_proto_rawDesc), len(file_agent_v1_agent_service_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   18,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

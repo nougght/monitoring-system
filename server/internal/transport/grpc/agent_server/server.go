@@ -47,6 +47,56 @@ func (s *AgentService) Register(server *grpc.Server) {
 	pb.RegisterAgentServiceServer(server, s)
 }
 
+func (s *AgentService) StartStreamMJPEG(stream pb.AgentService_StartStreamMJPEGServer) error {
+	log.Println("grpc streaming client connected")
+	// TODO: sync auth with main grpc service
+	idFromTLS, err := util.GetAgentIDFromContext(stream.Context())
+	if err != nil {
+		return status.Errorf(codes.Unauthenticated, "invalid agent ID: %s", err.Error())
+	}
+	if idFromTLS == uuid.Nil {
+		log.Println("parsin id from context")
+		idFromTLS, err = ParseIDFromContext(stream.Context())
+		if err != nil {
+			return status.Errorf(codes.Unauthenticated, "invalid agent ID: %s", err.Error())
+		}
+	}
+	log.Printf("id: %s", idFromTLS.String())
+	err = s.runStreamingReader(stream, idFromTLS)
+	s.wg.Wait()
+	return err
+}
+
+func (s *AgentService) runStreamingReader(stream pb.AgentService_StartStreamMJPEGServer, agentID uuid.UUID) error {
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+		for {
+			msg, err := stream.Recv()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					log.Println("grpc streaming client disconnected")
+					return
+				}
+				log.Println("error receiving message from streaming grpc client:", err)
+				// onClose()
+				return
+			}
+
+			switch msg.Payload.(type) {
+			case *pb.StreamingAgentMessage_Frame:
+				s.agentInteractionService.HandleFrame(msg.GetFrame().Data, agentID)
+
+			case *pb.StreamingAgentMessage_Info:
+
+			default:
+				log.Println("unknown streaming message received:", msg)
+			}
+		}
+	}()
+	return nil
+}
+
 func (s *AgentService) Connect(stream pb.AgentService_ConnectServer) error {
 	log.Println("grpc client connected")
 

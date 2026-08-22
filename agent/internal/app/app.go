@@ -96,6 +96,11 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 		log.Println("failed to connect to grpc server: ", err)
 	}
 
+	err = grpcAgentClient.StartStreamMJPEG(rootCtx)
+	if err != nil {
+		log.Println("failed to connect to grpc streaming: ", err)
+	}
+
 	log.Println("http server started on :8111")
 	err = server.ListenAndServe()
 

@@ -17,6 +17,9 @@ import type {
   DownloadAgentConfig400,
   DownloadAgentConfig404,
   DownloadAgentConfig500,
+  GetAgentByID400,
+  GetAgentByID404,
+  GetAgentByID500,
   GetAgentSpecs400,
   GetAgentSpecs404,
   GetAgentSpecs500,
@@ -142,6 +145,119 @@ export const createAgent = async (createAgentBody: CreateAgentBody, options?: Re
 
   const data: createAgentResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as createAgentResponse
+}
+
+
+
+export type getAgentByIDResponse200 = {
+  data: Agent
+  status: 200
+}
+
+export type getAgentByIDResponse400 = {
+  data: GetAgentByID400
+  status: 400
+}
+
+export type getAgentByIDResponse404 = {
+  data: GetAgentByID404
+  status: 404
+}
+
+export type getAgentByIDResponse500 = {
+  data: GetAgentByID500
+  status: 500
+}
+
+export type getAgentByIDResponseSuccess = (getAgentByIDResponse200) & {
+  headers: Headers;
+};
+export type getAgentByIDResponseError = (getAgentByIDResponse400 | getAgentByIDResponse404 | getAgentByIDResponse500) & {
+  headers: Headers;
+};
+
+export type getAgentByIDResponse = (getAgentByIDResponseSuccess | getAgentByIDResponseError)
+
+export const getGetAgentByIDUrl = (agentID: string,) => {
+
+
+
+
+  return `http://127.0.0.1:8091/api/v1/agents/${agentID}`
+}
+
+/**
+ * @summary Get agent by ID
+ */
+export const getAgentByID = async (agentID: string, options?: RequestInit): Promise<getAgentByIDResponse> => {
+
+  const res = await fetch(getGetAgentByIDUrl(agentID),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAgentByIDResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getAgentByIDResponse
+}
+
+
+
+export type getStreamFramesResponse400 = {
+  data: Blob
+  status: 400
+}
+
+export type getStreamFramesResponse404 = {
+  data: Blob
+  status: 404
+}
+
+export type getStreamFramesResponse500 = {
+  data: Blob
+  status: 500
+}
+
+;
+export type getStreamFramesResponseError = (getStreamFramesResponse400 | getStreamFramesResponse404 | getStreamFramesResponse500) & {
+  headers: Headers;
+};
+
+export type getStreamFramesResponse = (getStreamFramesResponseError)
+
+export const getGetStreamFramesUrl = (agentID: string,) => {
+
+
+
+
+  return `http://127.0.0.1:8091/api/v1/agents/${agentID}/frames`
+}
+
+/**
+ * @summary Get stream frames
+ */
+export const getStreamFrames = async (agentID: string, options?: RequestInit): Promise<getStreamFramesResponse> => {
+
+  const res = await fetch(getGetStreamFramesUrl(agentID),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getStreamFramesResponse['data'] = body !== null ? body : ''
+  return { data, status: res.status, headers: res.headers } as getStreamFramesResponse
 }
 
 
