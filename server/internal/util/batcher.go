@@ -4,35 +4,48 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
 var ErrBatcherFull = errors.New("batcher is full")
 
-type Batcher[T any] struct {
-	limit    int
-	interval time.Duration
-	items    []T
-	mu       sync.Mutex
-	wg       sync.WaitGroup
-	cancel   context.CancelFunc
+type (
+	Batcher[T any] struct {
+		limit    int
+		interval time.Duration
+		items    []T
+		mu       sync.Mutex
+		wg       sync.WaitGroup
+		cancel   context.CancelFunc
 
-	signal chan struct{}
+		signal chan struct{}
 
-	handler func([]T)
-}
+		handler batchHandler[T]
+		onceRun sync.Once
+		running atomic.Bool
+	}
+	batchHandler[T any] func(context.Context, []T) error
+)
 
-func NewBatcher[T any](ctx context.Context, limit int, interval time.Duration, handler func([]T)) *Batcher[T] {
-	batcherCtx, cancel := context.WithCancel(ctx)
+func NewBatcher[T any](limit int, interval time.Duration, handler batchHandler[T]) *Batcher[T] {
+
 	batcher := &Batcher[T]{
 		limit:    limit,
 		interval: interval,
 		handler:  handler,
 		signal:   make(chan struct{}, 1),
-		cancel:   cancel,
 	}
-	batcher.runWorker(batcherCtx)
 	return batcher
+}
+
+func (b *Batcher[T]) Run(ctx context.Context) {
+	b.onceRun.Do(func() {
+		batcherCtx, cancel := context.WithCancel(ctx)
+		b.cancel = cancel
+		b.running.Store(true)
+		b.runWorker(batcherCtx)
+	})
 }
 
 func (b *Batcher[T]) Add(item T) error {
@@ -63,18 +76,20 @@ func (b *Batcher[T]) runWorker(ctx context.Context) {
 		for {
 			select {
 			case <-ctx.Done():
-				b.flush() // proccess last items
+				flushContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				b.flush(flushContext) // proccess last items
 				return
 			case <-ticker.C:
-				b.flush()
+				b.flush(ctx)
 			case <-b.signal:
-				b.flush()
+				b.flush(ctx)
 			}
 		}
 	}()
 }
 
-func (b *Batcher[T]) flush() {
+func (b *Batcher[T]) flush(ctx context.Context) {
 	b.mu.Lock()
 	if len(b.items) == 0 {
 		b.mu.Unlock()
@@ -85,10 +100,19 @@ func (b *Batcher[T]) flush() {
 	b.items = make([]T, 0, b.limit)
 	b.mu.Unlock()
 
-	b.handler(batchToProcess)
+	err := b.handler(ctx, batchToProcess)
+	if err != nil {
+		// return items to buffer
+		b.mu.Lock()
+		b.items = append(b.items, batchToProcess...)
+		b.mu.Unlock()
+	}
 }
 
 func (b *Batcher[T]) Stop() {
-	b.cancel()
-	b.wg.Wait()
+	if b.running.Load() {
+		b.cancel()
+		b.wg.Wait()
+		b.running.Store(false)
+	}
 }

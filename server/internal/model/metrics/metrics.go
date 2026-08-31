@@ -18,3 +18,10 @@ type MetricsBatch struct {
 	AgentID uuid.UUID
 	Metrics []*MetricSample
 }
+
+// metric row for db
+type MetricRow struct {
+	Timestamp time.Time `db:"time"`
+	SeriesID  int32     `db:"series_id"`
+	Value     float64   `db:"value"`
+}

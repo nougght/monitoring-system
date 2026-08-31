@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/nougght/monitoring-system/server/internal/config"
@@ -27,11 +28,13 @@ func NewMetricsService(cfg *config.Config,
 	if cfg == nil || transactor == nil || metricsRepo == nil {
 		return nil, fmt.Errorf("params required")
 	}
-	return &MetricsService{
+	s := &MetricsService{
 		cfg:         cfg,
 		transactor:  transactor,
 		metricsRepo: metricsRepo,
-	}, nil
+	}
+	s.batcher = util.NewBatcher(1000, time.Second, s.resolveAndSaveBatchFunc)
+	return s, nil
 }
 
 func (s *MetricsService) HandleMetrics(ctx context.Context, agentID uuid.UUID, metrics metrics_model.MetricsBatch) error {
@@ -41,5 +44,9 @@ func (s *MetricsService) HandleMetrics(ctx context.Context, agentID uuid.UUID, m
 		return err
 	}
 
+	return nil
+}
+
+func (s *MetricsService) resolveAndSaveBatchFunc(ctx context.Context, batches []metrics_model.MetricsBatch) error {
 	return nil
 }
