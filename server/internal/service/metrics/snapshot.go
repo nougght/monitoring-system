@@ -22,8 +22,12 @@ func NewSnapshotCache() *SnapshotCache {
 
 func (s *SnapshotCache) UpdateMetrics(agentID uuid.UUID, batch metrics_model.MetricsBatch) {
 	s.mu.Lock()
-	snapshot := s.cache[agentID]
+	snapshot, ok := s.cache[agentID]
 	s.mu.Unlock()
+	if !ok || snapshot == nil {
+		snapshot = model.NewSnapshot(agentID)
+		s.cache[agentID] = snapshot
+	}
 	snapshot.UpdateMetrics(batch.Metrics)
 }
 

@@ -26,6 +26,13 @@ type Snapshot struct {
 	values map[AgentSeriesKey]MetricState
 }
 
+func NewSnapshot(agentID uuid.UUID) *Snapshot {
+	return &Snapshot{
+		AgentID: agentID,
+		values:  make(map[AgentSeriesKey]MetricState, 10),
+	}
+}
+
 func (s *Snapshot) UpdateMetrics(metrics []*MetricSample) {
 	s.mu.Lock()
 	for _, m := range metrics {

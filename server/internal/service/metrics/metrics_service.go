@@ -32,6 +32,7 @@ func NewMetricsService(cfg *config.Config,
 		cfg:         cfg,
 		transactor:  transactor,
 		metricsRepo: metricsRepo,
+		snapshot:    NewSnapshotCache(),
 	}
 	s.batcher = util.NewBatcher(1000, time.Second, s.resolveAndSaveBatchFunc)
 	return s, nil

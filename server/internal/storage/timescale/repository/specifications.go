@@ -32,7 +32,7 @@ func (r *SpecsRepository) db(ctx context.Context) DB {
 func (r *SpecsRepository) CreateOrUpdateSpecs(ctx context.Context, specs *agent_model.Specs) (*agent_model.Specs, error) {
 	query := `
 	INSERT INTO agent_specs (agent_id, hostname, os_type, os, os_arch, cpu_cores_count, memory_total, full_specs, updated_at) 
-	VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	ON CONFLICT (agent_id) 
 	DO UPDATE SET 
 		agent_id = EXCLUDED.agent_id,

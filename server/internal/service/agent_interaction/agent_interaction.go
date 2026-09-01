@@ -20,24 +20,25 @@ type Requester interface {
 }
 
 type AgentInteractionService struct {
-	cfg       *config.Config
-	registry  *agentregistry.AgentRegistryService
-	metrics   *metrics.MetricsService
-	requester Requester
+	cfg            *config.Config
+	registry       *agentregistry.AgentRegistryService
+	metricsService *metrics.MetricsService
+	requester      Requester
 
 	// lastFrames  map[uuid.UUID][]byte
 	viewerChans map[uuid.UUID]map[uuid.UUID]chan []byte
 	mu          sync.RWMutex
 }
 
-func NewAgentInteractionService(cfg *config.Config, registry *agentregistry.AgentRegistryService) (*AgentInteractionService, error) {
+func NewAgentInteractionService(cfg *config.Config, registry *agentregistry.AgentRegistryService, metrics *metrics.MetricsService) (*AgentInteractionService, error) {
 	if cfg == nil || registry == nil {
 		return nil, fmt.Errorf("params required")
 	}
 	return &AgentInteractionService{
-		cfg:         cfg,
-		registry:    registry,
-		viewerChans: make(map[uuid.UUID]map[uuid.UUID]chan []byte),
+		cfg:            cfg,
+		registry:       registry,
+		metricsService: metrics,
+		viewerChans:    make(map[uuid.UUID]map[uuid.UUID]chan []byte),
 	}, nil
 }
 
@@ -80,7 +81,7 @@ func (s *AgentInteractionService) HandleSpecifications(ctx context.Context, agen
 }
 
 func (s *AgentInteractionService) HandleMetricsBatch(ctx context.Context, batch *metrics_model.MetricsBatch) error {
-	return s.metrics.HandleMetrics(ctx, batch.AgentID, *batch)
+	return s.metricsService.HandleMetrics(ctx, batch.AgentID, *batch)
 }
 
 func (s *AgentInteractionService) SubStreaming(agentID, viewerID uuid.UUID) (<-chan []byte, error) {

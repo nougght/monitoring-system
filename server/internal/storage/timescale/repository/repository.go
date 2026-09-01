@@ -19,6 +19,7 @@ type Repositories struct {
 	agentRpository           *AgentRepository
 	enrollmentKeysRepository *EnrollmentKeysRepository
 	specsRepository          *SpecsRepository
+	MetricsRepository        *MetricsRepository
 }
 
 func New(db DB) *Repositories {
@@ -26,6 +27,7 @@ func New(db DB) *Repositories {
 		agentRpository:           NewAgentRepository(db),
 		enrollmentKeysRepository: NewEnrollmentKeysRepository(db),
 		specsRepository:          NewSpecsRepository(db),
+		MetricsRepository:        NewMetricsRepository(db),
 	}
 }
 

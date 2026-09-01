@@ -7,6 +7,7 @@ import (
 	"github.com/nougght/monitoring-system/server/internal/model"
 	agent "github.com/nougght/monitoring-system/server/internal/service/agent_interaction"
 	agentregistry "github.com/nougght/monitoring-system/server/internal/service/agent_registry"
+	"github.com/nougght/monitoring-system/server/internal/service/metrics"
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale/repository"
 )
 
@@ -35,10 +36,15 @@ func New(opts ServicesOptions) *Services {
 	if err != nil {
 		log.Panicf("failed initialize agent registry: %s", err.Error())
 	}
-
+	metrics, err := metrics.NewMetricsService(
+		opts.Config,
+		opts.Transactor,
+		opts.Repositories.MetricsRepository,
+	)
 	agentInteraction, err := agent.NewAgentInteractionService(
 		opts.Config,
 		agentRegistry,
+		metrics,
 	)
 	if err != nil {
 		log.Panicf("failed initialize agent interaction service: %s", err.Error())
