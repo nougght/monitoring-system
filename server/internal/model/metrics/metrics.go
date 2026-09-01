@@ -25,3 +25,14 @@ type MetricRow struct {
 	SeriesID  int32     `db:"series_id"`
 	Value     float64   `db:"value"`
 }
+
+type MetricSeries struct {
+	ID uuid.UUID `db:"id"`
+	SeriesKey
+}
+
+type SeriesKey struct {
+	AgentID uuid.UUID `db:"agent_id"`
+	Kind    string    `db:"kind"`
+	Label   string    `db:"lable"`
+}

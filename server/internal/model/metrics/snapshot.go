@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type seriesKey struct {
+type AgentSeriesKey struct {
 	Kind  int32
 	Label string
 }
@@ -23,13 +23,13 @@ type Snapshot struct {
 	LastSeen time.Time
 
 	mu     sync.RWMutex
-	values map[seriesKey]MetricState
+	values map[AgentSeriesKey]MetricState
 }
 
 func (s *Snapshot) UpdateMetrics(metrics []*MetricSample) {
 	s.mu.Lock()
 	for _, m := range metrics {
-		key := seriesKey{Kind: m.Kind, Label: m.Label}
+		key := AgentSeriesKey{Kind: m.Kind, Label: m.Label}
 		s.values[key] = MetricState{
 			Value: m.Value,
 			Ts:    m.Timestamp,
