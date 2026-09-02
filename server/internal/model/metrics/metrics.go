@@ -19,20 +19,29 @@ type MetricsBatch struct {
 	Metrics []*MetricSample
 }
 
+func CountAllMetricsInBatchList(batchList []MetricsBatch) (count int) {
+	for i := range batchList {
+		count += len(batchList[i].Metrics)
+	}
+	return count
+}
+
 // metric row for db
 type MetricRow struct {
 	Timestamp time.Time `db:"time"`
-	SeriesID  int32     `db:"series_id"`
+	SeriesID  int64     `db:"series_id"`
 	Value     float64   `db:"value"`
 }
 
 type MetricSeries struct {
-	ID uuid.UUID `db:"id"`
-	SeriesKey
+	ID MetricSeriesID `db:"id"`
+	MetricSeriesKey
 }
 
-type SeriesKey struct {
+type MetricSeriesID int64
+
+type MetricSeriesKey struct {
 	AgentID uuid.UUID `db:"agent_id"`
-	Kind    string    `db:"kind"`
+	Kind    int32     `db:"kind"`
 	Label   string    `db:"lable"`
 }

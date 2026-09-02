@@ -91,6 +91,12 @@ func New(ctx context.Context, cfg *config.Config) *App {
 		},
 	})
 
+	services.Metrics().StartSaving(ctx)
+	err = services.Metrics().SyncMetricKinds(ctx)
+	if err != nil {
+		log.Panicf("failed to sync metric kinds: %s", err.Error())
+	}
+
 	httpServer := rest.NewServer(cfg, *services)
 
 	agentServer := grpc.NewServer(

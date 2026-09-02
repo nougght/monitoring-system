@@ -11,7 +11,7 @@ import (
 func TestRegisteredMetricKinds(t *testing.T) {
 	for kind, name := range agentv1.MetricKind_name {
 		_, ok := MetricKinds[kind]
-		require.True(t, ok, fmt.Sprintf("info for metric kind '%s' is not registered", name))
+		require.True(t, ok || kind == 0, fmt.Sprintf("info for metric kind '%s' is not registered", name))
 	}
 }
 

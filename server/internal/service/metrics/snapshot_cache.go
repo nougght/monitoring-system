@@ -39,6 +39,6 @@ func (s *SnapshotCache) Get(agentID uuid.UUID) (snapshot *model.Snapshot, ok boo
 }
 
 func (s *SnapshotCache) All() map[uuid.UUID]*model.Snapshot {
-	// returning copy of map
+	// copy of map
 	return maps.Clone(s.cache)
 }

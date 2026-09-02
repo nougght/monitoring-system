@@ -3,6 +3,7 @@ package util
 import (
 	"context"
 	"errors"
+	"log"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -81,6 +82,7 @@ func (b *Batcher[T]) runWorker(ctx context.Context) {
 				b.flush(flushContext) // proccess last items
 				return
 			case <-ticker.C:
+				log.Println("metrics ticker")
 				b.flush(ctx)
 			case <-b.signal:
 				b.flush(ctx)
@@ -102,6 +104,7 @@ func (b *Batcher[T]) flush(ctx context.Context) {
 
 	err := b.handler(ctx, batchToProcess)
 	if err != nil {
+		log.Println("batcher handler error: %s", err.Error())
 		// return items to buffer
 		b.mu.Lock()
 		b.items = append(b.items, batchToProcess...)

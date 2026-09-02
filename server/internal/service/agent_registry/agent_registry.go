@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/nougght/monitoring-system/server/internal/config"
 	"github.com/nougght/monitoring-system/server/internal/model"
 	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
@@ -114,7 +115,7 @@ func (s *AgentRegistryService) CreateAgent(ctx context.Context, name string, des
 	}
 	defer func() {
 		err := tx.Rollback(ctx)
-		if err != nil {
+		if err != nil && !errors.Is(err, pgx.ErrTxClosed) {
 			log.Printf("rollback failed: %s", err.Error())
 		}
 	}()

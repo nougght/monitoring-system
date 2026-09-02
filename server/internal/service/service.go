@@ -14,6 +14,7 @@ import (
 type Services struct {
 	agentRegistry *agentregistry.AgentRegistryService
 	agent         *agent.AgentInteractionService
+	metrics       *metrics.MetricsService
 }
 
 //nolint:unused
@@ -39,7 +40,8 @@ func New(opts ServicesOptions) *Services {
 	metrics, err := metrics.NewMetricsService(
 		opts.Config,
 		opts.Transactor,
-		opts.Repositories.MetricsRepository,
+		opts.Repositories.MetricsRepository(),
+		opts.Repositories.SeriesRepository(),
 	)
 	agentInteraction, err := agent.NewAgentInteractionService(
 		opts.Config,
@@ -52,6 +54,7 @@ func New(opts ServicesOptions) *Services {
 	return &Services{
 		agentRegistry: agentRegistry,
 		agent:         agentInteraction,
+		metrics:       metrics,
 	}
 }
 
@@ -61,4 +64,8 @@ func (s *Services) AgentRegistry() *agentregistry.AgentRegistryService {
 
 func (s *Services) AgentInteractionService() *agent.AgentInteractionService {
 	return s.agent
+}
+
+func (s *Services) Metrics() *metrics.MetricsService {
+	return s.metrics
 }
