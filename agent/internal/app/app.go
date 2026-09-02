@@ -32,7 +32,7 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 
 	service, err := service.GetServices(setupConfig, cfg)
 	if err != nil {
-		return fmt.Errorf("failed to setup services: ", err)
+		return fmt.Errorf("failed to setup services: %w", err)
 	}
 	service.StartServices(rootCtx)
 
@@ -65,6 +65,38 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 		Handler: r.Handler(),
 	}
 
+	grpcTLS := service.GetCoreService().TLSConfigForGRPC()
+	grpcClient, err := grpc.NewClient(setupConfig.ServerAddress,
+		grpc.WithTransportCredentials(credentials.NewTLS(grpcTLS)),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create grpc client: %w", err)
+	}
+
+	grpcAgentClient := grpc_client.NewAgentClient(grpcClient,
+		cfg,
+		service.GetCoreService().State(),
+		service.GetMetricsService(),
+	)
+
+	grpcCtx, cancel := context.WithCancel(rootCtx)
+	defer cancel()
+
+	go func() {
+		err = grpcAgentClient.Connect(grpcCtx)
+		// TODO: add retrying
+		if err != nil {
+			log.Println("failed to connect to grpc server: ", err)
+		}
+		cancel()
+	}()
+	go func() {
+		err = grpcAgentClient.StartStreamMJPEG(grpcCtx)
+		if err != nil {
+			log.Println("failed to connect to grpc streaming: ", err)
+		}
+	}()
+
 	shutdownChan := make(chan error)
 	go func() {
 		defer close(shutdownChan)
@@ -76,20 +108,6 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 		shutdownChan <- err
 	}()
 
-	grpcTLS := service.GetCoreService().TLSConfigForGRPC()
-	grpcClient, err := grpc.NewClient(setupConfig.ServerAddress,
-		grpc.WithTransportCredentials(credentials.NewTLS(grpcTLS)),
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create grpc client: %w", err)
-	}
-	grpcAgentClient := grpc_client.NewAgentClient(grpcClient, cfg, service.GetMetricsService())
-	err = grpcAgentClient.Connect(rootCtx)
-	// TODO: add retrying
-	if err != nil {
-		log.Println("failed to connect to grpc server: ", err)
-	}
-
 	log.Println("http server started on :8111")
 	err = server.ListenAndServe()
 
@@ -99,7 +117,7 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 
 	err = <-shutdownChan
 	if err != nil {
-		return fmt.Errorf("http server shutdown error: ", err)
+		return fmt.Errorf("http server shutdown error: %w", err)
 	}
 	log.Println("http server stopped")
 	return nil

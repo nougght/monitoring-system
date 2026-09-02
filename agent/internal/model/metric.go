@@ -25,11 +25,11 @@ type Metric interface {
 } // @name Metric
 
 type CpuPercentMetric struct {
-	value     float32
+	value     float64
 	timestamp time.Time
 } // @name CpuPercentMetric
 
-func NewCpuPercentMetric(value float32) *CpuPercentMetric {
+func NewCpuPercentMetric(value float64) *CpuPercentMetric {
 	return &CpuPercentMetric{
 		value:     value,
 		timestamp: time.Now(),
@@ -42,7 +42,7 @@ func (m *CpuPercentMetric) Type() MetricType {
 func (m *CpuPercentMetric) Timestamp() time.Time {
 	return m.timestamp
 }
-func (m *CpuPercentMetric) Value() float32 {
+func (m *CpuPercentMetric) Value() float64 {
 	return m.value
 }
 

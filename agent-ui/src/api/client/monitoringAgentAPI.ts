@@ -86,7 +86,7 @@ export const getGetSpecsUrl = () => {
 
 
 
-  return `http://127.0.0.1:8088/specs`
+  return `http://127.0.0.1:8111/specs`
 }
 
 /**

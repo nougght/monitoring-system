@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	metrics_model "github.com/nougght/monitoring-system/server/internal/model/metrics"
 	model "github.com/nougght/monitoring-system/server/internal/model/metrics"
 )
 
@@ -19,10 +20,15 @@ func NewSnapshotCache() *SnapshotCache {
 	}
 }
 
-func (s *SnapshotCache) Update(agentID uuid.UUID, snapshot *model.Snapshot) {
+func (s *SnapshotCache) UpdateMetrics(agentID uuid.UUID, batch metrics_model.MetricsBatch) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.cache[agentID] = snapshot
+	snapshot, ok := s.cache[agentID]
+	s.mu.Unlock()
+	if !ok || snapshot == nil {
+		snapshot = model.NewSnapshot(agentID)
+		s.cache[agentID] = snapshot
+	}
+	snapshot.UpdateMetrics(batch.Metrics)
 }
 
 func (s *SnapshotCache) Get(agentID uuid.UUID) (snapshot *model.Snapshot, ok bool) {
@@ -33,6 +39,6 @@ func (s *SnapshotCache) Get(agentID uuid.UUID) (snapshot *model.Snapshot, ok boo
 }
 
 func (s *SnapshotCache) All() map[uuid.UUID]*model.Snapshot {
-	// returning copy of map
+	// copy of map
 	return maps.Clone(s.cache)
 }

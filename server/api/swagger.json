@@ -14,6 +14,7 @@
                     "application/json"
                 ],
                 "summary": "Get all agents",
+                "operationId": "getAllAgents",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -27,19 +28,22 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -52,6 +56,7 @@
                     "application/json"
                 ],
                 "summary": "Create new agent",
+                "operationId": "createAgent",
                 "parameters": [
                     {
                         "description": "Create agent body",
@@ -73,19 +78,110 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/{agentID}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get agent by ID",
+                "operationId": "getAgentByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent ID",
+                        "name": "agentID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Agent"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/{agentID}/frames": {
+            "get": {
+                "produces": [
+                    "image/jpeg"
+                ],
+                "summary": "Get stream frames",
+                "operationId": "getStreamFrames",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent ID",
+                        "name": "agentID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -100,6 +196,7 @@
                     "application/x-yaml"
                 ],
                 "summary": "Download agent setup config",
+                "operationId": "downloadAgentConfig",
                 "parameters": [
                     {
                         "type": "string",
@@ -128,19 +225,69 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/{agentID}/specifications": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get agent specifications",
+                "operationId": "getAgentSpecs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent ID",
+                        "name": "agentID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AgentSpecs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -196,6 +343,85 @@
                 }
             }
         },
+        "AgentSpecs": {
+            "type": "object",
+            "properties": {
+                "agentId": {
+                    "type": "string"
+                },
+                "cpuSpecs": {
+                    "$ref": "#/definitions/CpuSpecs"
+                },
+                "diskSpecs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DiskSpecs"
+                    }
+                },
+                "hostSpecs": {
+                    "$ref": "#/definitions/HostSpecs"
+                },
+                "memorySpecs": {
+                    "$ref": "#/definitions/MemorySpecs"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "CpuSpecs": {
+            "type": "object",
+            "properties": {
+                "architecture": {
+                    "type": "string"
+                },
+                "availability": {
+                    "type": "string"
+                },
+                "currentClockSpeed": {
+                    "type": "integer"
+                },
+                "data_width": {
+                    "type": "integer"
+                },
+                "l2CacheSize": {
+                    "type": "integer"
+                },
+                "l3CacheSize": {
+                    "type": "integer"
+                },
+                "manufacturer": {
+                    "type": "string"
+                },
+                "maxClockSpeed": {
+                    "type": "integer"
+                },
+                "modelName": {
+                    "type": "string"
+                },
+                "numberOfCores": {
+                    "type": "integer"
+                },
+                "numberOfEnabledCores": {
+                    "type": "integer"
+                },
+                "numberOfLogicalProcessors": {
+                    "type": "integer"
+                },
+                "processorId": {
+                    "type": "string"
+                },
+                "socketDesignation": {
+                    "type": "string"
+                },
+                "stepping": {
+                    "type": "string"
+                },
+                "virtualizationFirmwareEnabled": {
+                    "type": "boolean"
+                }
+            }
+        },
         "CreateAgentBody": {
             "type": "object",
             "required": [
@@ -239,9 +465,100 @@
                 }
             }
         },
-        "gin.H": {
+        "DiskSpecs": {
             "type": "object",
-            "additionalProperties": {}
+            "properties": {
+                "device": {
+                    "type": "string"
+                },
+                "fsType": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "HostSpecs": {
+            "type": "object",
+            "properties": {
+                "hostname": {
+                    "type": "string"
+                },
+                "kernelVersion": {
+                    "type": "string"
+                },
+                "os": {
+                    "type": "string"
+                },
+                "osArch": {
+                    "type": "string"
+                },
+                "osType": {
+                    "type": "string"
+                },
+                "osVersion": {
+                    "type": "string"
+                }
+            }
+        },
+        "MemorySpecs": {
+            "type": "object",
+            "properties": {
+                "physicalMemoryInfo": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PhysicalMemoryInfo"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "PhysicalMemoryInfo": {
+            "type": "object",
+            "properties": {
+                "bankLabel": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "configuredClockSpeed": {
+                    "type": "integer"
+                },
+                "deviceLocator": {
+                    "type": "string"
+                },
+                "form_factor": {
+                    "type": "string"
+                },
+                "hotSwappable": {
+                    "type": "boolean"
+                },
+                "manufacturer": {
+                    "type": "string"
+                },
+                "memoryType": {
+                    "type": "string"
+                },
+                "modelName": {
+                    "type": "string"
+                },
+                "removable": {
+                    "type": "boolean"
+                },
+                "replaceable": {
+                    "type": "boolean"
+                },
+                "serialNumber": {
+                    "type": "string"
+                },
+                "speed": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/nougght/monitoring-system/server/internal/model"
-	"github.com/nougght/monitoring-system/server/internal/model/agent"
+	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 )
 
 type EnrollmentKeysRepository struct {
@@ -25,13 +25,13 @@ func NewEnrollmentKeysRepository(db DB) *EnrollmentKeysRepository {
 
 func (r *EnrollmentKeysRepository) db(ctx context.Context) DB {
 	res := r.pool
-	if tx := ctx.Value(model.TxKey); tx != nil {
+	if tx := ctx.Value(model.ContextKeyTx); tx != nil {
 		res = tx.(DB)
 	}
 	return res
 }
 
-func (r *EnrollmentKeysRepository) CreateKey(ctx context.Context, key *agent.EnrollmentKey) (*agent.EnrollmentKey, error) {
+func (r *EnrollmentKeysRepository) CreateKey(ctx context.Context, key *agent_model.EnrollmentKey) (*agent_model.EnrollmentKey, error) {
 	query := `
 	INSERT INTO enrollment_keys (key_hash, agent_id, expires_at, selector) 
 	VALUES($1, $2, $3, $4)
@@ -44,7 +44,7 @@ func (r *EnrollmentKeysRepository) CreateKey(ctx context.Context, key *agent.Enr
 	return key, nil
 }
 
-func (r *EnrollmentKeysRepository) GetKeyBySelector(ctx context.Context, selector string) (*agent.EnrollmentKey, error) {
+func (r *EnrollmentKeysRepository) GetKeyBySelector(ctx context.Context, selector string) (*agent_model.EnrollmentKey, error) {
 	query := `
 	SELECT * FROM enrollment_keys k WHERE k.selector = $1
 	`
@@ -54,7 +54,7 @@ func (r *EnrollmentKeysRepository) GetKeyBySelector(ctx context.Context, selecto
 	}
 	defer rows.Close()
 
-	key, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[agent.EnrollmentKey])
+	key, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[agent_model.EnrollmentKey])
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
@@ -64,7 +64,7 @@ func (r *EnrollmentKeysRepository) GetKeyBySelector(ctx context.Context, selecto
 	return &key, nil
 }
 
-func (r *EnrollmentKeysRepository) GetKeyByAgentId(ctx context.Context, agentID uuid.UUID) (*agent.EnrollmentKey, error) {
+func (r *EnrollmentKeysRepository) GetKeyByAgentId(ctx context.Context, agentID uuid.UUID) (*agent_model.EnrollmentKey, error) {
 	query := `
 	SELECT * FROM enrollment_keys k WHERE k.agent_id = $1
 	`
@@ -74,7 +74,7 @@ func (r *EnrollmentKeysRepository) GetKeyByAgentId(ctx context.Context, agentID 
 	}
 	defer rows.Close()
 
-	key, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[agent.EnrollmentKey])
+	key, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[agent_model.EnrollmentKey])
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound

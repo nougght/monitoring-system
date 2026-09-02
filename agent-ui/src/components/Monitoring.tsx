@@ -1,5 +1,5 @@
 import { EMPTY_FOCUSED_WINDOW, type Metrics } from "../domain/metrics";
-import type { Specs } from "../domain/specs";
+import type { Specs } from "../../../shared/ui/src/domain/specs";
 import { getGradientColor } from "../util/gradientColor";
 import { convertBytesToGB } from "../util/units";
 

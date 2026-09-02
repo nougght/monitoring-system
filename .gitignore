@@ -3,11 +3,7 @@
 node_modules/*
 */node_modules/*
 
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.bmp
+
 
 *.exe
 .env
@@ -20,3 +16,5 @@ bin/*
 *.cnf
 *.srl
 *.csr
+
+.dev.docs.md

@@ -30,12 +30,17 @@
     margin: 0 auto;
 }
 
+body {
+    height: 100vh;
+    overflow: hidden;
+}
+
+#root,
 .app,
 main {
     height: 100%;
 }
 
-main {}
 
 
 
@@ -56,7 +61,13 @@ main {}
     align-items: center;
 }
 
+.agentsPage {
+    height: fit-content;
+}
 
+.agentsPage > main {
+    height: fit-content;
+}
 .agent-cards-container {
     display: grid;
     grid-template-columns: auto auto;
@@ -73,4 +84,83 @@ main {}
     background-color: lightblue;
 
     /* width: fit-content; */
+}
+
+
+.side-bar {
+    height: 100vh;
+    /* position:fixed; */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: start;
+    background-color: lightblue;
+    border-right: 1px rgb(197, 197, 197) solid;
+    margin-right: 5px;
+}
+
+.side-bar > nav {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: start;
+    align-items: stretch;
+    
+}
+
+.side-bar .side-bar-button {
+    border-radius: 6px;
+    border:none;
+    /* border: 1px solid rgb(178, 183, 185); */
+    padding: 5px;
+    margin: 5px;
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color:inherit;
+}
+
+.side-bar-button-title {
+    flex-grow: 1;
+    text-decoration: none;
+}
+
+.side-bar-button > * {
+    padding: 0 5px;
+    color: black;
+}
+.side-bar-button {
+    text-decoration: none;
+}
+
+.side-bar  .side-bar-button:hover {
+    background-color: rgb(240, 231, 216);
+}
+
+.side-bar  .side-bar-button.active {
+    background-color: rgb(240, 162, 61);
+}
+
+.tabBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.tabBar > .tab-button {
+    border-radius: 10px;
+    border: 1px solid rgb(178, 183, 185);
+    padding: 5px;
+    margin: 5px;
+}
+
+.tabBar > .tab-button:hover {
+    background-color: rgb(240, 231, 216);
+}
+
+.tabBar > .tab-button.active {
+    border: 2px solid rgb(240, 162, 61);
+    padding: 4px;
 }

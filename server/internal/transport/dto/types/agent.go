@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 )
 
 type AgentDTO struct {
@@ -40,3 +41,13 @@ type AgentConfigResponse struct {
 	EnrollmentAddress string `yaml:"enrollment_address"`
 	ServerAddress     string `yaml:"server_address"`
 } // @Name AgentConfigResponse
+
+// TODO: check if need
+type SpecsDTO struct {
+	AgentID     uuid.UUID                `json:"agentId"`
+	UpdatedAt   time.Time                `json:"updatedAt"`
+	HostSpecs   agent_model.HostSpecs    `json:"hostSpecs"`
+	CpuSpecs    agent_model.CpuSpecs     `json:"cpuSpecs"`
+	DiskSpecs   []*agent_model.DiskSpecs `json:"diskSpecs"`
+	MemorySpecs agent_model.MemorySpecs  `json:"memorySpecs"`
+} // @Name AgentSpecs

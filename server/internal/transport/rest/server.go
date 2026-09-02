@@ -31,6 +31,8 @@ func NewServer(cfg *config.Config, services service.Services) *http.Server {
 	api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	handlers.AgentHandler().RegisterRoutes(api)
+	handlers.StreamHandler().RegisterRoutes(api)
+
 	server := http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.HTTP.ServerPort),
 		Handler: r.Handler(),

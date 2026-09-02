@@ -31,7 +31,7 @@ func (h *Handler) LocalAgentStatus(c *gin.Context) {
 		connectionStatus = "not connected"
 		lastConnectedAt := h.core.State().LastConnectedAt()
 		if lastConnectedAt != nil {
-			connectionStatus += fmt.Sprintf(", last - %t", lastConnectedAt)
+			connectionStatus += fmt.Sprintf(", last - %v", *lastConnectedAt)
 		}
 	}
 	status := dto.Status{

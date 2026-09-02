@@ -3,12 +3,12 @@ import {
     useState
 } from 'react'
 
-import TabBar from './components/TabBar';
+import TabBar from '../../shared/ui/src/components/TabBar';
 import Monitoring from './components/Monitoring';
-import Specifications from './components/Specifications';
+import Specifications from '../../shared/ui/src/components/Specifications';
 import './App.css';
 import type { Metrics } from './domain/metrics';
-import type { Specs } from './domain/specs';
+import type { Specs } from '../../shared/ui/src/domain/specs';
 import { getSpecs } from './api/client/monitoringAgentAPI';
 
 interface Tab {
@@ -17,8 +17,8 @@ interface Tab {
 }
 
 function App() {
-    const [metrics, setMetrics] = useState<Metrics | null>(null);
-    const [specs, setSpecs] = useState<Specs | null>(null);
+    const [metrics, setMetrics] = useState<Metrics | undefined>();
+    const [specs, setSpecs] = useState<Specs | undefined>();
     const [activeTab, setActiveTab] = useState(0)
 
     const tabs: Tab[] = [
@@ -57,7 +57,7 @@ function App() {
     }, []);
 
     useEffect(() => {
-        const socket = new WebSocket("ws://127.0.0.1:8088/ws");
+        const socket = new WebSocket("ws://127.0.0.1:8111/ws");
         console.log("start")
         socket.addEventListener("open", () => {
             socket.send("Hello Server!");

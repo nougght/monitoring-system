@@ -22,5 +22,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src", "../shared/ui/src/components/TabBar.tsx", "../shared/ui/src/components/TabButton.tsx", "../shared/ui/src/components/Specifications.tsx", "../shared/ui/src/domain/specs.ts"]
 }

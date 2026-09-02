@@ -22,6 +22,186 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type MetricKind int32
+
+const (
+	MetricKind_METRIC_KIND_UNSPECIFIED MetricKind = 0
+	MetricKind_CPU_PERCENT             MetricKind = 1
+	// CPU_IOWAIT       = 20;
+	MetricKind_MEM_USED MetricKind = 30
+	// MEM_SWAP_USED    = 40;
+	MetricKind_DISK_USED    MetricKind = 50 // label = точка монтирования
+	MetricKind_NET_UPLOAD   MetricKind = 60 // label = интерфейс
+	MetricKind_NET_DOWNLOAD MetricKind = 70
+)
+
+// Enum value maps for MetricKind.
+var (
+	MetricKind_name = map[int32]string{
+		0:  "METRIC_KIND_UNSPECIFIED",
+		1:  "CPU_PERCENT",
+		30: "MEM_USED",
+		50: "DISK_USED",
+		60: "NET_UPLOAD",
+		70: "NET_DOWNLOAD",
+	}
+	MetricKind_value = map[string]int32{
+		"METRIC_KIND_UNSPECIFIED": 0,
+		"CPU_PERCENT":             1,
+		"MEM_USED":                30,
+		"DISK_USED":               50,
+		"NET_UPLOAD":              60,
+		"NET_DOWNLOAD":            70,
+	}
+)
+
+func (x MetricKind) Enum() *MetricKind {
+	p := new(MetricKind)
+	*p = x
+	return p
+}
+
+func (x MetricKind) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MetricKind) Descriptor() protoreflect.EnumDescriptor {
+	return file_agent_v1_agent_service_proto_enumTypes[0].Descriptor()
+}
+
+func (MetricKind) Type() protoreflect.EnumType {
+	return &file_agent_v1_agent_service_proto_enumTypes[0]
+}
+
+func (x MetricKind) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MetricKind.Descriptor instead.
+func (MetricKind) EnumDescriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{0}
+}
+
+type MetricSample struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Kind          MetricKind             `protobuf:"varint,1,opt,name=kind,proto3,enum=monitoring.agent.v1.MetricKind" json:"kind,omitempty"`
+	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Label         string                 `protobuf:"bytes,3,opt,name=label,proto3" json:"label,omitempty"` // метка для метрик с несколькими значениями на один вид
+	Value         float64                `protobuf:"fixed64,4,opt,name=value,proto3" json:"value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MetricSample) Reset() {
+	*x = MetricSample{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MetricSample) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MetricSample) ProtoMessage() {}
+
+func (x *MetricSample) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MetricSample.ProtoReflect.Descriptor instead.
+func (*MetricSample) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *MetricSample) GetKind() MetricKind {
+	if x != nil {
+		return x.Kind
+	}
+	return MetricKind_METRIC_KIND_UNSPECIFIED
+}
+
+func (x *MetricSample) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *MetricSample) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *MetricSample) GetValue() float64 {
+	if x != nil {
+		return x.Value
+	}
+	return 0
+}
+
+type MetricsBatch struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BatchId       uint64                 `protobuf:"varint,1,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"`
+	Samples       []*MetricSample        `protobuf:"bytes,2,rep,name=samples,proto3" json:"samples,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MetricsBatch) Reset() {
+	*x = MetricsBatch{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MetricsBatch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MetricsBatch) ProtoMessage() {}
+
+func (x *MetricsBatch) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MetricsBatch.ProtoReflect.Descriptor instead.
+func (*MetricsBatch) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *MetricsBatch) GetBatchId() uint64 {
+	if x != nil {
+		return x.BatchId
+	}
+	return 0
+}
+
+func (x *MetricsBatch) GetSamples() []*MetricSample {
+	if x != nil {
+		return x.Samples
+	}
+	return nil
+}
+
 type AgentMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Payload:
@@ -36,7 +216,7 @@ type AgentMessage struct {
 
 func (x *AgentMessage) Reset() {
 	*x = AgentMessage{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[0]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +228,7 @@ func (x *AgentMessage) String() string {
 func (*AgentMessage) ProtoMessage() {}
 
 func (x *AgentMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[0]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +241,7 @@ func (x *AgentMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentMessage.ProtoReflect.Descriptor instead.
 func (*AgentMessage) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{0}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AgentMessage) GetPayload() isAgentMessage_Payload {
@@ -80,7 +260,7 @@ func (x *AgentMessage) GetHandshake() *Handshake {
 	return nil
 }
 
-func (x *AgentMessage) GetMetrics() *Metrics {
+func (x *AgentMessage) GetMetrics() *MetricsBatch {
 	if x != nil {
 		if x, ok := x.Payload.(*AgentMessage_Metrics); ok {
 			return x.Metrics
@@ -107,7 +287,7 @@ type AgentMessage_Handshake struct {
 }
 
 type AgentMessage_Metrics struct {
-	Metrics *Metrics `protobuf:"bytes,2,opt,name=metrics,proto3,oneof"`
+	Metrics *MetricsBatch `protobuf:"bytes,2,opt,name=metrics,proto3,oneof"`
 }
 
 type AgentMessage_CommandResult struct {
@@ -125,6 +305,7 @@ type ServerMessage struct {
 	// Types that are valid to be assigned to Payload:
 	//
 	//	*ServerMessage_Command
+	//	*ServerMessage_Status
 	Payload       isServerMessage_Payload `protobuf_oneof:"payload"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -132,7 +313,7 @@ type ServerMessage struct {
 
 func (x *ServerMessage) Reset() {
 	*x = ServerMessage{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[1]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -144,7 +325,7 @@ func (x *ServerMessage) String() string {
 func (*ServerMessage) ProtoMessage() {}
 
 func (x *ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[1]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,7 +338,7 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
 func (*ServerMessage) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{1}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ServerMessage) GetPayload() isServerMessage_Payload {
@@ -176,6 +357,15 @@ func (x *ServerMessage) GetCommand() *Command {
 	return nil
 }
 
+func (x *ServerMessage) GetStatus() *HandshakeStatus {
+	if x != nil {
+		if x, ok := x.Payload.(*ServerMessage_Status); ok {
+			return x.Status
+		}
+	}
+	return nil
+}
+
 type isServerMessage_Payload interface {
 	isServerMessage_Payload()
 }
@@ -184,7 +374,13 @@ type ServerMessage_Command struct {
 	Command *Command `protobuf:"bytes,1,opt,name=command,proto3,oneof"`
 }
 
+type ServerMessage_Status struct {
+	Status *HandshakeStatus `protobuf:"bytes,2,opt,name=status,proto3,oneof"`
+}
+
 func (*ServerMessage_Command) isServerMessage_Payload() {}
+
+func (*ServerMessage_Status) isServerMessage_Payload() {}
 
 type Handshake struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -195,7 +391,7 @@ type Handshake struct {
 
 func (x *Handshake) Reset() {
 	*x = Handshake{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[2]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -207,7 +403,7 @@ func (x *Handshake) String() string {
 func (*Handshake) ProtoMessage() {}
 
 func (x *Handshake) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[2]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -220,7 +416,7 @@ func (x *Handshake) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Handshake.ProtoReflect.Descriptor instead.
 func (*Handshake) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{2}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Handshake) GetAgentUuid() string {
@@ -230,266 +426,27 @@ func (x *Handshake) GetAgentUuid() string {
 	return ""
 }
 
-type Metrics struct {
+type HandshakeStatus struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CpuPercent    *CpuPercentMetric      `protobuf:"bytes,1,opt,name=cpu_percent,json=cpuPercent,proto3" json:"cpu_percent,omitempty"`
-	FocusedWindow *FocusedWindowMetric   `protobuf:"bytes,2,opt,name=focused_window,json=focusedWindow,proto3" json:"focused_window,omitempty"`
-	MemoryUsage   *MemoryUsageMetric     `protobuf:"bytes,3,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
-	DiskUsage     *DiskUsageMetric       `protobuf:"bytes,4,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
-	NetworkUsage  *NetworkUsageMetric    `protobuf:"bytes,5,opt,name=network_usage,json=networkUsage,proto3" json:"network_usage,omitempty"`
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Connected     bool                   `protobuf:"varint,1,opt,name=connected,proto3" json:"connected,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Metrics) Reset() {
-	*x = Metrics{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Metrics) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Metrics) ProtoMessage() {}
-
-func (x *Metrics) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Metrics.ProtoReflect.Descriptor instead.
-func (*Metrics) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *Metrics) GetCpuPercent() *CpuPercentMetric {
-	if x != nil {
-		return x.CpuPercent
-	}
-	return nil
-}
-
-func (x *Metrics) GetFocusedWindow() *FocusedWindowMetric {
-	if x != nil {
-		return x.FocusedWindow
-	}
-	return nil
-}
-
-func (x *Metrics) GetMemoryUsage() *MemoryUsageMetric {
-	if x != nil {
-		return x.MemoryUsage
-	}
-	return nil
-}
-
-func (x *Metrics) GetDiskUsage() *DiskUsageMetric {
-	if x != nil {
-		return x.DiskUsage
-	}
-	return nil
-}
-
-func (x *Metrics) GetNetworkUsage() *NetworkUsageMetric {
-	if x != nil {
-		return x.NetworkUsage
-	}
-	return nil
-}
-
-func (x *Metrics) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
-}
-
-type Metric struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	Timestamp *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	// Types that are valid to be assigned to Payload:
-	//
-	//	*Metric_CpuPercent
-	//	*Metric_FocusedWindow
-	//	*Metric_MemoryUsage
-	//	*Metric_DiskUsage
-	//	*Metric_NetworkUsage
-	//	*Metric_Process
-	Payload       isMetric_Payload `protobuf_oneof:"payload"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Metric) Reset() {
-	*x = Metric{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Metric) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Metric) ProtoMessage() {}
-
-func (x *Metric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Metric.ProtoReflect.Descriptor instead.
-func (*Metric) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *Metric) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
-}
-
-func (x *Metric) GetPayload() isMetric_Payload {
-	if x != nil {
-		return x.Payload
-	}
-	return nil
-}
-
-func (x *Metric) GetCpuPercent() *CpuPercentMetric {
-	if x != nil {
-		if x, ok := x.Payload.(*Metric_CpuPercent); ok {
-			return x.CpuPercent
-		}
-	}
-	return nil
-}
-
-func (x *Metric) GetFocusedWindow() *FocusedWindowMetric {
-	if x != nil {
-		if x, ok := x.Payload.(*Metric_FocusedWindow); ok {
-			return x.FocusedWindow
-		}
-	}
-	return nil
-}
-
-func (x *Metric) GetMemoryUsage() *MemoryUsageMetric {
-	if x != nil {
-		if x, ok := x.Payload.(*Metric_MemoryUsage); ok {
-			return x.MemoryUsage
-		}
-	}
-	return nil
-}
-
-func (x *Metric) GetDiskUsage() *DiskUsageMetric {
-	if x != nil {
-		if x, ok := x.Payload.(*Metric_DiskUsage); ok {
-			return x.DiskUsage
-		}
-	}
-	return nil
-}
-
-func (x *Metric) GetNetworkUsage() *NetworkUsageMetric {
-	if x != nil {
-		if x, ok := x.Payload.(*Metric_NetworkUsage); ok {
-			return x.NetworkUsage
-		}
-	}
-	return nil
-}
-
-func (x *Metric) GetProcess() *ProcessMetric {
-	if x != nil {
-		if x, ok := x.Payload.(*Metric_Process); ok {
-			return x.Process
-		}
-	}
-	return nil
-}
-
-type isMetric_Payload interface {
-	isMetric_Payload()
-}
-
-type Metric_CpuPercent struct {
-	CpuPercent *CpuPercentMetric `protobuf:"bytes,2,opt,name=cpu_percent,json=cpuPercent,proto3,oneof"`
-}
-
-type Metric_FocusedWindow struct {
-	FocusedWindow *FocusedWindowMetric `protobuf:"bytes,3,opt,name=focused_window,json=focusedWindow,proto3,oneof"`
-}
-
-type Metric_MemoryUsage struct {
-	MemoryUsage *MemoryUsageMetric `protobuf:"bytes,4,opt,name=memory_usage,json=memoryUsage,proto3,oneof"`
-}
-
-type Metric_DiskUsage struct {
-	DiskUsage *DiskUsageMetric `protobuf:"bytes,5,opt,name=disk_usage,json=diskUsage,proto3,oneof"`
-}
-
-type Metric_NetworkUsage struct {
-	NetworkUsage *NetworkUsageMetric `protobuf:"bytes,6,opt,name=network_usage,json=networkUsage,proto3,oneof"`
-}
-
-type Metric_Process struct {
-	Process *ProcessMetric `protobuf:"bytes,7,opt,name=process,proto3,oneof"`
-}
-
-func (*Metric_CpuPercent) isMetric_Payload() {}
-
-func (*Metric_FocusedWindow) isMetric_Payload() {}
-
-func (*Metric_MemoryUsage) isMetric_Payload() {}
-
-func (*Metric_DiskUsage) isMetric_Payload() {}
-
-func (*Metric_NetworkUsage) isMetric_Payload() {}
-
-func (*Metric_Process) isMetric_Payload() {}
-
-type CpuPercentMetric struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Value         float32                `protobuf:"fixed32,1,opt,name=value,proto3" json:"value,omitempty"` // процент использования CPU
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CpuPercentMetric) Reset() {
-	*x = CpuPercentMetric{}
+func (x *HandshakeStatus) Reset() {
+	*x = HandshakeStatus{}
 	mi := &file_agent_v1_agent_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CpuPercentMetric) String() string {
+func (x *HandshakeStatus) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CpuPercentMetric) ProtoMessage() {}
+func (*HandshakeStatus) ProtoMessage() {}
 
-func (x *CpuPercentMetric) ProtoReflect() protoreflect.Message {
+func (x *HandshakeStatus) ProtoReflect() protoreflect.Message {
 	mi := &file_agent_v1_agent_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -501,239 +458,16 @@ func (x *CpuPercentMetric) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CpuPercentMetric.ProtoReflect.Descriptor instead.
-func (*CpuPercentMetric) Descriptor() ([]byte, []int) {
+// Deprecated: Use HandshakeStatus.ProtoReflect.Descriptor instead.
+func (*HandshakeStatus) Descriptor() ([]byte, []int) {
 	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *CpuPercentMetric) GetValue() float32 {
+func (x *HandshakeStatus) GetConnected() bool {
 	if x != nil {
-		return x.Value
+		return x.Connected
 	}
-	return 0
-}
-
-func (x *CpuPercentMetric) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
-}
-
-type FocusedWindowMetric struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"` // название активного окна
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FocusedWindowMetric) Reset() {
-	*x = FocusedWindowMetric{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FocusedWindowMetric) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FocusedWindowMetric) ProtoMessage() {}
-
-func (x *FocusedWindowMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FocusedWindowMetric.ProtoReflect.Descriptor instead.
-func (*FocusedWindowMetric) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *FocusedWindowMetric) GetValue() string {
-	if x != nil {
-		return x.Value
-	}
-	return ""
-}
-
-func (x *FocusedWindowMetric) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
-}
-
-type MemoryUsageMetric struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Value         uint64                 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"` // использование памяти
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *MemoryUsageMetric) Reset() {
-	*x = MemoryUsageMetric{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MemoryUsageMetric) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MemoryUsageMetric) ProtoMessage() {}
-
-func (x *MemoryUsageMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MemoryUsageMetric.ProtoReflect.Descriptor instead.
-func (*MemoryUsageMetric) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *MemoryUsageMetric) GetValue() uint64 {
-	if x != nil {
-		return x.Value
-	}
-	return 0
-}
-
-func (x *MemoryUsageMetric) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
-}
-
-type DiskUsageMetric struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Value         map[string]uint64      `protobuf:"bytes,1,rep,name=value,proto3" json:"value,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"` // использование дисков
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DiskUsageMetric) Reset() {
-	*x = DiskUsageMetric{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DiskUsageMetric) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DiskUsageMetric) ProtoMessage() {}
-
-func (x *DiskUsageMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DiskUsageMetric.ProtoReflect.Descriptor instead.
-func (*DiskUsageMetric) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *DiskUsageMetric) GetValue() map[string]uint64 {
-	if x != nil {
-		return x.Value
-	}
-	return nil
-}
-
-func (x *DiskUsageMetric) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
-}
-
-type NetworkUsageMetric struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UploadMbps    float32                `protobuf:"fixed32,1,opt,name=upload_mbps,json=uploadMbps,proto3" json:"upload_mbps,omitempty"`       // скорость загрузки
-	DownloadMbps  float32                `protobuf:"fixed32,2,opt,name=download_mbps,json=downloadMbps,proto3" json:"download_mbps,omitempty"` // скорость выгрузки
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *NetworkUsageMetric) Reset() {
-	*x = NetworkUsageMetric{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *NetworkUsageMetric) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NetworkUsageMetric) ProtoMessage() {}
-
-func (x *NetworkUsageMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NetworkUsageMetric.ProtoReflect.Descriptor instead.
-func (*NetworkUsageMetric) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *NetworkUsageMetric) GetUploadMbps() float32 {
-	if x != nil {
-		return x.UploadMbps
-	}
-	return 0
-}
-
-func (x *NetworkUsageMetric) GetDownloadMbps() float32 {
-	if x != nil {
-		return x.DownloadMbps
-	}
-	return 0
-}
-
-func (x *NetworkUsageMetric) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
+	return false
 }
 
 type Process struct {
@@ -749,7 +483,7 @@ type Process struct {
 
 func (x *Process) Reset() {
 	*x = Process{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[10]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -761,7 +495,7 @@ func (x *Process) String() string {
 func (*Process) ProtoMessage() {}
 
 func (x *Process) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[10]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -774,7 +508,7 @@ func (x *Process) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Process.ProtoReflect.Descriptor instead.
 func (*Process) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{10}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Process) GetPid() int32 {
@@ -821,7 +555,7 @@ type ProcessMetric struct {
 
 func (x *ProcessMetric) Reset() {
 	*x = ProcessMetric{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[11]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -833,7 +567,7 @@ func (x *ProcessMetric) String() string {
 func (*ProcessMetric) ProtoMessage() {}
 
 func (x *ProcessMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[11]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -846,7 +580,7 @@ func (x *ProcessMetric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProcessMetric.ProtoReflect.Descriptor instead.
 func (*ProcessMetric) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{11}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ProcessMetric) GetProcessList() []*Process {
@@ -857,7 +591,8 @@ func (x *ProcessMetric) GetProcessList() []*Process {
 }
 
 type Command struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	CommandUuid string                 `protobuf:"bytes,1,opt,name=command_uuid,json=commandUuid,proto3" json:"command_uuid,omitempty"`
 	// Types that are valid to be assigned to Payload:
 	//
 	//	*Command_SpecificationsRequest
@@ -868,7 +603,7 @@ type Command struct {
 
 func (x *Command) Reset() {
 	*x = Command{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[12]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -880,7 +615,7 @@ func (x *Command) String() string {
 func (*Command) ProtoMessage() {}
 
 func (x *Command) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[12]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -893,7 +628,14 @@ func (x *Command) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Command.ProtoReflect.Descriptor instead.
 func (*Command) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{12}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *Command) GetCommandUuid() string {
+	if x != nil {
+		return x.CommandUuid
+	}
+	return ""
 }
 
 func (x *Command) GetPayload() isCommand_Payload {
@@ -917,13 +659,14 @@ type isCommand_Payload interface {
 }
 
 type Command_SpecificationsRequest struct {
-	SpecificationsRequest *SpecificationsRequest `protobuf:"bytes,1,opt,name=specifications_request,json=specificationsRequest,proto3,oneof"`
+	SpecificationsRequest *SpecificationsRequest `protobuf:"bytes,2,opt,name=specifications_request,json=specificationsRequest,proto3,oneof"`
 }
 
 func (*Command_SpecificationsRequest) isCommand_Payload() {}
 
 type CommandResult struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	CommandUuid string                 `protobuf:"bytes,1,opt,name=command_uuid,json=commandUuid,proto3" json:"command_uuid,omitempty"`
 	// Types that are valid to be assigned to Payload:
 	//
 	//	*CommandResult_SpecificationsResponse
@@ -934,7 +677,7 @@ type CommandResult struct {
 
 func (x *CommandResult) Reset() {
 	*x = CommandResult{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[13]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -946,7 +689,7 @@ func (x *CommandResult) String() string {
 func (*CommandResult) ProtoMessage() {}
 
 func (x *CommandResult) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[13]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -959,7 +702,14 @@ func (x *CommandResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommandResult.ProtoReflect.Descriptor instead.
 func (*CommandResult) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{13}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CommandResult) GetCommandUuid() string {
+	if x != nil {
+		return x.CommandUuid
+	}
+	return ""
 }
 
 func (x *CommandResult) GetPayload() isCommandResult_Payload {
@@ -983,7 +733,7 @@ type isCommandResult_Payload interface {
 }
 
 type CommandResult_SpecificationsResponse struct {
-	SpecificationsResponse *SpecificationsResponse `protobuf:"bytes,1,opt,name=specifications_response,json=specificationsResponse,proto3,oneof"`
+	SpecificationsResponse *SpecificationsResponse `protobuf:"bytes,2,opt,name=specifications_response,json=specificationsResponse,proto3,oneof"`
 }
 
 func (*CommandResult_SpecificationsResponse) isCommandResult_Payload() {}
@@ -996,7 +746,7 @@ type SpecificationsRequest struct {
 
 func (x *SpecificationsRequest) Reset() {
 	*x = SpecificationsRequest{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[14]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1008,7 +758,7 @@ func (x *SpecificationsRequest) String() string {
 func (*SpecificationsRequest) ProtoMessage() {}
 
 func (x *SpecificationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[14]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1021,7 +771,7 @@ func (x *SpecificationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpecificationsRequest.ProtoReflect.Descriptor instead.
 func (*SpecificationsRequest) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{14}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{10}
 }
 
 type SpecificationsResponse struct {
@@ -1033,7 +783,7 @@ type SpecificationsResponse struct {
 
 func (x *SpecificationsResponse) Reset() {
 	*x = SpecificationsResponse{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[15]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1045,7 +795,7 @@ func (x *SpecificationsResponse) String() string {
 func (*SpecificationsResponse) ProtoMessage() {}
 
 func (x *SpecificationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[15]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1058,7 +808,7 @@ func (x *SpecificationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpecificationsResponse.ProtoReflect.Descriptor instead.
 func (*SpecificationsResponse) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{15}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SpecificationsResponse) GetSpecs() *Specs {
@@ -1080,7 +830,7 @@ type Specs struct {
 
 func (x *Specs) Reset() {
 	*x = Specs{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[16]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1092,7 +842,7 @@ func (x *Specs) String() string {
 func (*Specs) ProtoMessage() {}
 
 func (x *Specs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[16]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1105,7 +855,7 @@ func (x *Specs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Specs.ProtoReflect.Descriptor instead.
 func (*Specs) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{16}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *Specs) GetHost() *HostSpecs {
@@ -1150,7 +900,7 @@ type HostSpecs struct {
 
 func (x *HostSpecs) Reset() {
 	*x = HostSpecs{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[17]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1162,7 +912,7 @@ func (x *HostSpecs) String() string {
 func (*HostSpecs) ProtoMessage() {}
 
 func (x *HostSpecs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[17]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1175,7 +925,7 @@ func (x *HostSpecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HostSpecs.ProtoReflect.Descriptor instead.
 func (*HostSpecs) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{17}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *HostSpecs) GetHostname() string {
@@ -1244,7 +994,7 @@ type CpuSpecs struct {
 
 func (x *CpuSpecs) Reset() {
 	*x = CpuSpecs{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[18]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1256,7 +1006,7 @@ func (x *CpuSpecs) String() string {
 func (*CpuSpecs) ProtoMessage() {}
 
 func (x *CpuSpecs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[18]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1269,7 +1019,7 @@ func (x *CpuSpecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CpuSpecs.ProtoReflect.Descriptor instead.
 func (*CpuSpecs) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{18}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *CpuSpecs) GetModelName() string {
@@ -1393,7 +1143,7 @@ type DiskSpecsList struct {
 
 func (x *DiskSpecsList) Reset() {
 	*x = DiskSpecsList{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[19]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1405,7 +1155,7 @@ func (x *DiskSpecsList) String() string {
 func (*DiskSpecsList) ProtoMessage() {}
 
 func (x *DiskSpecsList) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[19]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1418,7 +1168,7 @@ func (x *DiskSpecsList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiskSpecsList.ProtoReflect.Descriptor instead.
 func (*DiskSpecsList) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{19}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DiskSpecsList) GetDisk() []*DiskSpecs {
@@ -1439,7 +1189,7 @@ type DiskSpecs struct {
 
 func (x *DiskSpecs) Reset() {
 	*x = DiskSpecs{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[20]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1451,7 +1201,7 @@ func (x *DiskSpecs) String() string {
 func (*DiskSpecs) ProtoMessage() {}
 
 func (x *DiskSpecs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[20]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1464,7 +1214,7 @@ func (x *DiskSpecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiskSpecs.ProtoReflect.Descriptor instead.
 func (*DiskSpecs) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{20}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *DiskSpecs) GetDevice() string {
@@ -1490,7 +1240,7 @@ func (x *DiskSpecs) GetTotal() uint64 {
 
 type MemorySpecs struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	Total          string                 `protobuf:"bytes,1,opt,name=total,proto3" json:"total,omitempty"` // общий объем памяти
+	Total          uint64                 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"` // общий объем памяти
 	PhysicalMemory []*PhysicalMemoryInfo  `protobuf:"bytes,2,rep,name=physical_memory,json=physicalMemory,proto3" json:"physical_memory,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -1498,7 +1248,7 @@ type MemorySpecs struct {
 
 func (x *MemorySpecs) Reset() {
 	*x = MemorySpecs{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[21]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1510,7 +1260,7 @@ func (x *MemorySpecs) String() string {
 func (*MemorySpecs) ProtoMessage() {}
 
 func (x *MemorySpecs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[21]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1523,14 +1273,14 @@ func (x *MemorySpecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MemorySpecs.ProtoReflect.Descriptor instead.
 func (*MemorySpecs) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{21}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *MemorySpecs) GetTotal() string {
+func (x *MemorySpecs) GetTotal() uint64 {
 	if x != nil {
 		return x.Total
 	}
-	return ""
+	return 0
 }
 
 func (x *MemorySpecs) GetPhysicalMemory() []*PhysicalMemoryInfo {
@@ -1561,7 +1311,7 @@ type PhysicalMemoryInfo struct {
 
 func (x *PhysicalMemoryInfo) Reset() {
 	*x = PhysicalMemoryInfo{}
-	mi := &file_agent_v1_agent_service_proto_msgTypes[22]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1573,7 +1323,7 @@ func (x *PhysicalMemoryInfo) String() string {
 func (*PhysicalMemoryInfo) ProtoMessage() {}
 
 func (x *PhysicalMemoryInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_service_proto_msgTypes[22]
+	mi := &file_agent_v1_agent_service_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1586,7 +1336,7 @@ func (x *PhysicalMemoryInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PhysicalMemoryInfo.ProtoReflect.Descriptor instead.
 func (*PhysicalMemoryInfo) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{22}
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *PhysicalMemoryInfo) GetDeviceLocator() string {
@@ -1680,63 +1430,321 @@ func (x *PhysicalMemoryInfo) GetReplaceable() bool {
 	return false
 }
 
+type StreamingAgentMessage struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*StreamingAgentMessage_Info
+	//	*StreamingAgentMessage_Frame
+	Payload       isStreamingAgentMessage_Payload `protobuf_oneof:"payload"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamingAgentMessage) Reset() {
+	*x = StreamingAgentMessage{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamingAgentMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamingAgentMessage) ProtoMessage() {}
+
+func (x *StreamingAgentMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamingAgentMessage.ProtoReflect.Descriptor instead.
+func (*StreamingAgentMessage) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *StreamingAgentMessage) GetPayload() isStreamingAgentMessage_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *StreamingAgentMessage) GetInfo() *StreamingInfo {
+	if x != nil {
+		if x, ok := x.Payload.(*StreamingAgentMessage_Info); ok {
+			return x.Info
+		}
+	}
+	return nil
+}
+
+func (x *StreamingAgentMessage) GetFrame() *VideoFrame {
+	if x != nil {
+		if x, ok := x.Payload.(*StreamingAgentMessage_Frame); ok {
+			return x.Frame
+		}
+	}
+	return nil
+}
+
+type isStreamingAgentMessage_Payload interface {
+	isStreamingAgentMessage_Payload()
+}
+
+type StreamingAgentMessage_Info struct {
+	Info *StreamingInfo `protobuf:"bytes,1,opt,name=info,proto3,oneof"`
+}
+
+type StreamingAgentMessage_Frame struct {
+	Frame *VideoFrame `protobuf:"bytes,2,opt,name=frame,proto3,oneof"`
+}
+
+func (*StreamingAgentMessage_Info) isStreamingAgentMessage_Payload() {}
+
+func (*StreamingAgentMessage_Frame) isStreamingAgentMessage_Payload() {}
+
+type StreamingInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamingInfo) Reset() {
+	*x = StreamingInfo{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamingInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamingInfo) ProtoMessage() {}
+
+func (x *StreamingInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamingInfo.ProtoReflect.Descriptor instead.
+func (*StreamingInfo) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{20}
+}
+
+type VideoFrame struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []byte                 `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Seq           uint32                 `protobuf:"varint,2,opt,name=seq,proto3" json:"seq,omitempty"`
+	CapturedAt    int64                  `protobuf:"varint,3,opt,name=captured_at,json=capturedAt,proto3" json:"captured_at,omitempty"`
+	DisplayId     uint32                 `protobuf:"varint,4,opt,name=display_id,json=displayId,proto3" json:"display_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VideoFrame) Reset() {
+	*x = VideoFrame{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VideoFrame) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VideoFrame) ProtoMessage() {}
+
+func (x *VideoFrame) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VideoFrame.ProtoReflect.Descriptor instead.
+func (*VideoFrame) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *VideoFrame) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *VideoFrame) GetSeq() uint32 {
+	if x != nil {
+		return x.Seq
+	}
+	return 0
+}
+
+func (x *VideoFrame) GetCapturedAt() int64 {
+	if x != nil {
+		return x.CapturedAt
+	}
+	return 0
+}
+
+func (x *VideoFrame) GetDisplayId() uint32 {
+	if x != nil {
+		return x.DisplayId
+	}
+	return 0
+}
+
+type StreamingServerMessage struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*StreamingServerMessage_Settings
+	Payload       isStreamingServerMessage_Payload `protobuf_oneof:"payload"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamingServerMessage) Reset() {
+	*x = StreamingServerMessage{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamingServerMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamingServerMessage) ProtoMessage() {}
+
+func (x *StreamingServerMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamingServerMessage.ProtoReflect.Descriptor instead.
+func (*StreamingServerMessage) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *StreamingServerMessage) GetPayload() isStreamingServerMessage_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *StreamingServerMessage) GetSettings() *StreamingSettings {
+	if x != nil {
+		if x, ok := x.Payload.(*StreamingServerMessage_Settings); ok {
+			return x.Settings
+		}
+	}
+	return nil
+}
+
+type isStreamingServerMessage_Payload interface {
+	isStreamingServerMessage_Payload()
+}
+
+type StreamingServerMessage_Settings struct {
+	Settings *StreamingSettings `protobuf:"bytes,1,opt,name=settings,proto3,oneof"`
+}
+
+func (*StreamingServerMessage_Settings) isStreamingServerMessage_Payload() {}
+
+type StreamingSettings struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamingSettings) Reset() {
+	*x = StreamingSettings{}
+	mi := &file_agent_v1_agent_service_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamingSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamingSettings) ProtoMessage() {}
+
+func (x *StreamingSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_service_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamingSettings.ProtoReflect.Descriptor instead.
+func (*StreamingSettings) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_service_proto_rawDescGZIP(), []int{23}
+}
+
 var File_agent_v1_agent_service_proto protoreflect.FileDescriptor
 
 const file_agent_v1_agent_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1cagent/v1/agent_service.proto\x12\x13monitoring.agent.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe0\x01\n" +
+	"\x1cagent/v1/agent_service.proto\x12\x13monitoring.agent.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa9\x01\n" +
+	"\fMetricSample\x123\n" +
+	"\x04kind\x18\x01 \x01(\x0e2\x1f.monitoring.agent.v1.MetricKindR\x04kind\x128\n" +
+	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x14\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\x12\x14\n" +
+	"\x05value\x18\x04 \x01(\x01R\x05value\"f\n" +
+	"\fMetricsBatch\x12\x19\n" +
+	"\bbatch_id\x18\x01 \x01(\x04R\abatchId\x12;\n" +
+	"\asamples\x18\x02 \x03(\v2!.monitoring.agent.v1.MetricSampleR\asamples\"\xe5\x01\n" +
 	"\fAgentMessage\x12>\n" +
-	"\thandshake\x18\x01 \x01(\v2\x1e.monitoring.agent.v1.HandshakeH\x00R\thandshake\x128\n" +
-	"\ametrics\x18\x02 \x01(\v2\x1c.monitoring.agent.v1.MetricsH\x00R\ametrics\x12K\n" +
+	"\thandshake\x18\x01 \x01(\v2\x1e.monitoring.agent.v1.HandshakeH\x00R\thandshake\x12=\n" +
+	"\ametrics\x18\x02 \x01(\v2!.monitoring.agent.v1.MetricsBatchH\x00R\ametrics\x12K\n" +
 	"\x0ecommand_result\x18\x03 \x01(\v2\".monitoring.agent.v1.CommandResultH\x00R\rcommandResultB\t\n" +
-	"\apayload\"T\n" +
+	"\apayload\"\x94\x01\n" +
 	"\rServerMessage\x128\n" +
-	"\acommand\x18\x01 \x01(\v2\x1c.monitoring.agent.v1.CommandH\x00R\acommandB\t\n" +
+	"\acommand\x18\x01 \x01(\v2\x1c.monitoring.agent.v1.CommandH\x00R\acommand\x12>\n" +
+	"\x06status\x18\x02 \x01(\v2$.monitoring.agent.v1.HandshakeStatusH\x00R\x06statusB\t\n" +
 	"\apayload\"*\n" +
 	"\tHandshake\x12\x1d\n" +
 	"\n" +
-	"agent_uuid\x18\x01 \x01(\tR\tagentUuid\"\xba\x03\n" +
-	"\aMetrics\x12F\n" +
-	"\vcpu_percent\x18\x01 \x01(\v2%.monitoring.agent.v1.CpuPercentMetricR\n" +
-	"cpuPercent\x12O\n" +
-	"\x0efocused_window\x18\x02 \x01(\v2(.monitoring.agent.v1.FocusedWindowMetricR\rfocusedWindow\x12I\n" +
-	"\fmemory_usage\x18\x03 \x01(\v2&.monitoring.agent.v1.MemoryUsageMetricR\vmemoryUsage\x12C\n" +
-	"\n" +
-	"disk_usage\x18\x04 \x01(\v2$.monitoring.agent.v1.DiskUsageMetricR\tdiskUsage\x12L\n" +
-	"\rnetwork_usage\x18\x05 \x01(\v2'.monitoring.agent.v1.NetworkUsageMetricR\fnetworkUsage\x128\n" +
-	"\ttimestamp\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\x8e\x04\n" +
-	"\x06Metric\x128\n" +
-	"\ttimestamp\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12H\n" +
-	"\vcpu_percent\x18\x02 \x01(\v2%.monitoring.agent.v1.CpuPercentMetricH\x00R\n" +
-	"cpuPercent\x12Q\n" +
-	"\x0efocused_window\x18\x03 \x01(\v2(.monitoring.agent.v1.FocusedWindowMetricH\x00R\rfocusedWindow\x12K\n" +
-	"\fmemory_usage\x18\x04 \x01(\v2&.monitoring.agent.v1.MemoryUsageMetricH\x00R\vmemoryUsage\x12E\n" +
-	"\n" +
-	"disk_usage\x18\x05 \x01(\v2$.monitoring.agent.v1.DiskUsageMetricH\x00R\tdiskUsage\x12N\n" +
-	"\rnetwork_usage\x18\x06 \x01(\v2'.monitoring.agent.v1.NetworkUsageMetricH\x00R\fnetworkUsage\x12>\n" +
-	"\aprocess\x18\a \x01(\v2\".monitoring.agent.v1.ProcessMetricH\x00R\aprocessB\t\n" +
-	"\apayload\"b\n" +
-	"\x10CpuPercentMetric\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\x02R\x05value\x128\n" +
-	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"e\n" +
-	"\x13FocusedWindowMetric\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05value\x128\n" +
-	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"c\n" +
-	"\x11MemoryUsageMetric\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\x04R\x05value\x128\n" +
-	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\xcc\x01\n" +
-	"\x0fDiskUsageMetric\x12E\n" +
-	"\x05value\x18\x01 \x03(\v2/.monitoring.agent.v1.DiskUsageMetric.ValueEntryR\x05value\x128\n" +
-	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x1a8\n" +
-	"\n" +
-	"ValueEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x04R\x05value:\x028\x01\"\x94\x01\n" +
-	"\x12NetworkUsageMetric\x12\x1f\n" +
-	"\vupload_mbps\x18\x01 \x01(\x02R\n" +
-	"uploadMbps\x12#\n" +
-	"\rdownload_mbps\x18\x02 \x01(\x02R\fdownloadMbps\x128\n" +
-	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\xce\x01\n" +
+	"agent_uuid\x18\x01 \x01(\tR\tagentUuid\"/\n" +
+	"\x0fHandshakeStatus\x12\x1c\n" +
+	"\tconnected\x18\x01 \x01(\bR\tconnected\"\xce\x01\n" +
 	"\aProcess\x12\x10\n" +
 	"\x03pid\x18\x01 \x01(\x05R\x03pid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\"\n" +
@@ -1750,12 +1758,14 @@ const file_agent_v1_agent_service_proto_rawDesc = "" +
 	"\f_cpu_percentB\x0e\n" +
 	"\f_memory_used\"P\n" +
 	"\rProcessMetric\x12?\n" +
-	"\fprocess_list\x18\x01 \x03(\v2\x1c.monitoring.agent.v1.ProcessR\vprocessList\"y\n" +
-	"\aCommand\x12c\n" +
-	"\x16specifications_request\x18\x01 \x01(\v2*.monitoring.agent.v1.SpecificationsRequestH\x00R\x15specificationsRequestB\t\n" +
-	"\apayload\"\x82\x01\n" +
-	"\rCommandResult\x12f\n" +
-	"\x17specifications_response\x18\x01 \x01(\v2+.monitoring.agent.v1.SpecificationsResponseH\x00R\x16specificationsResponseB\t\n" +
+	"\fprocess_list\x18\x01 \x03(\v2\x1c.monitoring.agent.v1.ProcessR\vprocessList\"\x9c\x01\n" +
+	"\aCommand\x12!\n" +
+	"\fcommand_uuid\x18\x01 \x01(\tR\vcommandUuid\x12c\n" +
+	"\x16specifications_request\x18\x02 \x01(\v2*.monitoring.agent.v1.SpecificationsRequestH\x00R\x15specificationsRequestB\t\n" +
+	"\apayload\"\xa5\x01\n" +
+	"\rCommandResult\x12!\n" +
+	"\fcommand_uuid\x18\x01 \x01(\tR\vcommandUuid\x12f\n" +
+	"\x17specifications_response\x18\x02 \x01(\v2+.monitoring.agent.v1.SpecificationsResponseH\x00R\x16specificationsResponseB\t\n" +
 	"\apayload\"\x17\n" +
 	"\x15SpecificationsRequest\"J\n" +
 	"\x16SpecificationsResponse\x120\n" +
@@ -1800,7 +1810,7 @@ const file_agent_v1_agent_service_proto_rawDesc = "" +
 	"\afs_type\x18\x02 \x01(\tR\x06fsType\x12\x14\n" +
 	"\x05total\x18\x03 \x01(\x04R\x05total\"u\n" +
 	"\vMemorySpecs\x12\x14\n" +
-	"\x05total\x18\x01 \x01(\tR\x05total\x12P\n" +
+	"\x05total\x18\x01 \x01(\x04R\x05total\x12P\n" +
 	"\x0fphysical_memory\x18\x02 \x03(\v2'.monitoring.agent.v1.PhysicalMemoryInfoR\x0ephysicalMemory\"\xd1\x03\n" +
 	"\x12PhysicalMemoryInfo\x12%\n" +
 	"\x0edevice_locator\x18\x01 \x01(\tR\rdeviceLocator\x12\x1f\n" +
@@ -1820,9 +1830,36 @@ const file_agent_v1_agent_service_proto_rawDesc = "" +
 	" \x01(\tR\tbankLabel\x12#\n" +
 	"\rhot_swappable\x18\v \x01(\bR\fhotSwappable\x12\x1c\n" +
 	"\tremovable\x18\f \x01(\bR\tremovable\x12 \n" +
-	"\vreplaceable\x18\r \x01(\bR\vreplaceable2d\n" +
+	"\vreplaceable\x18\r \x01(\bR\vreplaceable\"\x95\x01\n" +
+	"\x15StreamingAgentMessage\x128\n" +
+	"\x04info\x18\x01 \x01(\v2\".monitoring.agent.v1.StreamingInfoH\x00R\x04info\x127\n" +
+	"\x05frame\x18\x02 \x01(\v2\x1f.monitoring.agent.v1.VideoFrameH\x00R\x05frameB\t\n" +
+	"\apayload\"\x0f\n" +
+	"\rStreamingInfo\"r\n" +
+	"\n" +
+	"VideoFrame\x12\x12\n" +
+	"\x04data\x18\x01 \x01(\fR\x04data\x12\x10\n" +
+	"\x03seq\x18\x02 \x01(\rR\x03seq\x12\x1f\n" +
+	"\vcaptured_at\x18\x03 \x01(\x03R\n" +
+	"capturedAt\x12\x1d\n" +
+	"\n" +
+	"display_id\x18\x04 \x01(\rR\tdisplayId\"i\n" +
+	"\x16StreamingServerMessage\x12D\n" +
+	"\bsettings\x18\x01 \x01(\v2&.monitoring.agent.v1.StreamingSettingsH\x00R\bsettingsB\t\n" +
+	"\apayload\"\x13\n" +
+	"\x11StreamingSettings*y\n" +
+	"\n" +
+	"MetricKind\x12\x1b\n" +
+	"\x17METRIC_KIND_UNSPECIFIED\x10\x00\x12\x0f\n" +
+	"\vCPU_PERCENT\x10\x01\x12\f\n" +
+	"\bMEM_USED\x10\x1e\x12\r\n" +
+	"\tDISK_USED\x102\x12\x0e\n" +
+	"\n" +
+	"NET_UPLOAD\x10<\x12\x10\n" +
+	"\fNET_DOWNLOAD\x10F2\xd5\x01\n" +
 	"\fAgentService\x12T\n" +
-	"\aConnect\x12!.monitoring.agent.v1.AgentMessage\x1a\".monitoring.agent.v1.ServerMessage(\x010\x01BKZIgithub.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1;agentv1b\x06proto3"
+	"\aConnect\x12!.monitoring.agent.v1.AgentMessage\x1a\".monitoring.agent.v1.ServerMessage(\x010\x01\x12o\n" +
+	"\x10StartStreamMJPEG\x12*.monitoring.agent.v1.StreamingAgentMessage\x1a+.monitoring.agent.v1.StreamingServerMessage(\x010\x01BKZIgithub.com/nougght/monitoring-system/shared/go/proto/gen/agent/v1;agentv1b\x06proto3"
 
 var (
 	file_agent_v1_agent_service_proto_rawDescOnce sync.Once
@@ -1836,75 +1873,67 @@ func file_agent_v1_agent_service_proto_rawDescGZIP() []byte {
 	return file_agent_v1_agent_service_proto_rawDescData
 }
 
+var file_agent_v1_agent_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_agent_v1_agent_service_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_agent_v1_agent_service_proto_goTypes = []any{
-	(*AgentMessage)(nil),           // 0: monitoring.agent.v1.AgentMessage
-	(*ServerMessage)(nil),          // 1: monitoring.agent.v1.ServerMessage
-	(*Handshake)(nil),              // 2: monitoring.agent.v1.Handshake
-	(*Metrics)(nil),                // 3: monitoring.agent.v1.Metrics
-	(*Metric)(nil),                 // 4: monitoring.agent.v1.Metric
-	(*CpuPercentMetric)(nil),       // 5: monitoring.agent.v1.CpuPercentMetric
-	(*FocusedWindowMetric)(nil),    // 6: monitoring.agent.v1.FocusedWindowMetric
-	(*MemoryUsageMetric)(nil),      // 7: monitoring.agent.v1.MemoryUsageMetric
-	(*DiskUsageMetric)(nil),        // 8: monitoring.agent.v1.DiskUsageMetric
-	(*NetworkUsageMetric)(nil),     // 9: monitoring.agent.v1.NetworkUsageMetric
-	(*Process)(nil),                // 10: monitoring.agent.v1.Process
-	(*ProcessMetric)(nil),          // 11: monitoring.agent.v1.ProcessMetric
-	(*Command)(nil),                // 12: monitoring.agent.v1.Command
-	(*CommandResult)(nil),          // 13: monitoring.agent.v1.CommandResult
-	(*SpecificationsRequest)(nil),  // 14: monitoring.agent.v1.SpecificationsRequest
-	(*SpecificationsResponse)(nil), // 15: monitoring.agent.v1.SpecificationsResponse
-	(*Specs)(nil),                  // 16: monitoring.agent.v1.Specs
-	(*HostSpecs)(nil),              // 17: monitoring.agent.v1.HostSpecs
-	(*CpuSpecs)(nil),               // 18: monitoring.agent.v1.CpuSpecs
-	(*DiskSpecsList)(nil),          // 19: monitoring.agent.v1.DiskSpecsList
-	(*DiskSpecs)(nil),              // 20: monitoring.agent.v1.DiskSpecs
-	(*MemorySpecs)(nil),            // 21: monitoring.agent.v1.MemorySpecs
-	(*PhysicalMemoryInfo)(nil),     // 22: monitoring.agent.v1.PhysicalMemoryInfo
-	nil,                            // 23: monitoring.agent.v1.DiskUsageMetric.ValueEntry
-	(*timestamppb.Timestamp)(nil),  // 24: google.protobuf.Timestamp
+	(MetricKind)(0),                // 0: monitoring.agent.v1.MetricKind
+	(*MetricSample)(nil),           // 1: monitoring.agent.v1.MetricSample
+	(*MetricsBatch)(nil),           // 2: monitoring.agent.v1.MetricsBatch
+	(*AgentMessage)(nil),           // 3: monitoring.agent.v1.AgentMessage
+	(*ServerMessage)(nil),          // 4: monitoring.agent.v1.ServerMessage
+	(*Handshake)(nil),              // 5: monitoring.agent.v1.Handshake
+	(*HandshakeStatus)(nil),        // 6: monitoring.agent.v1.HandshakeStatus
+	(*Process)(nil),                // 7: monitoring.agent.v1.Process
+	(*ProcessMetric)(nil),          // 8: monitoring.agent.v1.ProcessMetric
+	(*Command)(nil),                // 9: monitoring.agent.v1.Command
+	(*CommandResult)(nil),          // 10: monitoring.agent.v1.CommandResult
+	(*SpecificationsRequest)(nil),  // 11: monitoring.agent.v1.SpecificationsRequest
+	(*SpecificationsResponse)(nil), // 12: monitoring.agent.v1.SpecificationsResponse
+	(*Specs)(nil),                  // 13: monitoring.agent.v1.Specs
+	(*HostSpecs)(nil),              // 14: monitoring.agent.v1.HostSpecs
+	(*CpuSpecs)(nil),               // 15: monitoring.agent.v1.CpuSpecs
+	(*DiskSpecsList)(nil),          // 16: monitoring.agent.v1.DiskSpecsList
+	(*DiskSpecs)(nil),              // 17: monitoring.agent.v1.DiskSpecs
+	(*MemorySpecs)(nil),            // 18: monitoring.agent.v1.MemorySpecs
+	(*PhysicalMemoryInfo)(nil),     // 19: monitoring.agent.v1.PhysicalMemoryInfo
+	(*StreamingAgentMessage)(nil),  // 20: monitoring.agent.v1.StreamingAgentMessage
+	(*StreamingInfo)(nil),          // 21: monitoring.agent.v1.StreamingInfo
+	(*VideoFrame)(nil),             // 22: monitoring.agent.v1.VideoFrame
+	(*StreamingServerMessage)(nil), // 23: monitoring.agent.v1.StreamingServerMessage
+	(*StreamingSettings)(nil),      // 24: monitoring.agent.v1.StreamingSettings
+	(*timestamppb.Timestamp)(nil),  // 25: google.protobuf.Timestamp
 }
 var file_agent_v1_agent_service_proto_depIdxs = []int32{
-	2,  // 0: monitoring.agent.v1.AgentMessage.handshake:type_name -> monitoring.agent.v1.Handshake
-	3,  // 1: monitoring.agent.v1.AgentMessage.metrics:type_name -> monitoring.agent.v1.Metrics
-	13, // 2: monitoring.agent.v1.AgentMessage.command_result:type_name -> monitoring.agent.v1.CommandResult
-	12, // 3: monitoring.agent.v1.ServerMessage.command:type_name -> monitoring.agent.v1.Command
-	5,  // 4: monitoring.agent.v1.Metrics.cpu_percent:type_name -> monitoring.agent.v1.CpuPercentMetric
-	6,  // 5: monitoring.agent.v1.Metrics.focused_window:type_name -> monitoring.agent.v1.FocusedWindowMetric
-	7,  // 6: monitoring.agent.v1.Metrics.memory_usage:type_name -> monitoring.agent.v1.MemoryUsageMetric
-	8,  // 7: monitoring.agent.v1.Metrics.disk_usage:type_name -> monitoring.agent.v1.DiskUsageMetric
-	9,  // 8: monitoring.agent.v1.Metrics.network_usage:type_name -> monitoring.agent.v1.NetworkUsageMetric
-	24, // 9: monitoring.agent.v1.Metrics.timestamp:type_name -> google.protobuf.Timestamp
-	24, // 10: monitoring.agent.v1.Metric.timestamp:type_name -> google.protobuf.Timestamp
-	5,  // 11: monitoring.agent.v1.Metric.cpu_percent:type_name -> monitoring.agent.v1.CpuPercentMetric
-	6,  // 12: monitoring.agent.v1.Metric.focused_window:type_name -> monitoring.agent.v1.FocusedWindowMetric
-	7,  // 13: monitoring.agent.v1.Metric.memory_usage:type_name -> monitoring.agent.v1.MemoryUsageMetric
-	8,  // 14: monitoring.agent.v1.Metric.disk_usage:type_name -> monitoring.agent.v1.DiskUsageMetric
-	9,  // 15: monitoring.agent.v1.Metric.network_usage:type_name -> monitoring.agent.v1.NetworkUsageMetric
-	11, // 16: monitoring.agent.v1.Metric.process:type_name -> monitoring.agent.v1.ProcessMetric
-	24, // 17: monitoring.agent.v1.CpuPercentMetric.timestamp:type_name -> google.protobuf.Timestamp
-	24, // 18: monitoring.agent.v1.FocusedWindowMetric.timestamp:type_name -> google.protobuf.Timestamp
-	24, // 19: monitoring.agent.v1.MemoryUsageMetric.timestamp:type_name -> google.protobuf.Timestamp
-	23, // 20: monitoring.agent.v1.DiskUsageMetric.value:type_name -> monitoring.agent.v1.DiskUsageMetric.ValueEntry
-	24, // 21: monitoring.agent.v1.DiskUsageMetric.timestamp:type_name -> google.protobuf.Timestamp
-	24, // 22: monitoring.agent.v1.NetworkUsageMetric.timestamp:type_name -> google.protobuf.Timestamp
-	10, // 23: monitoring.agent.v1.ProcessMetric.process_list:type_name -> monitoring.agent.v1.Process
-	14, // 24: monitoring.agent.v1.Command.specifications_request:type_name -> monitoring.agent.v1.SpecificationsRequest
-	15, // 25: monitoring.agent.v1.CommandResult.specifications_response:type_name -> monitoring.agent.v1.SpecificationsResponse
-	16, // 26: monitoring.agent.v1.SpecificationsResponse.specs:type_name -> monitoring.agent.v1.Specs
-	17, // 27: monitoring.agent.v1.Specs.host:type_name -> monitoring.agent.v1.HostSpecs
-	18, // 28: monitoring.agent.v1.Specs.cpu:type_name -> monitoring.agent.v1.CpuSpecs
-	19, // 29: monitoring.agent.v1.Specs.disk:type_name -> monitoring.agent.v1.DiskSpecsList
-	21, // 30: monitoring.agent.v1.Specs.memory:type_name -> monitoring.agent.v1.MemorySpecs
-	20, // 31: monitoring.agent.v1.DiskSpecsList.disk:type_name -> monitoring.agent.v1.DiskSpecs
-	22, // 32: monitoring.agent.v1.MemorySpecs.physical_memory:type_name -> monitoring.agent.v1.PhysicalMemoryInfo
-	0,  // 33: monitoring.agent.v1.AgentService.Connect:input_type -> monitoring.agent.v1.AgentMessage
-	1,  // 34: monitoring.agent.v1.AgentService.Connect:output_type -> monitoring.agent.v1.ServerMessage
-	34, // [34:35] is the sub-list for method output_type
-	33, // [33:34] is the sub-list for method input_type
-	33, // [33:33] is the sub-list for extension type_name
-	33, // [33:33] is the sub-list for extension extendee
-	0,  // [0:33] is the sub-list for field type_name
+	0,  // 0: monitoring.agent.v1.MetricSample.kind:type_name -> monitoring.agent.v1.MetricKind
+	25, // 1: monitoring.agent.v1.MetricSample.timestamp:type_name -> google.protobuf.Timestamp
+	1,  // 2: monitoring.agent.v1.MetricsBatch.samples:type_name -> monitoring.agent.v1.MetricSample
+	5,  // 3: monitoring.agent.v1.AgentMessage.handshake:type_name -> monitoring.agent.v1.Handshake
+	2,  // 4: monitoring.agent.v1.AgentMessage.metrics:type_name -> monitoring.agent.v1.MetricsBatch
+	10, // 5: monitoring.agent.v1.AgentMessage.command_result:type_name -> monitoring.agent.v1.CommandResult
+	9,  // 6: monitoring.agent.v1.ServerMessage.command:type_name -> monitoring.agent.v1.Command
+	6,  // 7: monitoring.agent.v1.ServerMessage.status:type_name -> monitoring.agent.v1.HandshakeStatus
+	7,  // 8: monitoring.agent.v1.ProcessMetric.process_list:type_name -> monitoring.agent.v1.Process
+	11, // 9: monitoring.agent.v1.Command.specifications_request:type_name -> monitoring.agent.v1.SpecificationsRequest
+	12, // 10: monitoring.agent.v1.CommandResult.specifications_response:type_name -> monitoring.agent.v1.SpecificationsResponse
+	13, // 11: monitoring.agent.v1.SpecificationsResponse.specs:type_name -> monitoring.agent.v1.Specs
+	14, // 12: monitoring.agent.v1.Specs.host:type_name -> monitoring.agent.v1.HostSpecs
+	15, // 13: monitoring.agent.v1.Specs.cpu:type_name -> monitoring.agent.v1.CpuSpecs
+	16, // 14: monitoring.agent.v1.Specs.disk:type_name -> monitoring.agent.v1.DiskSpecsList
+	18, // 15: monitoring.agent.v1.Specs.memory:type_name -> monitoring.agent.v1.MemorySpecs
+	17, // 16: monitoring.agent.v1.DiskSpecsList.disk:type_name -> monitoring.agent.v1.DiskSpecs
+	19, // 17: monitoring.agent.v1.MemorySpecs.physical_memory:type_name -> monitoring.agent.v1.PhysicalMemoryInfo
+	21, // 18: monitoring.agent.v1.StreamingAgentMessage.info:type_name -> monitoring.agent.v1.StreamingInfo
+	22, // 19: monitoring.agent.v1.StreamingAgentMessage.frame:type_name -> monitoring.agent.v1.VideoFrame
+	24, // 20: monitoring.agent.v1.StreamingServerMessage.settings:type_name -> monitoring.agent.v1.StreamingSettings
+	3,  // 21: monitoring.agent.v1.AgentService.Connect:input_type -> monitoring.agent.v1.AgentMessage
+	20, // 22: monitoring.agent.v1.AgentService.StartStreamMJPEG:input_type -> monitoring.agent.v1.StreamingAgentMessage
+	4,  // 23: monitoring.agent.v1.AgentService.Connect:output_type -> monitoring.agent.v1.ServerMessage
+	23, // 24: monitoring.agent.v1.AgentService.StartStreamMJPEG:output_type -> monitoring.agent.v1.StreamingServerMessage
+	23, // [23:25] is the sub-list for method output_type
+	21, // [21:23] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_agent_v1_agent_service_proto_init() }
@@ -1912,41 +1941,42 @@ func file_agent_v1_agent_service_proto_init() {
 	if File_agent_v1_agent_service_proto != nil {
 		return
 	}
-	file_agent_v1_agent_service_proto_msgTypes[0].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[2].OneofWrappers = []any{
 		(*AgentMessage_Handshake)(nil),
 		(*AgentMessage_Metrics)(nil),
 		(*AgentMessage_CommandResult)(nil),
 	}
-	file_agent_v1_agent_service_proto_msgTypes[1].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[3].OneofWrappers = []any{
 		(*ServerMessage_Command)(nil),
+		(*ServerMessage_Status)(nil),
 	}
-	file_agent_v1_agent_service_proto_msgTypes[4].OneofWrappers = []any{
-		(*Metric_CpuPercent)(nil),
-		(*Metric_FocusedWindow)(nil),
-		(*Metric_MemoryUsage)(nil),
-		(*Metric_DiskUsage)(nil),
-		(*Metric_NetworkUsage)(nil),
-		(*Metric_Process)(nil),
-	}
-	file_agent_v1_agent_service_proto_msgTypes[10].OneofWrappers = []any{}
-	file_agent_v1_agent_service_proto_msgTypes[12].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[6].OneofWrappers = []any{}
+	file_agent_v1_agent_service_proto_msgTypes[8].OneofWrappers = []any{
 		(*Command_SpecificationsRequest)(nil),
 	}
-	file_agent_v1_agent_service_proto_msgTypes[13].OneofWrappers = []any{
+	file_agent_v1_agent_service_proto_msgTypes[9].OneofWrappers = []any{
 		(*CommandResult_SpecificationsResponse)(nil),
+	}
+	file_agent_v1_agent_service_proto_msgTypes[19].OneofWrappers = []any{
+		(*StreamingAgentMessage_Info)(nil),
+		(*StreamingAgentMessage_Frame)(nil),
+	}
+	file_agent_v1_agent_service_proto_msgTypes[22].OneofWrappers = []any{
+		(*StreamingServerMessage_Settings)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_v1_agent_service_proto_rawDesc), len(file_agent_v1_agent_service_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_agent_v1_agent_service_proto_goTypes,
 		DependencyIndexes: file_agent_v1_agent_service_proto_depIdxs,
+		EnumInfos:         file_agent_v1_agent_service_proto_enumTypes,
 		MessageInfos:      file_agent_v1_agent_service_proto_msgTypes,
 	}.Build()
 	File_agent_v1_agent_service_proto = out.File

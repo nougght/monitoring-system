@@ -10,7 +10,7 @@ import (
 
 // @title           Monitoring Agent API
 // @version         1.0
-// @host            localhost:8088
+// @host            localhost:8111
 // @BasePath        /
 func main() {
 	os.Exit(cli.New().Execute())

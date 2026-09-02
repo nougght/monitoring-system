@@ -1,15 +1,23 @@
 package mapper
 
 import (
-	"github.com/nougght/monitoring-system/server/internal/model/agent"
+	"log"
+
+	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 	dto "github.com/nougght/monitoring-system/server/internal/transport/dto/types"
 )
 
 // -- agents --
 
-func AgentToDTO(domain *agent.Agent) (res *dto.AgentDTO) {
+func AgentToDTO(domain *agent_model.Agent) (res *dto.AgentDTO) {
 	if domain == nil {
 		return
+	}
+	isOnline := false
+	if domain.IsOnline != nil {
+		isOnline = *domain.IsOnline
+	} else {
+		log.Println("Warning: agent IsOnline field is nil, defaulting to false in DTO")
 	}
 	res = &dto.AgentDTO{
 		ID:          domain.ID,
@@ -18,12 +26,12 @@ func AgentToDTO(domain *agent.Agent) (res *dto.AgentDTO) {
 		CreatedAt:   domain.CreatedAt,
 		LastSeenAt:  domain.LastSeenAt,
 		Status:      domain.Status,
-		IsOnline:    domain.IsOnline,
+		IsOnline:    isOnline,
 	}
 	return
 }
 
-func CreateAgentResultToDTO(domain *agent.CreateAgentResult) (res *dto.CreateAgentResponse) {
+func CreateAgentResultToDTO(domain *agent_model.CreateAgentResult) (res *dto.CreateAgentResponse) {
 	if domain == nil {
 		return
 	}
@@ -34,7 +42,7 @@ func CreateAgentResultToDTO(domain *agent.CreateAgentResult) (res *dto.CreateAge
 	return
 }
 
-func AgentConfigToDTO(domain *agent.AgentSetupConfig) (res *dto.AgentConfigResponse) {
+func AgentConfigToDTO(domain *agent_model.AgentSetupConfig) (res *dto.AgentConfigResponse) {
 	if domain == nil {
 		return
 	}
@@ -44,4 +52,19 @@ func AgentConfigToDTO(domain *agent.AgentSetupConfig) (res *dto.AgentConfigRespo
 		ServerAddress:     domain.ServerAddress,
 	}
 	return
+}
+
+func SpecsToDTO(domain *agent_model.Specs) (res *dto.SpecsDTO) {
+	if domain == nil {
+		return nil
+	}
+
+	return &dto.SpecsDTO{
+		AgentID:     domain.AgentID,
+		UpdatedAt:   domain.UpdatedAt,
+		HostSpecs:   domain.HostSpecs,
+		CpuSpecs:    domain.CpuSpecs,
+		MemorySpecs: domain.MemorySpecs,
+		DiskSpecs:   domain.DiskSpecs,
+	}
 }

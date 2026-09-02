@@ -8,42 +8,57 @@ import type {
   Agent,
   AgentConfigBody,
   AgentConfigResponse,
+  AgentSpecs,
+  CreateAgent400,
+  CreateAgent404,
+  CreateAgent500,
   CreateAgentBody,
   CreateAgentResponse,
-  GinH
+  DownloadAgentConfig400,
+  DownloadAgentConfig404,
+  DownloadAgentConfig500,
+  GetAgentByID400,
+  GetAgentByID404,
+  GetAgentByID500,
+  GetAgentSpecs400,
+  GetAgentSpecs404,
+  GetAgentSpecs500,
+  GetAllAgents400,
+  GetAllAgents404,
+  GetAllAgents500
 } from '../models';
 
 
-export type getAgentsResponse200 = {
+export type getAllAgentsResponse200 = {
   data: Agent[]
   status: 200
 }
 
-export type getAgentsResponse400 = {
-  data: GinH
+export type getAllAgentsResponse400 = {
+  data: GetAllAgents400
   status: 400
 }
 
-export type getAgentsResponse404 = {
-  data: GinH
+export type getAllAgentsResponse404 = {
+  data: GetAllAgents404
   status: 404
 }
 
-export type getAgentsResponse500 = {
-  data: GinH
+export type getAllAgentsResponse500 = {
+  data: GetAllAgents500
   status: 500
 }
 
-export type getAgentsResponseSuccess = (getAgentsResponse200) & {
+export type getAllAgentsResponseSuccess = (getAllAgentsResponse200) & {
   headers: Headers;
 };
-export type getAgentsResponseError = (getAgentsResponse400 | getAgentsResponse404 | getAgentsResponse500) & {
+export type getAllAgentsResponseError = (getAllAgentsResponse400 | getAllAgentsResponse404 | getAllAgentsResponse500) & {
   headers: Headers;
 };
 
-export type getAgentsResponse = (getAgentsResponseSuccess | getAgentsResponseError)
+export type getAllAgentsResponse = (getAllAgentsResponseSuccess | getAllAgentsResponseError)
 
-export const getGetAgentsUrl = () => {
+export const getGetAllAgentsUrl = () => {
 
 
 
@@ -54,9 +69,9 @@ export const getGetAgentsUrl = () => {
 /**
  * @summary Get all agents
  */
-export const getAgents = async ( options?: RequestInit): Promise<getAgentsResponse> => {
+export const getAllAgents = async ( options?: RequestInit): Promise<getAllAgentsResponse> => {
 
-  const res = await fetch(getGetAgentsUrl(),
+  const res = await fetch(getGetAllAgentsUrl(),
   {
     ...options,
     method: 'GET'
@@ -68,42 +83,42 @@ export const getAgents = async ( options?: RequestInit): Promise<getAgentsRespon
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getAgentsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getAgentsResponse
+  const data: getAllAgentsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getAllAgentsResponse
 }
 
 
 
-export type postAgentsResponse200 = {
+export type createAgentResponse200 = {
   data: CreateAgentResponse
   status: 200
 }
 
-export type postAgentsResponse400 = {
-  data: GinH
+export type createAgentResponse400 = {
+  data: CreateAgent400
   status: 400
 }
 
-export type postAgentsResponse404 = {
-  data: GinH
+export type createAgentResponse404 = {
+  data: CreateAgent404
   status: 404
 }
 
-export type postAgentsResponse500 = {
-  data: GinH
+export type createAgentResponse500 = {
+  data: CreateAgent500
   status: 500
 }
 
-export type postAgentsResponseSuccess = (postAgentsResponse200) & {
+export type createAgentResponseSuccess = (createAgentResponse200) & {
   headers: Headers;
 };
-export type postAgentsResponseError = (postAgentsResponse400 | postAgentsResponse404 | postAgentsResponse500) & {
+export type createAgentResponseError = (createAgentResponse400 | createAgentResponse404 | createAgentResponse500) & {
   headers: Headers;
 };
 
-export type postAgentsResponse = (postAgentsResponseSuccess | postAgentsResponseError)
+export type createAgentResponse = (createAgentResponseSuccess | createAgentResponseError)
 
-export const getPostAgentsUrl = () => {
+export const getCreateAgentUrl = () => {
 
 
 
@@ -114,9 +129,9 @@ export const getPostAgentsUrl = () => {
 /**
  * @summary Create new agent
  */
-export const postAgents = async (createAgentBody: CreateAgentBody, options?: RequestInit): Promise<postAgentsResponse> => {
+export const createAgent = async (createAgentBody: CreateAgentBody, options?: RequestInit): Promise<createAgentResponse> => {
 
-  const res = await fetch(getPostAgentsUrl(),
+  const res = await fetch(getCreateAgentUrl(),
   {
     ...options,
     method: 'POST',
@@ -128,42 +143,155 @@ export const postAgents = async (createAgentBody: CreateAgentBody, options?: Req
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: postAgentsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as postAgentsResponse
+  const data: createAgentResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createAgentResponse
 }
 
 
 
-export type postAgentsAgentIDSetupconfigResponse200 = {
+export type getAgentByIDResponse200 = {
+  data: Agent
+  status: 200
+}
+
+export type getAgentByIDResponse400 = {
+  data: GetAgentByID400
+  status: 400
+}
+
+export type getAgentByIDResponse404 = {
+  data: GetAgentByID404
+  status: 404
+}
+
+export type getAgentByIDResponse500 = {
+  data: GetAgentByID500
+  status: 500
+}
+
+export type getAgentByIDResponseSuccess = (getAgentByIDResponse200) & {
+  headers: Headers;
+};
+export type getAgentByIDResponseError = (getAgentByIDResponse400 | getAgentByIDResponse404 | getAgentByIDResponse500) & {
+  headers: Headers;
+};
+
+export type getAgentByIDResponse = (getAgentByIDResponseSuccess | getAgentByIDResponseError)
+
+export const getGetAgentByIDUrl = (agentID: string,) => {
+
+
+
+
+  return `http://127.0.0.1:8091/api/v1/agents/${agentID}`
+}
+
+/**
+ * @summary Get agent by ID
+ */
+export const getAgentByID = async (agentID: string, options?: RequestInit): Promise<getAgentByIDResponse> => {
+
+  const res = await fetch(getGetAgentByIDUrl(agentID),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAgentByIDResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getAgentByIDResponse
+}
+
+
+
+export type getStreamFramesResponse400 = {
+  data: Blob
+  status: 400
+}
+
+export type getStreamFramesResponse404 = {
+  data: Blob
+  status: 404
+}
+
+export type getStreamFramesResponse500 = {
+  data: Blob
+  status: 500
+}
+
+;
+export type getStreamFramesResponseError = (getStreamFramesResponse400 | getStreamFramesResponse404 | getStreamFramesResponse500) & {
+  headers: Headers;
+};
+
+export type getStreamFramesResponse = (getStreamFramesResponseError)
+
+export const getGetStreamFramesUrl = (agentID: string,) => {
+
+
+
+
+  return `http://127.0.0.1:8091/api/v1/agents/${agentID}/frames`
+}
+
+/**
+ * @summary Get stream frames
+ */
+export const getStreamFrames = async (agentID: string, options?: RequestInit): Promise<getStreamFramesResponse> => {
+
+  const res = await fetch(getGetStreamFramesUrl(agentID),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getStreamFramesResponse['data'] = body !== null ? body : ''
+  return { data, status: res.status, headers: res.headers } as getStreamFramesResponse
+}
+
+
+
+export type downloadAgentConfigResponse200 = {
   data: AgentConfigResponse
   status: 200
 }
 
-export type postAgentsAgentIDSetupconfigResponse400 = {
-  data: GinH
+export type downloadAgentConfigResponse400 = {
+  data: DownloadAgentConfig400
   status: 400
 }
 
-export type postAgentsAgentIDSetupconfigResponse404 = {
-  data: GinH
+export type downloadAgentConfigResponse404 = {
+  data: DownloadAgentConfig404
   status: 404
 }
 
-export type postAgentsAgentIDSetupconfigResponse500 = {
-  data: GinH
+export type downloadAgentConfigResponse500 = {
+  data: DownloadAgentConfig500
   status: 500
 }
 
-export type postAgentsAgentIDSetupconfigResponseSuccess = (postAgentsAgentIDSetupconfigResponse200) & {
+export type downloadAgentConfigResponseSuccess = (downloadAgentConfigResponse200) & {
   headers: Headers;
 };
-export type postAgentsAgentIDSetupconfigResponseError = (postAgentsAgentIDSetupconfigResponse400 | postAgentsAgentIDSetupconfigResponse404 | postAgentsAgentIDSetupconfigResponse500) & {
+export type downloadAgentConfigResponseError = (downloadAgentConfigResponse400 | downloadAgentConfigResponse404 | downloadAgentConfigResponse500) & {
   headers: Headers;
 };
 
-export type postAgentsAgentIDSetupconfigResponse = (postAgentsAgentIDSetupconfigResponseSuccess | postAgentsAgentIDSetupconfigResponseError)
+export type downloadAgentConfigResponse = (downloadAgentConfigResponseSuccess | downloadAgentConfigResponseError)
 
-export const getPostAgentsAgentIDSetupconfigUrl = (agentID: string,) => {
+export const getDownloadAgentConfigUrl = (agentID: string,) => {
 
 
 
@@ -174,10 +302,10 @@ export const getPostAgentsAgentIDSetupconfigUrl = (agentID: string,) => {
 /**
  * @summary Download agent setup config
  */
-export const postAgentsAgentIDSetupconfig = async (agentID: string,
-    agentConfigBody: AgentConfigBody, options?: RequestInit): Promise<postAgentsAgentIDSetupconfigResponse> => {
+export const downloadAgentConfig = async (agentID: string,
+    agentConfigBody: AgentConfigBody, options?: RequestInit): Promise<downloadAgentConfigResponse> => {
 
-  const res = await fetch(getPostAgentsAgentIDSetupconfigUrl(agentID),
+  const res = await fetch(getDownloadAgentConfigUrl(agentID),
   {
     ...options,
     method: 'POST',
@@ -189,8 +317,68 @@ export const postAgentsAgentIDSetupconfig = async (agentID: string,
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: postAgentsAgentIDSetupconfigResponse['data'] = body !== null ? body : ''
-  return { data, status: res.status, headers: res.headers } as postAgentsAgentIDSetupconfigResponse
+  const data: downloadAgentConfigResponse['data'] = body !== null ? body : ''
+  return { data, status: res.status, headers: res.headers } as downloadAgentConfigResponse
+}
+
+
+
+export type getAgentSpecsResponse200 = {
+  data: AgentSpecs
+  status: 200
+}
+
+export type getAgentSpecsResponse400 = {
+  data: GetAgentSpecs400
+  status: 400
+}
+
+export type getAgentSpecsResponse404 = {
+  data: GetAgentSpecs404
+  status: 404
+}
+
+export type getAgentSpecsResponse500 = {
+  data: GetAgentSpecs500
+  status: 500
+}
+
+export type getAgentSpecsResponseSuccess = (getAgentSpecsResponse200) & {
+  headers: Headers;
+};
+export type getAgentSpecsResponseError = (getAgentSpecsResponse400 | getAgentSpecsResponse404 | getAgentSpecsResponse500) & {
+  headers: Headers;
+};
+
+export type getAgentSpecsResponse = (getAgentSpecsResponseSuccess | getAgentSpecsResponseError)
+
+export const getGetAgentSpecsUrl = (agentID: string,) => {
+
+
+
+
+  return `http://127.0.0.1:8091/api/v1/agents/${agentID}/specifications`
+}
+
+/**
+ * @summary Get agent specifications
+ */
+export const getAgentSpecs = async (agentID: string, options?: RequestInit): Promise<getAgentSpecsResponse> => {
+
+  const res = await fetch(getGetAgentSpecsUrl(agentID),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAgentSpecsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getAgentSpecsResponse
 }
 
 

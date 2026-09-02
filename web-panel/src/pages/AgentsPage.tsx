@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom"
-import { useCreateAgents } from "../hooks/useCreateAgent"
+import { Link, useNavigate } from "react-router-dom"
 import { useAgents } from "../hooks/useGetAgents";
 import { useEffect, useState } from "react";
 import { AgentCard } from "../components/agentCard";
@@ -11,10 +10,11 @@ export const AgentsPage = () => {
     const {
         data: agents,
         isPending: isAgentsPending,
-        isError: isAgentsError,
-        error: agentsError,
-        isFetching: isAgentsFetching,
+        isError: _isAgentsError,
+        error: _agentsError,
+        isFetching: _isAgentsFetching,
     } = useAgents();
+    let navigate = useNavigate()
 
 
     useEffect(() => {
@@ -35,7 +35,7 @@ export const AgentsPage = () => {
                         agents?.agents?.filter((a) => a.status != null).map((agent) => 
                             // {agent.status != null &&
                             <div key={agent.id}>
-                                <AgentCard agent={agent} />
+                                <AgentCard agent={agent} onClick={(id)=> {navigate(id)}}/>
                             </div>
                             // }
                         )

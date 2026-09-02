@@ -1,4 +1,4 @@
-package agent
+package agent_model
 
 type AgentSetupConfig struct {
 	EnrollmentKey     string `yaml:"enrollment_key"`

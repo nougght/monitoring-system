@@ -5,4 +5,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface GinH {[key: string]: unknown}
+export type GetStreamFrames404 = { [key: string]: unknown };

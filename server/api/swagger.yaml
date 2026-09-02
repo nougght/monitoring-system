@@ -31,6 +31,58 @@ definitions:
       serverAddress:
         type: string
     type: object
+  AgentSpecs:
+    properties:
+      agentId:
+        type: string
+      cpuSpecs:
+        $ref: '#/definitions/CpuSpecs'
+      diskSpecs:
+        items:
+          $ref: '#/definitions/DiskSpecs'
+        type: array
+      hostSpecs:
+        $ref: '#/definitions/HostSpecs'
+      memorySpecs:
+        $ref: '#/definitions/MemorySpecs'
+      updatedAt:
+        type: string
+    type: object
+  CpuSpecs:
+    properties:
+      architecture:
+        type: string
+      availability:
+        type: string
+      currentClockSpeed:
+        type: integer
+      data_width:
+        type: integer
+      l2CacheSize:
+        type: integer
+      l3CacheSize:
+        type: integer
+      manufacturer:
+        type: string
+      maxClockSpeed:
+        type: integer
+      modelName:
+        type: string
+      numberOfCores:
+        type: integer
+      numberOfEnabledCores:
+        type: integer
+      numberOfLogicalProcessors:
+        type: integer
+      processorId:
+        type: string
+      socketDesignation:
+        type: string
+      stepping:
+        type: string
+      virtualizationFirmwareEnabled:
+        type: boolean
+    type: object
   CreateAgentBody:
     properties:
       description:
@@ -59,8 +111,67 @@ definitions:
       status:
         type: string
     type: object
-  gin.H:
-    additionalProperties: {}
+  DiskSpecs:
+    properties:
+      device:
+        type: string
+      fsType:
+        type: string
+      total:
+        type: integer
+    type: object
+  HostSpecs:
+    properties:
+      hostname:
+        type: string
+      kernelVersion:
+        type: string
+      os:
+        type: string
+      osArch:
+        type: string
+      osType:
+        type: string
+      osVersion:
+        type: string
+    type: object
+  MemorySpecs:
+    properties:
+      physicalMemoryInfo:
+        items:
+          $ref: '#/definitions/PhysicalMemoryInfo'
+        type: array
+      total:
+        type: integer
+    type: object
+  PhysicalMemoryInfo:
+    properties:
+      bankLabel:
+        type: string
+      capacity:
+        type: integer
+      configuredClockSpeed:
+        type: integer
+      deviceLocator:
+        type: string
+      form_factor:
+        type: string
+      hotSwappable:
+        type: boolean
+      manufacturer:
+        type: string
+      memoryType:
+        type: string
+      modelName:
+        type: string
+      removable:
+        type: boolean
+      replaceable:
+        type: boolean
+      serialNumber:
+        type: string
+      speed:
+        type: integer
     type: object
 host: localhost:8091
 info:
@@ -70,6 +181,7 @@ info:
 paths:
   /agents:
     get:
+      operationId: getAllAgents
       produces:
       - application/json
       responses:
@@ -82,19 +194,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Get all agents
     post:
       consumes:
       - application/json
+      operationId: createAgent
       parameters:
       - description: Create agent body
         in: body
@@ -112,20 +228,84 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Create new agent
+  /agents/{agentID}:
+    get:
+      operationId: getAgentByID
+      parameters:
+      - description: Agent ID
+        in: path
+        name: agentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Agent'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get agent by ID
+  /agents/{agentID}/frames:
+    get:
+      operationId: getStreamFrames
+      parameters:
+      - description: Agent ID
+        in: path
+        name: agentID
+        required: true
+        type: string
+      produces:
+      - image/jpeg
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get stream frames
   /agents/{agentID}/setupconfig:
     post:
       consumes:
       - application/json
+      operationId: downloadAgentConfig
       parameters:
       - description: Agent ID
         in: path
@@ -148,14 +328,49 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Download agent setup config
+  /agents/{agentID}/specifications:
+    get:
+      operationId: getAgentSpecs
+      parameters:
+      - description: Agent ID
+        in: path
+        name: agentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AgentSpecs'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get agent specifications
 swagger: "2.0"

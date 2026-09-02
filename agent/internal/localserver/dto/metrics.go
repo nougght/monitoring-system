@@ -12,7 +12,7 @@ type Process struct {
 type Metrics struct {
 	FocusedWindow *string            `json:"focusedWindow,omitempty"`
 	ProcessList   []Process          `json:"processList,omitempty"`
-	CpuPercent    *float32           `json:"cpuPercent,omitempty"`
+	CpuPercent    *float64           `json:"cpuPercent,omitempty"`
 	MemoryUsed    *uint64            `json:"memoryUsed,omitempty"`
 	DiskUsage     *map[string]uint64 `json:"diskUsage,omitempty"`
 	UploadMbps    *float32           `json:"uploadMbps,omitempty"`

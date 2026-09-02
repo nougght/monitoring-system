@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/nougght/monitoring-system/server/internal/model"
-	"github.com/nougght/monitoring-system/server/internal/model/agent"
+	agent_model "github.com/nougght/monitoring-system/server/internal/model/agent"
 )
 
 type AgentRepository struct {
@@ -24,13 +24,13 @@ func NewAgentRepository(db DB) *AgentRepository {
 
 func (r *AgentRepository) db(ctx context.Context) DB {
 	res := r.pool
-	if tx := ctx.Value(model.TxKey); tx != nil {
+	if tx := ctx.Value(model.ContextKeyTx); tx != nil {
 		res = tx.(DB)
 	}
 	return res
 }
 
-func (r *AgentRepository) CreateAgent(ctx context.Context, agent *agent.Agent) (*agent.Agent, error) {
+func (r *AgentRepository) CreateAgent(ctx context.Context, agent *agent_model.Agent) (*agent_model.Agent, error) {
 	query := `
 	INSERT INTO agents (name, description) 
 	VALUES($1, $2)
@@ -44,7 +44,7 @@ func (r *AgentRepository) CreateAgent(ctx context.Context, agent *agent.Agent) (
 	return agent, nil
 }
 
-func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent.Agent, err error) {
+func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent_model.Agent, err error) {
 	query := `
 		SELECT * FROM agents;
 		`
@@ -60,7 +60,7 @@ func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent.Agent,
 	}
 	defer rows.Close()
 
-	res, err = pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[agent.Agent])
+	res, err = pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[agent_model.Agent])
 	if err != nil {
 		return nil, fmt.Errorf("collect rows failed: %w", err)
 	}
@@ -68,7 +68,27 @@ func (r *AgentRepository) GetAllAgents(ctx context.Context) (res []*agent.Agent,
 	return res, nil
 }
 
-func (r *AgentRepository) UpdateStatus(ctx context.Context, agentID uuid.UUID, status agent.AgentStatus) error {
+func (r *AgentRepository) GetAgentByID(ctx context.Context, id uuid.UUID) (res *agent_model.Agent, err error) {
+	query := `
+		SELECT * FROM agents WHERE agents.id = $1;
+		`
+	rows, err := r.db(ctx).Query(ctx, query, id)
+	if err != nil {
+		return nil, fmt.Errorf("select failed: %w", err)
+	}
+	defer rows.Close()
+
+	res, err = pgx.CollectOneRow(rows, pgx.RowToAddrOfStructByName[agent_model.Agent])
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = ErrNotFound
+	}
+	if err != nil {
+		return nil, fmt.Errorf("collect row failed: %w", err)
+	}
+
+	return res, nil
+}
+func (r *AgentRepository) UpdateStatus(ctx context.Context, agentID uuid.UUID, status agent_model.AgentStatus) error {
 	query := `
 	UPDATE agents SET status = $1 WHERE ID = $2
 	`
