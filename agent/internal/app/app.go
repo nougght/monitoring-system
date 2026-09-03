@@ -6,8 +6,10 @@ import (
 	"agent/internal/localserver/handler"
 	ws "agent/internal/localserver/websocket"
 	"agent/internal/service"
+	"agent/static"
 	"context"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os/signal"
@@ -53,6 +55,14 @@ func RunAgent(setupConfig *config.SetupConfig) error {
 	// 	ctx.Request.URL.Path = "/doc.json"
 	// 	r.HandleContext(ctx)
 	// })
+	staticUI, err := fs.Sub(static.StaticFiles, "files")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fileServer := gin.WrapH(http.FileServer(http.FS(staticUI)))
+
+	r.GET("/", fileServer)
+	r.NoRoute(fileServer) // for ui routing
 
 	r.GET("/ws", wsHandler.HandleConnection)
 	r.GET("/specs", h.GetSpecifications)

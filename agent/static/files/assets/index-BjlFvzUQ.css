@@ -1,0 +1,1 @@
+.tabBar{flex-direction:row;justify-content:center;align-items:center;display:flex}.tabBar>.tab-button{border:1px solid #b2b7b9;border-radius:10px;margin:5px;padding:5px}.tabBar>.tab-button:hover{background-color:#f0e7d8}.tabBar>.tab-button.active{border:2px solid #f0a23d;padding:4px}
