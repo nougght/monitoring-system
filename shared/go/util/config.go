@@ -29,15 +29,18 @@ func ReadYaml(path string, out interface{}) error {
 	return nil
 }
 
-func SaveYaml(path string, in interface{}) error {
-	f, err := os.OpenFile(path, os.O_RDWR, 0644)
+func SaveYaml(path string, in interface{}) (err error) {
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 
 	if err != nil {
 		return fmt.Errorf("failed to open file %s: %w", path, err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
-	defer CloseWithLog(f)
 	encoded, err := yaml.Marshal(in)
 	if err != nil {
 		return fmt.Errorf("failed to encode yaml:%w", err)
