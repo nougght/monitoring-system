@@ -18,6 +18,16 @@ type Config struct {
 	MetricsSendingInterval time.Duration `yaml:"metrics_sending_interval"`
 }
 
+var DefaultConfig = Config{
+	FocusedWindowInterval:  time.Second * 1,
+	CpuPercentInterval:     time.Millisecond * 500,
+	MemoryInterval:         time.Second * 1,
+	DiskInterval:           time.Second * 10,
+	NetInterval:            time.Second * 1,
+	ProcessInterval:        time.Second * 1,
+	MetricsSendingInterval: time.Millisecond * 500,
+}
+
 func MustLoadConfig(path string) *Config {
 	cfg, err := LoadConfig(path)
 	if err != nil {
@@ -33,6 +43,8 @@ func LoadConfig(path string) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read yaml config")
 	}
+
+	cfg = &DefaultConfig
 
 	if cfg.NetInterval < time.Second {
 		return nil, fmt.Errorf("net interval can't be less than 1 second")

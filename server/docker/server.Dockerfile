@@ -7,14 +7,15 @@ COPY shared/go ./shared/go
 COPY server ./server
 
 WORKDIR /build/server
-RUN go build -o /build/app ./cmd/main.go
+RUN go build -o /build/monit-server ./cmd/main.go
 
 
 # light weight image for running
 FROM alpine
-WORKDIR /app
+WORKDIR /app/server
 
-COPY --from=build /build/app ./app
-COPY --from=build /build/server/config.yaml ./config.yaml
-
-ENTRYPOINT ["./app"]
+COPY --from=build /build/monit-server .
+COPY --from=build /build/server/config.yaml .
+COPY bin/agent.exe /app/bin/agent.exe
+COPY server/creds/root-ca.crt /app/server/creds/root-ca.crt
+ENTRYPOINT ["./monit-server"]

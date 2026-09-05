@@ -21,7 +21,7 @@ async function downloadConfig(vars: SetupConfigVariables): Promise<Error | void>
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'config.yaml';
+    a.download = 'agent.zip';
     a.click();
     URL.revokeObjectURL(url);
 }

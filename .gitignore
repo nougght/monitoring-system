@@ -13,7 +13,7 @@ bin/*
 
 *.crt
 *.key
-*.cnf
+# *.cnf
 *.srl
 *.csr
 

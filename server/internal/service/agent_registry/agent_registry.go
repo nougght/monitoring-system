@@ -12,6 +12,7 @@ import (
 	"log"
 	"math"
 	"math/big"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -24,6 +25,7 @@ import (
 	"github.com/nougght/monitoring-system/server/internal/storage/timescale/repository"
 	"github.com/nougght/monitoring-system/server/internal/util"
 	utilShared "github.com/nougght/monitoring-system/shared/go/util"
+	"github.com/nougght/monitoring-system/shared/go/util/fsutil"
 )
 
 type AgentRegistryService struct {
@@ -164,6 +166,38 @@ func (s *AgentRegistryService) GenerateAgentSetupConfig(ctx context.Context, age
 		EnrollmentAddress: fmt.Sprintf("%s:%d", s.cfg.SettingsConfig.Address, s.cfg.GRPC.EnrollmentPort),
 		ServerAddress:     fmt.Sprintf("%s:%d", s.cfg.SettingsConfig.Address, s.cfg.GRPC.MainPort),
 	}
+}
+
+func (s *AgentRegistryService) GetNewAgentFiles(ctx context.Context, agentID uuid.UUID, enrollmentKey string) ([]byte, error) {
+	tempDir, err := os.MkdirTemp("", "agent-files-*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create temporary directory: %w", err)
+	}
+	defer func() {
+		err := os.RemoveAll(tempDir)
+		if err != nil {
+			log.Printf("failed remove all temp dir: %s", err)
+		}
+	}()
+
+	for filePath, currentPath := range agent_model.AgentFilePaths {
+		err = fsutil.CopyFile(currentPath, fmt.Sprintf("%s/%s", tempDir, filePath))
+		if err != nil {
+			return nil, fmt.Errorf("failed to copy file to temp dir: %w", err)
+		}
+	}
+
+	setupConfig := s.GenerateAgentSetupConfig(ctx, agentID, enrollmentKey)
+	err = utilShared.SaveYaml(fmt.Sprintf("%s/%s", tempDir, agent_model.SetupConfigFileName), setupConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to save temp config file: %w", err)
+	}
+
+	zippedFileBytes, err := fsutil.ZipFolderRaw(tempDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to zip agent files in temp folder: %w", err)
+	}
+	return zippedFileBytes, nil
 }
 
 // TODO: return agent token
