@@ -41,7 +41,7 @@ func LoadConfig(path string) (*Config, error) {
 	cfg := new(Config)
 	err := util.ReadYaml(path, cfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read yaml config")
+		log.Println("failed to read yaml config")
 	}
 
 	cfg = &DefaultConfig
