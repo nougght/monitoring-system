@@ -5,7 +5,7 @@ import { useSpecs } from "../hooks/useGetSpecs";
 import { useAgent } from "../hooks/useGetAgent";
 import { useEffect, useState } from 'react';
 import type { Agent } from '../domain/agent';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 interface Tab {
     text: string;

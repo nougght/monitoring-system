@@ -61,17 +61,19 @@ gen-swag-server:
 
 
 
-# temp
-gen-ca:
+
+gen-root-ca:
 # root — самоподписанный
 	openssl ecparam -genkey -name prime256v1 -noout -out ./cert-config/root-ca.key
 	openssl req -x509 -new -key ./cert-config/root-ca.key -days 3650 \
 		-subj "/CN=Monitoring Root CA" -out ./cert-config/root-ca.crt
 
-# intermediate — CSR подписывается root, используется для подписания
+gen-intermedate-ca:
+# intermediate — CSR подписывается root
 	openssl ecparam -genkey -name prime256v1 -noout -out ./server/creds/intermediate-ca.key
 	openssl req -new -key ./server/creds/intermediate-ca.key -subj "/CN=Monitoring Intermediate CA" -out ./server/creds/intermediate-ca.csr
 	openssl x509 -req -in ./server/creds/intermediate-ca.csr -CA ./cert-config/root-ca.crt -CAkey ./cert-config/root-ca.key \
 		-CAcreateserial -days 1825 -extfile cert-config/int.cnf \
 		-out ./server/creds/intermediate-ca.crt
-
+copy-root-ca:
+	cp ./cert-config/root-ca.crt ./server/creds/root-ca.crt

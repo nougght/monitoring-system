@@ -16,11 +16,11 @@ export interface SideBarData {
     // TODO: add more sections
 }
 
-interface SideBarProps {
-    data: SideBarData
-    onSwitch: (id: string) => void
-    activeId: string
-}
+// interface SideBarProps {
+//     data: SideBarData
+//     onSwitch: (id: string) => void
+//     activeId: string
+// }
 
 
 const SideBarButton = ({ data }: { data: NavItem }) => {

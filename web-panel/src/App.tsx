@@ -1,10 +1,10 @@
 import './App.css'
-import { BrowserRouter, Navigate, Route, Routes, Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, Outlet, useLocation } from 'react-router-dom'
 import { AgentsPage } from './pages/AgentsPage'
 import { AgentPage } from './pages/AgentPage'
 import { NewAgentPage } from './pages/NewAgentPage'
-import { SideBar, type SideBarData, type NavItem } from './components/sideBar'
-import { useEffect, useState } from 'react'
+import { SideBar, type SideBarData} from './components/sideBar'
+import { useEffect } from 'react'
 import dashIcon from "./assets/dashboard.svg"
 import agentsIcon from "./assets/cpu.svg"
 
@@ -18,7 +18,6 @@ const sideBarData: SideBarData = {
 
 }
 const AppLayout = () => {
-    const navigate = useNavigate()
     let location = useLocation()
 
     useEffect(

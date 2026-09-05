@@ -1,11 +1,10 @@
-import { useState } from "react"
 import type { Agent } from "../domain/agent"
 
 
 const onlineInd = "🟢"
 const offlineInd = "🔴"
 
-export const AgentCard = ({ agent, onClick}: { agent: Agent, onClick: (id: string)=>void }) => {
+export const AgentCard = ({ agent, onClick }: { agent: Agent, onClick: (id: string) => void }) => {
     return (
         <div className="agent-card" onClick={() => onClick(agent.id)}>
             <h2>{agent.name}</h2>

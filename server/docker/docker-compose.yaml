@@ -36,9 +36,22 @@ services:
 
     depends_on:
       - timescale
+      - nginx
     stop_grace_period: 10s
     volumes:
       - .${HOST_CREDS_PATH}:${CONTAINER_CREDS_PATH}
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_monit
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../../web-panel/dist:/usr/share/nginx/html:ro
+
 volumes:
   db-data:
   

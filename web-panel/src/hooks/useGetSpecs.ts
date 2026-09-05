@@ -1,8 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { getAgentSpecs, getAllAgents as getAllAgents } from '../api/client/monitoringServerAPI';
+import { getAgentSpecs } from '../api/client/monitoringServerAPI';
 import type {Error} from './common'
-import type { AgentSpecs } from '../api/models';
 import type {Specs} from '../../../shared/ui/src/domain/specs';
 import { convertSpecsFromDTO } from '../api/mapper';
 

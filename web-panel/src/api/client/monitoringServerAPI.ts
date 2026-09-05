@@ -21,7 +21,10 @@ import type {
   GetAgentSpecs500,
   GetAllAgents400,
   GetAllAgents404,
-  GetAllAgents500
+  GetAllAgents500,
+  GetStreamFrames400,
+  GetStreamFrames404,
+  GetStreamFrames500
 } from '../models';
 
 
@@ -205,27 +208,34 @@ export const getAgentByID = async (agentID: string, options?: RequestInit): Prom
 
 
 
-export type getStreamFramesResponse400 = {
+export type getStreamFramesResponse200 = {
   data: Blob
+  status: 200
+}
+
+export type getStreamFramesResponse400 = {
+  data: GetStreamFrames400
   status: 400
 }
 
 export type getStreamFramesResponse404 = {
-  data: Blob
+  data: GetStreamFrames404
   status: 404
 }
 
 export type getStreamFramesResponse500 = {
-  data: Blob
+  data: GetStreamFrames500
   status: 500
 }
 
-;
+export type getStreamFramesResponseSuccess = (getStreamFramesResponse200) & {
+  headers: Headers;
+};
 export type getStreamFramesResponseError = (getStreamFramesResponse400 | getStreamFramesResponse404 | getStreamFramesResponse500) & {
   headers: Headers;
 };
 
-export type getStreamFramesResponse = (getStreamFramesResponseError)
+export type getStreamFramesResponse = (getStreamFramesResponseSuccess | getStreamFramesResponseError)
 
 export const getGetStreamFramesUrl = (agentID: string,) => {
 
@@ -250,9 +260,8 @@ export const getStreamFrames = async (agentID: string, options?: RequestInit): P
 )
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getStreamFramesResponse['data'] = body !== null ? body : ''
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getStreamFramesResponse['data'] = body as getStreamFramesResponse['data']
   return { data, status: res.status, headers: res.headers } as getStreamFramesResponse
 }
 

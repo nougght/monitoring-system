@@ -36,8 +36,9 @@ func (s *StreamHandler) RegisterRoutes(r *gin.RouterGroup) {
 // StreamFrames godoc
 // @Id getStreamFrames
 // @Summary Get stream frames
-// @Produce image/jpeg
+// @Produce multipart/x-mixed-replace
 // @Param agentID path string true "Agent ID"
+// @Success      200  {file}    binary  "MJPEG stream"
 // @Failure      400  {object}  map[string]any
 // @Failure      404  {object}  map[string]any
 // @Failure      500  {object}  map[string]any

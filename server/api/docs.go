@@ -156,7 +156,7 @@ const docTemplate = `{
         "/agents/{agentID}/frames": {
             "get": {
                 "produces": [
-                    "image/jpeg"
+                    "multipart/x-mixed-replace"
                 ],
                 "summary": "Get stream frames",
                 "operationId": "getStreamFrames",
@@ -170,6 +170,12 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
+                    "200": {
+                        "description": "MJPEG stream",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {

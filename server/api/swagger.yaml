@@ -274,8 +274,12 @@ paths:
         required: true
         type: string
       produces:
-      - image/jpeg
+      - multipart/x-mixed-replace
       responses:
+        "200":
+          description: MJPEG stream
+          schema:
+            type: file
         "400":
           description: Bad Request
           schema:
