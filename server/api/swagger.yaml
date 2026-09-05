@@ -22,15 +22,6 @@ definitions:
       enrollmentKey:
         type: string
     type: object
-  AgentConfigResponse:
-    properties:
-      enrollmentAddress:
-        type: string
-      enrollmentKey:
-        type: string
-      serverAddress:
-        type: string
-    type: object
   AgentSpecs:
     properties:
       agentId:
@@ -305,26 +296,26 @@ paths:
     post:
       consumes:
       - application/json
-      operationId: downloadAgentConfig
+      operationId: downloadAgentFiles
       parameters:
       - description: Agent ID
         in: path
         name: agentID
         required: true
         type: string
-      - description: Download agent config body
+      - description: Download agent files
         in: body
         name: request
         required: true
         schema:
           $ref: '#/definitions/AgentConfigBody'
       produces:
-      - application/x-yaml
+      - application/zip
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/AgentConfigResponse'
+            type: file
         "400":
           description: Bad Request
           schema:
@@ -340,7 +331,7 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Download agent setup config
+      summary: Download agent files
   /agents/{agentID}/specifications:
     get:
       operationId: getAgentSpecs

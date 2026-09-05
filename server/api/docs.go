@@ -200,10 +200,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "produces": [
-                    "application/x-yaml"
+                    "application/zip"
                 ],
-                "summary": "Download agent setup config",
-                "operationId": "downloadAgentConfig",
+                "summary": "Download agent files",
+                "operationId": "downloadAgentFiles",
                 "parameters": [
                     {
                         "type": "string",
@@ -213,7 +213,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Download agent config body",
+                        "description": "Download agent files",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -226,7 +226,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/AgentConfigResponse"
+                            "type": "file"
                         }
                     },
                     "400": {
@@ -332,20 +332,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "enrollmentKey": {
-                    "type": "string"
-                }
-            }
-        },
-        "AgentConfigResponse": {
-            "type": "object",
-            "properties": {
-                "enrollmentAddress": {
-                    "type": "string"
-                },
-                "enrollmentKey": {
-                    "type": "string"
-                },
-                "serverAddress": {
                     "type": "string"
                 }
             }

@@ -96,7 +96,7 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                         </div>
                         <div>
                             <button onClick={handleDownloadInstaller}>Скачать установщик</button>
-                            <button onClick={handleDownloadConfig}>Скачать конфиг</button>
+                            <button onClick={handleDownloadConfig}>Скачать файлы агента</button>
                         </div>
                     </div>
                 }

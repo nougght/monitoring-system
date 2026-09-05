@@ -1,0 +1,3 @@
+subjectAltName=DNS:monitoring.nought.ru
+basicConstraints=CA:TRUE,pathlen:0
+keyUsage=keyCertSign

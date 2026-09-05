@@ -7,16 +7,12 @@
 import type {
   Agent,
   AgentConfigBody,
-  AgentConfigResponse,
   AgentSpecs,
   CreateAgent400,
   CreateAgent404,
   CreateAgent500,
   CreateAgentBody,
   CreateAgentResponse,
-  DownloadAgentConfig400,
-  DownloadAgentConfig404,
-  DownloadAgentConfig500,
   GetAgentByID400,
   GetAgentByID404,
   GetAgentByID500,
@@ -262,36 +258,36 @@ export const getStreamFrames = async (agentID: string, options?: RequestInit): P
 
 
 
-export type downloadAgentConfigResponse200 = {
-  data: AgentConfigResponse
+export type downloadAgentFilesResponse200 = {
+  data: Blob
   status: 200
 }
 
-export type downloadAgentConfigResponse400 = {
-  data: DownloadAgentConfig400
+export type downloadAgentFilesResponse400 = {
+  data: Blob
   status: 400
 }
 
-export type downloadAgentConfigResponse404 = {
-  data: DownloadAgentConfig404
+export type downloadAgentFilesResponse404 = {
+  data: Blob
   status: 404
 }
 
-export type downloadAgentConfigResponse500 = {
-  data: DownloadAgentConfig500
+export type downloadAgentFilesResponse500 = {
+  data: Blob
   status: 500
 }
 
-export type downloadAgentConfigResponseSuccess = (downloadAgentConfigResponse200) & {
+export type downloadAgentFilesResponseSuccess = (downloadAgentFilesResponse200) & {
   headers: Headers;
 };
-export type downloadAgentConfigResponseError = (downloadAgentConfigResponse400 | downloadAgentConfigResponse404 | downloadAgentConfigResponse500) & {
+export type downloadAgentFilesResponseError = (downloadAgentFilesResponse400 | downloadAgentFilesResponse404 | downloadAgentFilesResponse500) & {
   headers: Headers;
 };
 
-export type downloadAgentConfigResponse = (downloadAgentConfigResponseSuccess | downloadAgentConfigResponseError)
+export type downloadAgentFilesResponse = (downloadAgentFilesResponseSuccess | downloadAgentFilesResponseError)
 
-export const getDownloadAgentConfigUrl = (agentID: string,) => {
+export const getDownloadAgentFilesUrl = (agentID: string,) => {
 
 
 
@@ -300,12 +296,12 @@ export const getDownloadAgentConfigUrl = (agentID: string,) => {
 }
 
 /**
- * @summary Download agent setup config
+ * @summary Download agent files
  */
-export const downloadAgentConfig = async (agentID: string,
-    agentConfigBody: AgentConfigBody, options?: RequestInit): Promise<downloadAgentConfigResponse> => {
+export const downloadAgentFiles = async (agentID: string,
+    agentConfigBody: AgentConfigBody, options?: RequestInit): Promise<downloadAgentFilesResponse> => {
 
-  const res = await fetch(getDownloadAgentConfigUrl(agentID),
+  const res = await fetch(getDownloadAgentFilesUrl(agentID),
   {
     ...options,
     method: 'POST',
@@ -315,10 +311,9 @@ export const downloadAgentConfig = async (agentID: string,
 )
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: downloadAgentConfigResponse['data'] = body !== null ? body : ''
-  return { data, status: res.status, headers: res.headers } as downloadAgentConfigResponse
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: downloadAgentFilesResponse['data'] = body as downloadAgentFilesResponse['data']
+  return { data, status: res.status, headers: res.headers } as downloadAgentFilesResponse
 }
 
 

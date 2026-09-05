@@ -37,7 +37,7 @@ func (h *AgentHandler) RegisterRoutes(r *gin.RouterGroup) {
 	group.POST("", h.CreateAgent)
 	group.GET("/:agentID", h.GetAgent)
 	group.GET("", h.GetAllAgents)
-	group.POST("/:agentID/setupconfig", h.DownloadAgentConfig)
+	group.POST("/:agentID/setupconfig", h.DownloadAgentFiles)
 	group.GET("/:agentID/specifications", h.GetAgentSpecs)
 }
 
@@ -69,19 +69,19 @@ func (h *AgentHandler) CreateAgent(c *gin.Context) {
 	c.JSON(http.StatusOK, mapper.CreateAgentResultToDTO(res))
 }
 
-// DownloadAgentConfig godoc
-// @Id downloadAgentConfig
-// @Summary Download agent setup config
+// DownloadAgentFiles godoc
+// @Id downloadAgentFiles
+// @Summary Download agent files
 // @Accept json
-// @Produce application/x-yaml
+// @Produce application/zip
 // @Param agentID path string true "Agent ID"
-// @Param request body dto.AgentConfigBody true "Download agent config body"
-// @Success 200 {object} dto.AgentConfigResponse
+// @Param request body dto.AgentConfigBody true "Download agent files"
+// @Success 200 {file} binary
 // @Failure      400  {object}  map[string]any
 // @Failure      404  {object}  map[string]any
 // @Failure      500  {object}  map[string]any
 // @Router /agents/{agentID}/setupconfig [post]
-func (h *AgentHandler) DownloadAgentConfig(c *gin.Context) {
+func (h *AgentHandler) DownloadAgentFiles(c *gin.Context) {
 	agentID, err := uuid.Parse(c.Param("agentID"))
 	if err != nil {
 		handleError(c, fmt.Errorf("invalid 'agentID' path parameter: %w", model.ErrBadRequest))
@@ -95,9 +95,19 @@ func (h *AgentHandler) DownloadAgentConfig(c *gin.Context) {
 		return
 	}
 
-	config := h.agentRegistryService.GenerateAgentSetupConfig(c.Request.Context(), agentID, body.EnrollmentKey)
-	c.Writer.Header().Set("Content-Disposition", `attachment; filename="config.yaml"`)
-	c.YAML(http.StatusOK, config)
+	bytes, err := h.agentRegistryService.GetNewAgentFiles(c.Request.Context(), agentID, body.EnrollmentKey)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	c.Writer.Header().Set("Content-Disposition", `attachment; filename="agent-files.zip"`)
+	c.Writer.Header().Set("Content-Type", "application/zip")
+
+	if _, err := c.Writer.Write(bytes); err != nil {
+		handleError(c, fmt.Errorf("failed to write agent files: %w", err))
+		return
+	}
 }
 
 // GetAllAgents godoc

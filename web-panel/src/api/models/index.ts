@@ -7,7 +7,6 @@
 
 export * from './agent';
 export * from './agentConfigBody';
-export * from './agentConfigResponse';
 export * from './agentSpecs';
 export * from './cpuSpecs';
 export * from './createAgent400';
@@ -16,9 +15,9 @@ export * from './createAgent500';
 export * from './createAgentBody';
 export * from './createAgentResponse';
 export * from './diskSpecs';
-export * from './downloadAgentConfig400';
-export * from './downloadAgentConfig404';
-export * from './downloadAgentConfig500';
+export * from './downloadAgentFiles400';
+export * from './downloadAgentFiles404';
+export * from './downloadAgentFiles500';
 export * from './getAgentByID400';
 export * from './getAgentByID404';
 export * from './getAgentByID500';
