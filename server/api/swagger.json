@@ -5,7 +5,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8091",
+    "host": "montoring.nought.ru",
     "basePath": "/api/v1",
     "paths": {
         "/agents": {

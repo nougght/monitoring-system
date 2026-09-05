@@ -4,6 +4,11 @@ WORKDIR /build
 
 # Context is repo root so the go.mod replace ../shared/go resolves.
 COPY shared/go ./shared/go
+COPY server/go.mod ./server/go.mod
+COPY server/go.sum ./server/go.sum
+
+RUN cd server && go mod download -x
+
 COPY server ./server
 
 WORKDIR /build/server

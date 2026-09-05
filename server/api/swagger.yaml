@@ -164,7 +164,7 @@ definitions:
       speed:
         type: integer
     type: object
-host: localhost:8091
+host: montoring.nought.ru
 info:
   contact: {}
   title: Monitoring Server API

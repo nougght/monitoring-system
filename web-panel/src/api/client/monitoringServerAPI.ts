@@ -62,7 +62,7 @@ export const getGetAllAgentsUrl = () => {
 
 
 
-  return `http://127.0.0.1:8091/api/v1/agents`
+  return `http://monitoring.nought.ru/api/v1/agents`
 }
 
 /**
@@ -122,7 +122,7 @@ export const getCreateAgentUrl = () => {
 
 
 
-  return `http://127.0.0.1:8091/api/v1/agents`
+  return `http://monitoring.nought.ru/api/v1/agents`
 }
 
 /**
@@ -182,7 +182,7 @@ export const getGetAgentByIDUrl = (agentID: string,) => {
 
 
 
-  return `http://127.0.0.1:8091/api/v1/agents/${agentID}`
+  return `http://monitoring.nought.ru/api/v1/agents/${agentID}`
 }
 
 /**
@@ -242,7 +242,7 @@ export const getGetStreamFramesUrl = (agentID: string,) => {
 
 
 
-  return `http://127.0.0.1:8091/api/v1/agents/${agentID}/frames`
+  return `http://monitoring.nought.ru/api/v1/agents/${agentID}/frames`
 }
 
 /**
@@ -301,7 +301,7 @@ export const getDownloadAgentFilesUrl = (agentID: string,) => {
 
 
 
-  return `http://127.0.0.1:8091/api/v1/agents/${agentID}/setupconfig`
+  return `http://monitoring.nought.ru/api/v1/agents/${agentID}/setupconfig`
 }
 
 /**
@@ -361,7 +361,7 @@ export const getGetAgentSpecsUrl = (agentID: string,) => {
 
 
 
-  return `http://127.0.0.1:8091/api/v1/agents/${agentID}/specifications`
+  return `http://monitoring.nought.ru/api/v1/agents/${agentID}/specifications`
 }
 
 /**

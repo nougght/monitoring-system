@@ -63,7 +63,7 @@ export const AgentPage = () => {
                 <div>
                     <p>{`Имя хоста: ${specs?.specs?.host?.hostName ?? "NO DATA"}`}</p>
                     <p>{`Идентификатор агента: ${agent.id}`}</p>
-                    <img src={`http://127.0.0.1:8091/api/v1/agents/${agent.id}/frames`} height="200px"/>
+                    <img src={`http://monitoring.nought.ru/api/v1/agents/${agent.id}/frames`} height="200px"/>
                 </div> :
                 agentResp?.error?.status == 404 && <div>Агент не найден</div>
         },

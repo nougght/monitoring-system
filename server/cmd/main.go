@@ -13,7 +13,7 @@ import (
 
 // @title           Monitoring Server API
 // @version         1.0
-// @host            localhost:8091
+// @host            montoring.nought.ru
 // @BasePath        /api/v1
 func main() {
 	cfg := config.MustLoadConfig("config.yaml")
