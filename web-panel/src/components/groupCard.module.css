@@ -1,0 +1,7 @@
+.groupCard {
+    border: 1px solid var(--color-brd);
+    border-radius: 15px;
+    padding: 4px 10px;
+    /* background-color: lightblue; */
+    cursor: pointer;
+}

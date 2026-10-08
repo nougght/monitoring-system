@@ -1,0 +1,18 @@
+/* groupsPage.module.css */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.05);
+}
+.content {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    left: 60%;
+    /*transform: translate(-50%, -50%);*/
+    background: #fff;
+    color: #000;
+    padding: 24px;
+    border-radius: 8px;
+}

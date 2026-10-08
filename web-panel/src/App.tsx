@@ -23,6 +23,7 @@ import {
 import {OverviewPage} from './pages/OverviewPage'
 import type {Overview} from './domain/overview'
 import type {ActivityUpdate} from './domain/activity'
+import {GroupsPage} from "./pages/GroupsPage.tsx";
 import {BottomNav, type BottomNavData} from "./components/bottomNav.tsx";
 // import type { SeriesDTO } from './domain/metrics'
 let sideBarData: SideBarData = {

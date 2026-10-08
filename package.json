@@ -12,12 +12,14 @@
     "build:all": "npm run build:web && npm run build:agent-ui",
     "dev:web": "npm run dev --workspace=web-panel",
     "dev:agent-ui": "npm run dev --workspace=agent-ui",
+    "gen:api": "npm run generate:api --workspace=web-panel",
     "rmp": "npm run dev --workspace=.temp/rm"
   },
   "devDependencies": {
     "@types/react": "^19.2.17"
   },
   "dependencies": {
+    "radix-ui": "^1.7.0",
     "usehooks-ts": "^3.1.1"
   }
 }
