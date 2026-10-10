@@ -1,13 +1,11 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useAgents } from "../hooks/useGetAgents";
-import { useEffect, useState } from "react";
 import { AgentCard } from "../components/agentCard";
 import styles from "./agentsPage.module.css"
 
 
 
 export const AgentsPage = () => {
-    const [warning, setWarning] = useState<string | null>()
     const {
         data: agents,
         isPending: isAgentsPending,
@@ -15,14 +13,7 @@ export const AgentsPage = () => {
         error: _agentsError,
         isFetching: _isAgentsFetching,
     } = useAgents();
-    let navigate = useNavigate()
-
-
-    useEffect(() => {
-        if (agents?.error != null) {
-            setWarning(`ошибка:${agents?.error.status} ${agents?.error.message}`)
-        }
-    }, [agents]);
+    const navigate = useNavigate()
 
     if (isAgentsPending) {
         return <div>Загрузка...</div>;
@@ -32,8 +23,8 @@ export const AgentsPage = () => {
             <h1>Агенты</h1>
             <main>
                 <div className={styles.agentCardsContainer}>
-                    {agents?.agents != null && agents?.agents.length > 0 &&
-                        agents?.agents?.filter((a) => a.status != null)
+                    {agents && agents?.length > 0 &&
+                        agents.filter((a) => a.status != null)
                             .sort((a, b) => {
                                 if (a.isOnline == b.isOnline)
                                     return 0
@@ -58,9 +49,9 @@ export const AgentsPage = () => {
                 </div>
             </main>
             {
-                warning != null &&
+                _isAgentsError &&
                 <div>
-                    <p>{warning}</p>
+                    <p>ошибка: {_agentsError.message}</p>
                 </div>
             }
         </div>

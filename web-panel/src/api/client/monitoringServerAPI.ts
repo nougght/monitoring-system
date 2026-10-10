@@ -13,39 +13,10 @@ import type {
   CreateAgentBody,
   CreateAgentGroupBody,
   CreateAgentResponse,
-  ErrorResponse,
   UpdateAgentGroupBody
 } from '../models';
 
-
-export type getAllAgentsResponse200 = {
-  data: Agent[]
-  status: 200
-}
-
-export type getAllAgentsResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type getAllAgentsResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getAllAgentsResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type getAllAgentsResponseSuccess = (getAllAgentsResponse200) & {
-  headers: Headers;
-};
-export type getAllAgentsResponseError = (getAllAgentsResponse400 | getAllAgentsResponse404 | getAllAgentsResponse500) & {
-  headers: Headers;
-};
-
-export type getAllAgentsResponse = (getAllAgentsResponseSuccess | getAllAgentsResponseError)
+import { customFetch } from '../apiFetch';
 
 export const getGetAllAgentsUrl = () => {
 
@@ -58,54 +29,18 @@ export const getGetAllAgentsUrl = () => {
 /**
  * @summary Get all agents
  */
-export const getAllAgents = async ( options?: RequestInit): Promise<getAllAgentsResponse> => {
+export const getAllAgents = async ( options?: Parameters<typeof customFetch>[1]): Promise<Agent[]> => {
 
-  const res = await fetch(getGetAllAgentsUrl(),
+  return customFetch<Agent[]>(getGetAllAgentsUrl(),
   {
     ...options,
     method: 'GET'
 
 
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getAllAgentsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getAllAgentsResponse
-}
-
-
-
-export type createAgentResponse200 = {
-  data: CreateAgentResponse
-  status: 200
-}
-
-export type createAgentResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type createAgentResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type createAgentResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type createAgentResponseSuccess = (createAgentResponse200) & {
-  headers: Headers;
-};
-export type createAgentResponseError = (createAgentResponse400 | createAgentResponse404 | createAgentResponse500) & {
-  headers: Headers;
-};
-
-export type createAgentResponse = (createAgentResponseSuccess | createAgentResponseError)
 
 export const getCreateAgentUrl = () => {
 
@@ -118,54 +53,18 @@ export const getCreateAgentUrl = () => {
 /**
  * @summary Create new agent
  */
-export const createAgent = async (createAgentBody: CreateAgentBody, options?: RequestInit): Promise<createAgentResponse> => {
+export const createAgent = async (createAgentBody: CreateAgentBody, options?: Parameters<typeof customFetch>[1]): Promise<CreateAgentResponse> => {
 
-  const res = await fetch(getCreateAgentUrl(),
+  return customFetch<CreateAgentResponse>(getCreateAgentUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(createAgentBody)
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createAgentResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createAgentResponse
-}
-
-
-
-export type getAgentByIDResponse200 = {
-  data: Agent
-  status: 200
-}
-
-export type getAgentByIDResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type getAgentByIDResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getAgentByIDResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type getAgentByIDResponseSuccess = (getAgentByIDResponse200) & {
-  headers: Headers;
-};
-export type getAgentByIDResponseError = (getAgentByIDResponse400 | getAgentByIDResponse404 | getAgentByIDResponse500) & {
-  headers: Headers;
-};
-
-export type getAgentByIDResponse = (getAgentByIDResponseSuccess | getAgentByIDResponseError)
 
 export const getGetAgentByIDUrl = (agentID: string,) => {
 
@@ -178,54 +77,18 @@ export const getGetAgentByIDUrl = (agentID: string,) => {
 /**
  * @summary Get agent by ID
  */
-export const getAgentByID = async (agentID: string, options?: RequestInit): Promise<getAgentByIDResponse> => {
+export const getAgentByID = async (agentID: string, options?: Parameters<typeof customFetch>[1]): Promise<Agent> => {
 
-  const res = await fetch(getGetAgentByIDUrl(agentID),
+  return customFetch<Agent>(getGetAgentByIDUrl(agentID),
   {
     ...options,
     method: 'GET'
 
 
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getAgentByIDResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getAgentByIDResponse
-}
-
-
-
-export type getStreamFramesResponse200 = {
-  data: Blob
-  status: 200
-}
-
-export type getStreamFramesResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type getStreamFramesResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getStreamFramesResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type getStreamFramesResponseSuccess = (getStreamFramesResponse200) & {
-  headers: Headers;
-};
-export type getStreamFramesResponseError = (getStreamFramesResponse400 | getStreamFramesResponse404 | getStreamFramesResponse500) & {
-  headers: Headers;
-};
-
-export type getStreamFramesResponse = (getStreamFramesResponseSuccess | getStreamFramesResponseError)
 
 export const getGetStreamFramesUrl = (agentID: string,) => {
 
@@ -238,53 +101,18 @@ export const getGetStreamFramesUrl = (agentID: string,) => {
 /**
  * @summary Get stream frames
  */
-export const getStreamFrames = async (agentID: string, options?: RequestInit): Promise<getStreamFramesResponse> => {
+export const getStreamFrames = async (agentID: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
 
-  const res = await fetch(getGetStreamFramesUrl(agentID),
+  return customFetch<Blob>(getGetStreamFramesUrl(agentID),
   {
     ...options,
     method: 'GET'
 
 
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
-  const data: getStreamFramesResponse['data'] = body as getStreamFramesResponse['data']
-  return { data, status: res.status, headers: res.headers } as getStreamFramesResponse
-}
-
-
-
-export type downloadAgentFilesResponse200 = {
-  data: Blob
-  status: 200
-}
-
-export type downloadAgentFilesResponse400 = {
-  data: Blob
-  status: 400
-}
-
-export type downloadAgentFilesResponse404 = {
-  data: Blob
-  status: 404
-}
-
-export type downloadAgentFilesResponse500 = {
-  data: Blob
-  status: 500
-}
-
-export type downloadAgentFilesResponseSuccess = (downloadAgentFilesResponse200) & {
-  headers: Headers;
-};
-export type downloadAgentFilesResponseError = (downloadAgentFilesResponse400 | downloadAgentFilesResponse404 | downloadAgentFilesResponse500) & {
-  headers: Headers;
-};
-
-export type downloadAgentFilesResponse = (downloadAgentFilesResponseSuccess | downloadAgentFilesResponseError)
 
 export const getDownloadAgentFilesUrl = (agentID: string,) => {
 
@@ -298,53 +126,18 @@ export const getDownloadAgentFilesUrl = (agentID: string,) => {
  * @summary Download agent files
  */
 export const downloadAgentFiles = async (agentID: string,
-    agentConfigBody: AgentConfigBody, options?: RequestInit): Promise<downloadAgentFilesResponse> => {
+    agentConfigBody: AgentConfigBody, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
 
-  const res = await fetch(getDownloadAgentFilesUrl(agentID),
+  return customFetch<Blob>(getDownloadAgentFilesUrl(agentID),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(agentConfigBody)
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
-  const data: downloadAgentFilesResponse['data'] = body as downloadAgentFilesResponse['data']
-  return { data, status: res.status, headers: res.headers } as downloadAgentFilesResponse
-}
-
-
-
-export type getAgentSpecsResponse200 = {
-  data: AgentSpecs
-  status: 200
-}
-
-export type getAgentSpecsResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type getAgentSpecsResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getAgentSpecsResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type getAgentSpecsResponseSuccess = (getAgentSpecsResponse200) & {
-  headers: Headers;
-};
-export type getAgentSpecsResponseError = (getAgentSpecsResponse400 | getAgentSpecsResponse404 | getAgentSpecsResponse500) & {
-  headers: Headers;
-};
-
-export type getAgentSpecsResponse = (getAgentSpecsResponseSuccess | getAgentSpecsResponseError)
 
 export const getGetAgentSpecsUrl = (agentID: string,) => {
 
@@ -357,54 +150,18 @@ export const getGetAgentSpecsUrl = (agentID: string,) => {
 /**
  * @summary Get agent specifications
  */
-export const getAgentSpecs = async (agentID: string, options?: RequestInit): Promise<getAgentSpecsResponse> => {
+export const getAgentSpecs = async (agentID: string, options?: Parameters<typeof customFetch>[1]): Promise<AgentSpecs> => {
 
-  const res = await fetch(getGetAgentSpecsUrl(agentID),
+  return customFetch<AgentSpecs>(getGetAgentSpecsUrl(agentID),
   {
     ...options,
     method: 'GET'
 
 
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getAgentSpecsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getAgentSpecsResponse
-}
-
-
-
-export type getFleetOverviewResponse200 = {
-  data: AgentsOverview
-  status: 200
-}
-
-export type getFleetOverviewResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type getFleetOverviewResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getFleetOverviewResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type getFleetOverviewResponseSuccess = (getFleetOverviewResponse200) & {
-  headers: Headers;
-};
-export type getFleetOverviewResponseError = (getFleetOverviewResponse400 | getFleetOverviewResponse404 | getFleetOverviewResponse500) & {
-  headers: Headers;
-};
-
-export type getFleetOverviewResponse = (getFleetOverviewResponseSuccess | getFleetOverviewResponseError)
 
 export const getGetFleetOverviewUrl = () => {
 
@@ -417,44 +174,18 @@ export const getGetFleetOverviewUrl = () => {
 /**
  * @summary Get fleet overview
  */
-export const getFleetOverview = async ( options?: RequestInit): Promise<getFleetOverviewResponse> => {
+export const getFleetOverview = async ( options?: Parameters<typeof customFetch>[1]): Promise<AgentsOverview> => {
 
-  const res = await fetch(getGetFleetOverviewUrl(),
+  return customFetch<AgentsOverview>(getGetFleetOverviewUrl(),
   {
     ...options,
     method: 'GET'
 
 
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getFleetOverviewResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getFleetOverviewResponse
-}
-
-
-
-export type getAllAgentGroupsResponse200 = {
-  data: AgentGroup[]
-  status: 200
-}
-
-export type getAllAgentGroupsResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type getAllAgentGroupsResponseSuccess = (getAllAgentGroupsResponse200) & {
-  headers: Headers;
-};
-export type getAllAgentGroupsResponseError = (getAllAgentGroupsResponse500) & {
-  headers: Headers;
-};
-
-export type getAllAgentGroupsResponse = (getAllAgentGroupsResponseSuccess | getAllAgentGroupsResponseError)
 
 export const getGetAllAgentGroupsUrl = () => {
 
@@ -467,54 +198,18 @@ export const getGetAllAgentGroupsUrl = () => {
 /**
  * @summary Get all agent groups
  */
-export const getAllAgentGroups = async ( options?: RequestInit): Promise<getAllAgentGroupsResponse> => {
+export const getAllAgentGroups = async ( options?: Parameters<typeof customFetch>[1]): Promise<AgentGroup[]> => {
 
-  const res = await fetch(getGetAllAgentGroupsUrl(),
+  return customFetch<AgentGroup[]>(getGetAllAgentGroupsUrl(),
   {
     ...options,
     method: 'GET'
 
 
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getAllAgentGroupsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getAllAgentGroupsResponse
-}
-
-
-
-export type createAgentGroupResponse200 = {
-  data: AgentGroup
-  status: 200
-}
-
-export type createAgentGroupResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type createAgentGroupResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type createAgentGroupResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type createAgentGroupResponseSuccess = (createAgentGroupResponse200) & {
-  headers: Headers;
-};
-export type createAgentGroupResponseError = (createAgentGroupResponse400 | createAgentGroupResponse404 | createAgentGroupResponse500) & {
-  headers: Headers;
-};
-
-export type createAgentGroupResponse = (createAgentGroupResponseSuccess | createAgentGroupResponseError)
 
 export const getCreateAgentGroupUrl = () => {
 
@@ -527,54 +222,18 @@ export const getCreateAgentGroupUrl = () => {
 /**
  * @summary Create new agent group
  */
-export const createAgentGroup = async (createAgentGroupBody: CreateAgentGroupBody, options?: RequestInit): Promise<createAgentGroupResponse> => {
+export const createAgentGroup = async (createAgentGroupBody: CreateAgentGroupBody, options?: Parameters<typeof customFetch>[1]): Promise<AgentGroup> => {
 
-  const res = await fetch(getCreateAgentGroupUrl(),
+  return customFetch<AgentGroup>(getCreateAgentGroupUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(createAgentGroupBody)
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createAgentGroupResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createAgentGroupResponse
-}
-
-
-
-export type getAgentGroupByIDResponse200 = {
-  data: AgentGroup
-  status: 200
-}
-
-export type getAgentGroupByIDResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type getAgentGroupByIDResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getAgentGroupByIDResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type getAgentGroupByIDResponseSuccess = (getAgentGroupByIDResponse200) & {
-  headers: Headers;
-};
-export type getAgentGroupByIDResponseError = (getAgentGroupByIDResponse400 | getAgentGroupByIDResponse404 | getAgentGroupByIDResponse500) & {
-  headers: Headers;
-};
-
-export type getAgentGroupByIDResponse = (getAgentGroupByIDResponseSuccess | getAgentGroupByIDResponseError)
 
 export const getGetAgentGroupByIDUrl = (id: string,) => {
 
@@ -587,54 +246,18 @@ export const getGetAgentGroupByIDUrl = (id: string,) => {
 /**
  * @summary Get agent group by ID
  */
-export const getAgentGroupByID = async (id: string, options?: RequestInit): Promise<getAgentGroupByIDResponse> => {
+export const getAgentGroupByID = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<AgentGroup> => {
 
-  const res = await fetch(getGetAgentGroupByIDUrl(id),
+  return customFetch<AgentGroup>(getGetAgentGroupByIDUrl(id),
   {
     ...options,
     method: 'GET'
 
 
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getAgentGroupByIDResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getAgentGroupByIDResponse
-}
-
-
-
-export type deleteAgentGroupResponse200 = {
-  data: void
-  status: 200
-}
-
-export type deleteAgentGroupResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type deleteAgentGroupResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type deleteAgentGroupResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type deleteAgentGroupResponseSuccess = (deleteAgentGroupResponse200) & {
-  headers: Headers;
-};
-export type deleteAgentGroupResponseError = (deleteAgentGroupResponse400 | deleteAgentGroupResponse404 | deleteAgentGroupResponse500) & {
-  headers: Headers;
-};
-
-export type deleteAgentGroupResponse = (deleteAgentGroupResponseSuccess | deleteAgentGroupResponseError)
 
 export const getDeleteAgentGroupUrl = (id: string,) => {
 
@@ -647,54 +270,18 @@ export const getDeleteAgentGroupUrl = (id: string,) => {
 /**
  * @summary Delete agent group by ID
  */
-export const deleteAgentGroup = async (id: string, options?: RequestInit): Promise<deleteAgentGroupResponse> => {
+export const deleteAgentGroup = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
 
-  const res = await fetch(getDeleteAgentGroupUrl(id),
+  return customFetch<void>(getDeleteAgentGroupUrl(id),
   {
     ...options,
     method: 'DELETE'
 
 
   }
-)
+);}
 
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: deleteAgentGroupResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as deleteAgentGroupResponse
-}
-
-
-
-export type updateAgentGroupResponse200 = {
-  data: void
-  status: 200
-}
-
-export type updateAgentGroupResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-
-export type updateAgentGroupResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type updateAgentGroupResponse500 = {
-  data: ErrorResponse
-  status: 500
-}
-
-export type updateAgentGroupResponseSuccess = (updateAgentGroupResponse200) & {
-  headers: Headers;
-};
-export type updateAgentGroupResponseError = (updateAgentGroupResponse400 | updateAgentGroupResponse404 | updateAgentGroupResponse500) & {
-  headers: Headers;
-};
-
-export type updateAgentGroupResponse = (updateAgentGroupResponseSuccess | updateAgentGroupResponseError)
 
 export const getUpdateAgentGroupUrl = (id: string,) => {
 
@@ -708,23 +295,16 @@ export const getUpdateAgentGroupUrl = (id: string,) => {
  * @summary Update agent group
  */
 export const updateAgentGroup = async (id: string,
-    updateAgentGroupBody: UpdateAgentGroupBody, options?: RequestInit): Promise<updateAgentGroupResponse> => {
+    updateAgentGroupBody: UpdateAgentGroupBody, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
 
-  const res = await fetch(getUpdateAgentGroupUrl(id),
+  return customFetch<void>(getUpdateAgentGroupUrl(id),
   {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(updateAgentGroupBody)
   }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: updateAgentGroupResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as updateAgentGroupResponse
-}
+);}
 
 
 

@@ -26,7 +26,7 @@ import type {ActivityUpdate} from './domain/activity'
 import {GroupsPage} from "./pages/GroupsPage.tsx";
 import {BottomNav, type BottomNavData} from "./components/bottomNav.tsx";
 // import type { SeriesDTO } from './domain/metrics'
-let sideBarData: SideBarData = {
+const sideBarData: SideBarData = {
     iconSrc: "",
     title: "Vigil",
     items: [
@@ -40,7 +40,7 @@ let sideBarData: SideBarData = {
     ]
 
 }
-let bottomNavData: BottomNavData = {
+const bottomNavData: BottomNavData = {
     iconSrc: "",
     title: "Vigil",
     items: [
@@ -109,7 +109,7 @@ function App() {
             console.log("send message ", currentMsg)
             try {
                 wsSocket?.send(JSON.stringify(currentMsg))
-            } catch (ex: any) {
+            } catch (ex: unknown) {
                 console.log(`exception: ${ex}`)
             }
         }
@@ -207,7 +207,7 @@ function App() {
                             metricsProp={metrics}
                             activity={activity}/>}/>
                         <Route path="/agents/new" element={<NewAgentPage/>}/>
-                        <Route path="/groups" element={<NotImplemented/>}/>
+                        <Route path="/groups" element={<GroupsPage/>}/>
                         <Route path="/reports" element={<NotImplemented/>}/>
                         <Route path="/events" element={<NotImplemented/>}/>
                         <Route path="/streams" element={<NotImplemented/>}/>

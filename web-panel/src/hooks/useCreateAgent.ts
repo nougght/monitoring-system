@@ -10,15 +10,11 @@ export const useCreateAgents = () => {
 
     return useMutation({
         mutationFn: async (dto: CreateAgentBody) => { 
-            var resp = await createAgent(dto)
-            if (resp.status != 200) {
-                throw new Error(`error: ${resp.data}`)
-            }
-            return resp
+            return await createAgent(dto)
         },
 
         onSuccess: (_resp) => {
-            queryClient.invalidateQueries({ queryKey: ['post-agents'] })
+            queryClient.invalidateQueries({ queryKey: ['agents'] })
         },
 
         onError: (error) => {

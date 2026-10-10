@@ -18,9 +18,8 @@ interface Tab {
 }
 
 export const AgentPage = ({ metricsProp, activity }: { metricsProp?: Metrics, activity?: ActivityUpdate }) => {
-    const { state } = useLocation() as { state: Agent | null }
+    const { state } = useLocation() as { state: Agent | undefined }
     const { id } = useParams()
-    const [agent, setAgent] = useState<Agent | null>(state)
     const [activeTab, setActiveTab] = useState(0)
     const [warning, setWarning] = useState<string | null>()
     const [metrics, setMetrics] = useState<Metrics | null>()
@@ -34,7 +33,7 @@ export const AgentPage = ({ metricsProp, activity }: { metricsProp?: Metrics, ac
     } = useSpecs(id ?? "");
 
     const {
-        data: agentResp,
+        data: agent,
         isPending: isAgentPending,
         isError: _isAgentError,
         error: _agentError,
@@ -49,13 +48,6 @@ export const AgentPage = ({ metricsProp, activity }: { metricsProp?: Metrics, ac
     }, [specs]);
 
 
-    useEffect(() => {
-        if (agentResp?.error != null) {
-            console.error(agentResp?.error)
-            setWarning(`ошибка:${agentResp?.error.status} ${agentResp?.error.message}`)
-        }
-        setAgent(agentResp?.agent!)
-    }, [agentResp]);
 
     useEffect(() => {
         if (agent?.id != metricsProp?.agentID) {
@@ -132,7 +124,7 @@ export const AgentPage = ({ metricsProp, activity }: { metricsProp?: Metrics, ac
                                 processes={metrics?.processList ?? []} /> */}
                         </section>
                     </div> :
-                    agentResp?.error?.status == 404 && <div>Агент не найден</div>
+                    _isAgentError && <div>Агент не найден</div>
         },
         {
             text: "Активность",

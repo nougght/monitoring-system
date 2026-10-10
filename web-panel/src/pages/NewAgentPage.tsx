@@ -35,13 +35,7 @@ export const NewAgentPage = (_props: NewAgentProps) => {
                 description: description ?? undefined
             },
             {
-                onSuccess: (resp) => {
-                    if (resp.status == 200) {
-                        setResp(resp.data)
-                    } else {
-                        setWarning("ошибка")
-                    }
-                },
+                onSuccess: resp => setResp(resp),
                 onError: (error) => {
                     setWarning(`ошибка:${error}`)
                 }
