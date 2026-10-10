@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react"
-import { Link } from "react-router-dom";
-import { useOverview } from "../hooks/useOverview";
+import {useEffect, useState} from "react"
+import {Link} from "react-router-dom";
+import {useOverview} from "../hooks/useOverview";
 import SimplePieChart from "../components/pieChart";
-import { CountDistToPieList, type Overview } from "../domain/overview";
-import { AgentCount } from "../components/agentCount";
-import { LoadBar } from "../components/loadBar";
-import { AvgCPU } from "../components/avgCPU";
-import { AvgMem } from "../components/avgMem";
+import {CountDistToPieList, type Overview} from "../domain/overview";
+import {AgentCount} from "../components/agentCount";
+import {LoadBar} from "../components/loadBar";
+import {AvgCPU} from "../components/avgCPU";
+import {AvgMem} from "../components/avgMem";
 import styles from "./overviewPage.module.css"
 import commonStyles from "../common.module.css"
 
-export const OverviewPage = ({ overviewProp }: { overviewProp: Overview | undefined }) => {
+export const OverviewPage = ({overviewProp}: { overviewProp: Overview | undefined }) => {
     const [warning, setWarning] = useState<string | null>()
     const [info, _setInfo] = useState<string | null>()
-    
-    
+
+
     const {
         data: overview,
         isPending: isOverviewLoading,
@@ -26,17 +26,19 @@ export const OverviewPage = ({ overviewProp }: { overviewProp: Overview | undefi
     useEffect(() => {
         if (overviewProp != undefined) {
             setWarning(null)
-            overview!.overview = overviewProp
+            overview!.summary = overviewProp.summary
+            overview!.topN = overviewProp.topN
+
         }
     }, [overviewProp]);
 
     useEffect(() => {
-        if (overview?.error != null) {
-            setWarning(`ошибка:${overview?.error?.status} ${overview?.error?.message}`)
+        if (_isOverviewError) {
+            setWarning(`ошибка:${_overviewError.message}`)
         }
         // if (overview?.overview != null) {
         //     setInfo("Данные успешно загружены")
-        // }
+
     }, [overview]);
 
     if (isOverviewLoading) {
@@ -48,19 +50,19 @@ export const OverviewPage = ({ overviewProp }: { overviewProp: Overview | undefi
         <div>
             <div>
                 <h1>Обзор</h1>
-                {overview?.overview?.summary != null && (
+                {overview?.summary != null && (
 
                     <div>
                         <div className={styles.topCards}>
                             <AgentCount
-                                online={overview?.overview?.summary?.onlineAgents}
-                                count={overview?.overview?.summary?.totalAgents}
+                                online={overview?.summary?.onlineAgents}
+                                count={overview?.summary?.totalAgents}
                             />
                             <AvgCPU
-                                value={overview?.overview?.summary?.averageCPUUsage}
+                                value={overview?.summary?.averageCPUUsage}
                             />
                             <AvgMem
-                                value={overview?.overview?.summary?.averageMemoryUsage}
+                                value={overview?.summary?.averageMemoryUsage}
                             />
                             {/* <label>Среднее использование CPU </label>
                             <span>{overview?.overview?.summary?.averageCPUUsage.toFixed(2)}%</span>
@@ -106,17 +108,17 @@ export const OverviewPage = ({ overviewProp }: { overviewProp: Overview | undefi
 
                                 <SimplePieChart
                                     Title="Использование CPU"
-                                    PieData={CountDistToPieList(overview.overview.summary.cpuUsageDistribution)}
+                                    PieData={CountDistToPieList(overview.summary.cpuUsageDistribution)}
                                 />
 
                                 <SimplePieChart
                                     Title="Использование памяти"
-                                    PieData={CountDistToPieList(overview.overview.summary.memoryUsageDistribution)}
+                                    PieData={CountDistToPieList(overview.summary.memoryUsageDistribution)}
                                 />
 
                                 <SimplePieChart
                                     Title="Использование диска"
-                                    PieData={CountDistToPieList(overview.overview.summary.diskUsageDistribution)}
+                                    PieData={CountDistToPieList(overview.summary.diskUsageDistribution)}
                                 />
                             </div>
                         </div>
@@ -132,14 +134,14 @@ export const OverviewPage = ({ overviewProp }: { overviewProp: Overview | undefi
                                         </tr>
                                     </thead> */}
                                     <tbody>
-                                        {overview?.overview?.topN?.cpuUsage?.map((agent) => (
-                                            agent.name != "" &&
-                                            <tr key={agent.id}>
-                                                <td><Link to={`/agents/${agent.id}`}>{agent.name}</Link></td>
-                                                <td><LoadBar value={agent.cpuUsage} width={70} height={10} /></td>
-                                                <td>{agent.cpuUsage.toFixed(2)}%</td>
-                                            </tr>
-                                        ))}
+                                    {overview.topN?.cpuUsage?.map((agent) => (
+                                        agent.name != "" &&
+                                        <tr key={agent.id}>
+                                            <td><Link to={`/agents/${agent.id}`}>{agent.name}</Link></td>
+                                            <td><LoadBar value={agent.cpuUsage} width={70} height={10}/></td>
+                                            <td>{agent.cpuUsage.toFixed(2)}%</td>
+                                        </tr>
+                                    ))}
                                     </tbody>
                                 </table>
                             </div>
@@ -153,14 +155,14 @@ export const OverviewPage = ({ overviewProp }: { overviewProp: Overview | undefi
                                         </tr>
                                     </thead> */}
                                     <tbody>
-                                        {overview?.overview?.topN?.memoryUsage?.map((agent) => (
-                                            agent.name != "" &&
-                                            <tr key={agent.id}>
-                                                <td><Link to={`/agents/${agent.id}`}>{agent.name}</Link></td>
-                                                <td><LoadBar value={agent.memoryUsage} width={70} height={10} /></td>
-                                                <td>{agent.memoryUsage.toFixed(2)}%</td>
-                                            </tr>
-                                        ))}
+                                    {overview?.topN?.memoryUsage?.map((agent) => (
+                                        agent.name != "" &&
+                                        <tr key={agent.id}>
+                                            <td><Link to={`/agents/${agent.id}`}>{agent.name}</Link></td>
+                                            <td><LoadBar value={agent.memoryUsage} width={70} height={10}/></td>
+                                            <td>{agent.memoryUsage.toFixed(2)}%</td>
+                                        </tr>
+                                    ))}
                                     </tbody>
                                 </table>
                             </div>

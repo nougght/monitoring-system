@@ -1,35 +1,12 @@
-
-import { useQuery } from '@tanstack/react-query';
-import { getAgentSpecs } from '../api/client/monitoringServerAPI';
-import type {Error} from './common'
-import type {Specs} from '../../../shared/ui/src/domain/specs';
-import { convertSpecsFromDTO } from '../api/mapper';
-
-interface getSpecsResult {
-    specs?: Specs
-    error: Error | null
-}
-
-const getSpecs = async (id: string): Promise<getSpecsResult> => {
-    const resp = await getAgentSpecs(id);
-    return resp.status == 200 ?
-    {
-        specs: convertSpecsFromDTO(resp.data),
-        error: null
-    } : 
-    {
-        error: {
-            status: resp.status,
-            message: JSON.stringify(resp.data)
-        }
-    }
-}
+import {useQuery} from '@tanstack/react-query';
+import {getAgentSpecs} from '../api/client/monitoringServerAPI';
+import {convertSpecsFromDTO} from '../api/mapper';
 
 
 export function useSpecs(id: string) {
     return useQuery({
         queryKey: ['specs'],
-        queryFn: () => getSpecs(id),
+        queryFn: async () => convertSpecsFromDTO(await getAgentSpecs(id)),
         retry: 2,
     });
 }
